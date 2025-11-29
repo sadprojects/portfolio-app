@@ -1,57 +1,48 @@
-import useDimensions from '@hooks/useDimensions';
-import { useEffect, useRef } from 'react';
-const Loader = ({ duration }: { duration?: number }) => {
-  const characters = 'LOADING';
-  const canvasRef = useRef(null);
-  const [, width, height] = useDimensions();
+import { memo } from 'react';
+import styled, { keyframes } from 'styled-components';
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    canvas.width = width;
-    canvas.height = height;
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
 
-    const fontSize = 16;
-    const columns = canvas.width / fontSize;
-    const drops = Array.from({ length: columns }, () => Math.floor(Math.random() * -100));
+const pulse = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+`;
 
-    function draw() {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+const LoaderContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 2rem;
+`;
 
-      ctx.fillStyle = '#0f0';
-      ctx.font = `${fontSize}px monospace`;
+const Spinner = styled.div`
+  width: 48px;
+  height: 48px;
+  border: 3px solid ${({ theme }) => theme.colors.border};
+  border-top-color: ${({ theme }) => theme.colors.foreground};
+  border-radius: 50%;
+  animation: ${spin} 0.8s linear infinite;
+`;
 
-      for (let i = 0; i < drops.length; i++) {
-        const text = characters.charAt(Math.floor(Math.random() * characters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+const LoadingText = styled.div`
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  animation: ${pulse} 1.5s ease-in-out infinite;
+`;
 
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
-          drops[i] = Math.floor(Math.random() * -20);
-        } else {
-          drops[i]++;
-        }
-      }
-
-      requestAnimationFrame(draw);
-    }
-
-    draw();
-  }, [width, height]);
-
-  const loaderStyle = duration
-    ? {
-        animation: `fadeInOut ${duration}ms infinite`,
-      }
-    : {};
-
+export const Loader = memo(() => {
   return (
-    <div
-      className='loader'
-      style={loaderStyle}>
-      <canvas ref={canvasRef}></canvas>
-    </div>
+    <LoaderContainer>
+      <Spinner />
+      <LoadingText>Loading...</LoadingText>
+    </LoaderContainer>
   );
-};
-
-export default Loader;
+});

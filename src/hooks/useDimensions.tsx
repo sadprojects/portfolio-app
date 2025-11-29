@@ -1,5 +1,5 @@
 import { BREAKPOINTS } from '@constants/breakpoints';
-import { debounce } from '@helpers/helpers';
+import { debounce } from '@utils/helpers';
 import { useLayoutEffect, useState } from 'react';
 
 const useDimensions = (): [boolean, number, number] => {

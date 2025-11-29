@@ -1,4 +1,4 @@
-import { ComponentType, LazyExoticComponent } from 'react';
+import { ComponentType, JSX, LazyExoticComponent } from 'react';
 import { RoutesProps } from 'react-router-dom';
 
 export interface Route extends RoutesProps {
