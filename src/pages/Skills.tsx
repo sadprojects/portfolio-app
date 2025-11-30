@@ -13,7 +13,7 @@ const SkillsContainer = styled.div`
 
 const Header = styled.div`
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: clamp(2rem, 5vw, 4rem);
 `;
 
 const Title = styled(motion.h1)`
@@ -23,7 +23,7 @@ const Title = styled(motion.h1)`
 `;
 
 const Subtitle = styled(motion.p)`
-  font-size: 1.125rem;
+  font-size: clamp(1rem, 2vw, 1.125rem);
   color: ${({ theme }) => theme.colors.secondary};
   max-width: 600px;
   margin: 0 auto;
@@ -31,40 +31,32 @@ const Subtitle = styled(motion.p)`
 
 const SkillsGrid = styled(motion.div)`
   display: grid;
-  gap: 3rem;
-
-  @media (max-width: 768px) {
-    gap: 2rem;
-  }
+  gap: clamp(1.5rem, 4vw, 3rem);
 `;
 
 const SkillSection = styled(motion.section)`
   background-color: ${({ theme }) => theme.colors.card};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
-  padding: 2.5rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
   transition: all ${({ theme }) => theme.transitions.normal};
 
   &:hover {
     border-color: ${({ theme }) => theme.colors.foreground};
     box-shadow: ${({ theme }) => theme.shadows.large};
   }
-
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
 `;
 
 const SectionHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
+  margin-bottom: clamp(1.5rem, 3vw, 2rem);
 `;
 
 const SectionIcon = styled.div<{ $color?: string }>`
-  width: 48px;
-  height: 48px;
+  width: clamp(40px, 8vw, 48px);
+  height: clamp(40px, 8vw, 48px);
   border-radius: 0.75rem;
   background: linear-gradient(
     135deg,
@@ -79,25 +71,20 @@ const SectionIcon = styled.div<{ $color?: string }>`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 1.75rem;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
   font-weight: 700;
   margin: 0;
-
-  @media (max-width: 768px) {
-    font-size: 1.5rem;
-  }
 `;
 
 // Professional Skills
 const SkillsList = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 80px), 1fr));
+  gap: clamp(0.75rem, 2vw, 1.5rem);
   padding: 1rem 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: 600px) {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
   }
 `;
 
@@ -107,10 +94,10 @@ const SkillItem = styled.div`
   align-items: center;
   gap: 0.75rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 600px) {
     flex-direction: column;
     justify-content: flex-start;
-    align-items: stretch;
+    align-items: flex-start;
     gap: 0.5rem;
   }
 `;
@@ -123,11 +110,10 @@ const SkillBarContainer = styled.div`
   justify-content: center;
   position: relative;
 
-  @media (max-width: 768px) {
-    width: 100%;
+  @media (max-width: 600px) {
     height: 40px;
     align-items: center;
-    position: relative;
+    justify-content: flex-start;
   }
 `;
 
@@ -152,7 +138,7 @@ const SkillBar = styled(motion.div)<{ $level: number }>`
     box-shadow: ${({ theme }) => theme.shadows.medium};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 600px) {
     max-width: none;
     height: 100%;
     background: linear-gradient(
@@ -163,7 +149,7 @@ const SkillBar = styled(motion.div)<{ $level: number }>`
     border-radius: 0.5rem 0 0 0.5rem;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 0.75rem;
+    padding: 0 clamp(0.5rem, 2vw, 0.75rem);
 
     &:hover {
       transform: translateX(4px);
@@ -172,25 +158,20 @@ const SkillBar = styled(motion.div)<{ $level: number }>`
 `;
 
 const SkillLevel = styled.span`
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
   font-weight: 700;
   color: ${({ theme }) => theme.colors.background};
   z-index: 1;
-
-  @media (max-width: 768px) {
-    font-size: 0.75rem;
-  }
 `;
 
 const SkillName = styled.span`
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
   text-align: center;
   word-break: break-word;
   line-height: 1.2;
 
-  @media (max-width: 768px) {
-    font-size: 0.875rem;
+  @media (max-width: 600px) {
     text-align: left;
     order: -1;
     margin-bottom: 0.25rem;
@@ -201,16 +182,16 @@ const SkillName = styled.span`
 const TagsGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: clamp(0.5rem, 2vw, 1rem);
 `;
 
 const Tag = styled.div`
-  padding: 0.75rem 1.25rem;
+  padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1.25rem);
   background-color: ${({ theme }) => theme.colors.accent};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 0.5rem;
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: clamp(0.8125rem, 1.5vw, 0.9375rem);
   transition: all ${({ theme }) => theme.transitions.fast};
   cursor: default;
 
@@ -224,24 +205,17 @@ const Tag = styled.div`
 // Personal Skills
 const PersonalSkillsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
   gap: 1rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 480px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
 `;
 
 const PersonalSkillCard = styled.div`
-  padding: 1rem 1.5rem;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.5rem);
   background-color: ${({ theme }) => theme.colors.accent};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 0.5rem;
   font-weight: 600;
+  font-size: clamp(0.8125rem, 1.5vw, 1rem);
   text-align: center;
   display: flex;
   align-items: center;
@@ -257,23 +231,13 @@ const PersonalSkillCard = styled.div`
 // Codewars Styles
 const CodewarsStats = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
   gap: 1rem;
   margin-top: 1.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    justify-items: center;
-
-    & > *:nth-child(3) {
-      grid-column: 1 / -1;
-      max-width: 200px;
-    }
-  }
 `;
 
 const CodewarsStat = styled.div`
-  padding: 1.5rem;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
   background-color: ${({ theme }) => theme.colors.accent};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 0.75rem;
@@ -288,7 +252,7 @@ const CodewarsStat = styled.div`
 `;
 
 const CodewarsStatValue = styled.div`
-  font-size: 1.75rem;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
   font-weight: 700;
   margin-bottom: 0.5rem;
   display: flex;
@@ -299,7 +263,7 @@ const CodewarsStatValue = styled.div`
 `;
 
 const CodewarsStatLabel = styled.div`
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
   color: ${({ theme }) => theme.colors.secondary};
   text-transform: uppercase;
   letter-spacing: 0.05em;

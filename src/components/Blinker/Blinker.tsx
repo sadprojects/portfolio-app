@@ -75,6 +75,7 @@ const Blinker = ({
     <Tag className={className} style={{ minHeight: '1.2em', display: 'inline-block' }}>
       {displayedText}
       <span
+        className="blinker-cursor"
         style={{
           display: 'inline-block',
           width: '2.75rem',
@@ -89,6 +90,11 @@ const Blinker = ({
         @keyframes blink {
           0%, 50% { opacity: 1; }
           51%, 100% { opacity: 0; }
+        }
+        @media (max-width: 768px) {
+          .blinker-cursor {
+            width: 0.75rem !important;
+          }
         }
       `}</style>
     </Tag>

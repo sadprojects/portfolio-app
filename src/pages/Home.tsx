@@ -24,10 +24,16 @@ const HomeSection = styled.section`
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  scroll-margin-top: 4rem;
+
+  @media (max-width: 768px) {
+    scroll-margin-top: 3.5rem;
+  }
 `;
 
 const Home = memo(() => {
   const [isDraggingTOC, setIsDraggingTOC] = useState(false);
+  const [isTOCExpanded, setIsTOCExpanded] = useState(false);
 
   // Extract data and derived values
   const {
@@ -59,6 +65,7 @@ const Home = memo(() => {
         sections={sections}
         activeSection={activeSection}
         onNavigate={scrollToSection}
+        isTOCExpanded={isTOCExpanded}
       />
       <PageContainer ref={containerRef}>
         <TableOfContents
@@ -66,6 +73,7 @@ const Home = memo(() => {
           activeSection={activeSection}
           onNavigate={scrollToSection}
           onDraggingChange={setIsDraggingTOC}
+          onExpandedChange={setIsTOCExpanded}
         />
 
         <HomeSection data-section="home">

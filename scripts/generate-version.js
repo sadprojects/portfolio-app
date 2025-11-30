@@ -10,7 +10,7 @@ const __dirname = dirname(__filename);
 const versionPath = join(__dirname, '../src/version.json');
 
 // Read existing version.json or create new one
-let currentVersion = '0.0.0';
+let currentVersion = '0.0.2';
 if (existsSync(versionPath)) {
   try {
     const existing = JSON.parse(readFileSync(versionPath, 'utf-8'));

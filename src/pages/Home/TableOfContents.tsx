@@ -27,7 +27,7 @@ const TableOfContentsNav = styled.nav<{ $expanded: boolean }>`
   flex-direction: column;
   gap: 0;
   padding: 1rem;
-  background-color: ${({ theme }) => `${theme.colors.card}40`};
+  background-color: ${({ theme }) => `${theme.colors.card}80`};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   backdrop-filter: blur(24px) saturate(220%);
@@ -202,9 +202,10 @@ interface TableOfContentsProps {
   activeSection: string;
   onNavigate: (sectionId: string) => void;
   onDraggingChange?: (isDragging: boolean) => void;
+  onExpandedChange?: (isExpanded: boolean) => void;
 }
 
-export const TableOfContents = memo(({ sections, activeSection, onNavigate, onDraggingChange }: TableOfContentsProps) => {
+export const TableOfContents = memo(({ sections, activeSection, onNavigate, onDraggingChange, onExpandedChange }: TableOfContentsProps) => {
   const [expanded, setExpanded] = useState(false);
   const [visible, setVisible] = useState(() => {
     // Start hidden on tablet, visible on desktop
@@ -224,6 +225,11 @@ export const TableOfContents = memo(({ sections, activeSection, onNavigate, onDr
   const navRef = useRef<HTMLElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Notify parent when expanded changes
+  useEffect(() => {
+    onExpandedChange?.(expanded && visible);
+  }, [expanded, visible, onExpandedChange]);
 
   // Check if device is tablet
   const isTablet = useCallback(() => {

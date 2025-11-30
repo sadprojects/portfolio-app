@@ -62,7 +62,7 @@ const ExperienceCard = styled(motion.div)<{ $isCurrent?: boolean }>`
     content: '';
     position: absolute;
     left: -3.0375rem;
-    top: 0.5rem;
+    top: 50%;
     width: 12px;
     height: 12px;
     border-radius: 50%;
@@ -80,7 +80,7 @@ const ExperienceCard = styled(motion.div)<{ $isCurrent?: boolean }>`
     content: '';
     position: absolute;
     left: -3.1625rem;
-    top: 0.375rem;
+    top: 49.3%;
     width: 16px;
     height: 16px;
     border-radius: 50%;

@@ -23,9 +23,11 @@ const Section = styled(motion.section)`
   flex-direction: column;
   position: relative;
   padding: 8rem 2rem 4rem;
+  scroll-margin-top: 4rem;
 
   @media (max-width: 768px) {
     padding: 6rem 1.5rem 3rem;
+    scroll-margin-top: 3.5rem;
   }
 `;
 

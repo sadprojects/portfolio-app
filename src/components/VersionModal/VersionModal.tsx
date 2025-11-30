@@ -2,6 +2,7 @@ import versionInfo from '@/version.json';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Package, X } from 'lucide-react';
 import { memo } from 'react';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 
 const Overlay = styled(motion.div)`
@@ -108,7 +109,7 @@ interface VersionModalProps {
 }
 
 export const VersionModal = memo(({ isOpen, onClose }: VersionModalProps) => {
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <Overlay
@@ -146,6 +147,9 @@ export const VersionModal = memo(({ isOpen, onClose }: VersionModalProps) => {
       )}
     </AnimatePresence>
   );
+
+  // Render modal in a portal to ensure proper stacking
+  return createPortal(modalContent, document.body);
 });
 
 VersionModal.displayName = 'VersionModal';

@@ -32,14 +32,10 @@ const Subtitle = styled(motion.p)`
 
 const TabsContainer = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: clamp(0.5rem, 2vw, 1rem);
   justify-content: center;
   margin-bottom: 3rem;
   flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    gap: 0.5rem;
-  }
 `;
 
 const Tab = styled.button<{ $active: boolean }>`
@@ -47,7 +43,7 @@ const Tab = styled.button<{ $active: boolean }>`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 1rem 2rem;
+  padding: clamp(0.625rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem);
   background-color: ${({ theme, $active }) =>
     $active ? theme.colors.foreground : 'transparent'};
   color: ${({ theme, $active }) =>
@@ -55,7 +51,7 @@ const Tab = styled.button<{ $active: boolean }>`
   border: 2px solid ${({ theme }) => theme.colors.border};
   border-radius: 0.5rem;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: clamp(0.8125rem, 2vw, 1rem);
   cursor: pointer;
   transition: all ${({ theme }) => theme.transitions.fast};
   text-align: center;
@@ -65,33 +61,17 @@ const Tab = styled.button<{ $active: boolean }>`
     border-color: ${({ theme }) => theme.colors.foreground};
   }
 
-  @media (max-width: 768px) {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
-    gap: 0.375rem;
-
-    svg {
-      width: 16px;
-      height: 16px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.625rem 1rem;
-    font-size: 0.8125rem;
+  svg {
+    width: clamp(16px, 3vw, 20px);
+    height: clamp(16px, 3vw, 20px);
   }
 `;
 
 // Photography Styles
 const PhotoGrid = styled(motion.div)`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
 `;
 
 const PhotoCard = styled(motion.a)`
@@ -137,7 +117,7 @@ const PhotoOverlay = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1.5rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
   z-index: 1;
   opacity: 0;
   transform: translateY(10px);
@@ -151,7 +131,7 @@ const PhotoOverlay = styled.div`
 
 const PhotoAlt = styled.p`
   color: white;
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 2vw, 0.875rem);
   font-weight: 500;
   margin-bottom: 0.5rem;
 `;
@@ -161,20 +141,15 @@ const PhotoLink = styled.div`
   align-items: center;
   gap: 0.25rem;
   color: white;
-  font-size: 0.75rem;
+  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
   opacity: 0.9;
 `;
 
 // Games Styles
 const GamesGrid = styled(motion.div)`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 2rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
 `;
 
 const GameCard = styled(motion.div)`
@@ -182,7 +157,7 @@ const GameCard = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 2rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
   background-color: ${({ theme }) => theme.colors.card};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
@@ -197,8 +172,8 @@ const GameCard = styled(motion.div)`
 `;
 
 const GameIconWrapper = styled.div`
-  width: 80px;
-  height: 80px;
+  width: clamp(60px, 15vw, 80px);
+  height: clamp(60px, 15vw, 80px);
   border-radius: 0.75rem;
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.background};
@@ -215,7 +190,7 @@ const GameIconWrapper = styled.div`
 `;
 
 const GameTitle = styled.h3`
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 2vw, 1rem);
   font-weight: 600;
   text-align: center;
   color: ${({ theme }) => theme.colors.foreground};
@@ -250,27 +225,18 @@ const SpeedSkatingImage = styled.img`
 `;
 
 const SpeedSkatingContent = styled.div`
-  padding: 2.5rem;
-
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
+  padding: clamp(1.5rem, 4vw, 2.5rem);
 `;
 
 const SpeedSkatingTitle = styled.h2`
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
   color: ${({ theme }) => theme.colors.foreground};
-
-  @media (max-width: 768px) {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
 `;
 
 const SpeedSkatingParagraph = styled.p`
-  font-size: 1.125rem;
+  font-size: clamp(1rem, 2vw, 1.125rem);
   line-height: 1.8;
   color: ${({ theme }) => theme.colors.secondary};
   margin-bottom: 1.5rem;
@@ -280,7 +246,6 @@ const SpeedSkatingParagraph = styled.p`
   }
 
   @media (max-width: 768px) {
-    font-size: 1rem;
     line-height: 1.6;
   }
 `;

@@ -4,11 +4,11 @@ import useDimensions from '@hooks/useDimensions';
 import type { SectionConfig } from '@utils/sectionBuilder';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, Moon, Sun, X } from 'lucide-react';
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const HeaderContainer = styled.header`
+const HeaderContainer = styled(motion.header)`
   position: sticky;
   top: 0;
   z-index: 100;
@@ -58,12 +58,22 @@ const Logo = styled.button`
 
 const LogoFirstName = styled.span`
   font-size: 2.75rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.925rem; /* 30% smaller */
+  }
 `;
 
 const LogoLastName = styled.span`
   font-size: 2.75rem;
   padding-left: 2rem;
   margin-top: -0.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.925rem; /* 30% smaller */
+    padding-left: 1.4rem; /* Proportionally smaller */
+    margin-top: -0.35rem; /* Proportionally smaller */
+  }
 `;
 
 const RightActions = styled.div`
@@ -179,14 +189,46 @@ interface HeaderProps {
   sections?: SectionConfig[];
   activeSection?: string;
   onNavigate?: (sectionId: string) => void;
+  isTOCExpanded?: boolean;
 }
 
-export const Header = memo(({ sections = [], onNavigate }: HeaderProps = {}) => {
+export const Header = memo(({ sections = [], onNavigate, isTOCExpanded = false }: HeaderProps = {}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile] = useDimensions();
   const { mode, toggleTheme } = useTheme();
   const navRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const [isTabletOrMobile, setIsTabletOrMobile] = useState(false);
+
+  // Detect mobile/tablet viewport
+  useEffect(() => {
+    const checkViewport = () => {
+      setIsTabletOrMobile(window.innerWidth <= 1024);
+    };
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+    return () => window.removeEventListener('resize', checkViewport);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show header when scrolling up, hide when scrolling down
+      if (currentScrollY < lastScrollY.current || currentScrollY < 100) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setIsVisible(false);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const openMenu = useCallback(() => setIsOpen(true), []);
   const closeMenu = useCallback(() => setIsOpen(false), []);
@@ -210,7 +252,11 @@ export const Header = memo(({ sections = [], onNavigate }: HeaderProps = {}) => 
 
   return (
     <>
-      <HeaderContainer>
+      <HeaderContainer
+        initial={{ y: 0 }}
+        animate={{ y: (isVisible && !(isTabletOrMobile && isTOCExpanded)) ? 0 : '-100%' }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      >
       <Nav>
         <Logo onClick={handleLogoClick} aria-label="Scroll to top">
           <LogoFirstName>Silviu</LogoFirstName>
