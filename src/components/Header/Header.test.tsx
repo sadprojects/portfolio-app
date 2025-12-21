@@ -1,8 +1,8 @@
+import { AccessibilityProvider } from '@contexts/AccessibilityContext';
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Home } from 'lucide-react';
 import { BrowserRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
 import { Header } from './Header';
 
 const mockSections = [
@@ -11,38 +11,38 @@ const mockSections = [
   { id: 'contact', label: 'Contact', icon: Home, enabled: true, order: 2 },
 ];
 
-describe('Header', () => {
-  it('should render the header with logo', () => {
-    render(
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <AccessibilityProvider>
       <ThemeProvider>
         <BrowserRouter>
-          <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
+          {ui}
         </BrowserRouter>
       </ThemeProvider>
+    </AccessibilityProvider>
+  );
+};
+
+describe('Header', () => {
+  it('should render the header with logo', () => {
+    renderWithProviders(
+      <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
     );
     expect(screen.getByText(/Silviu/i)).toBeDefined();
     expect(screen.getByText(/Dinu/i)).toBeDefined();
   });
 
   it('should render theme toggle button', () => {
-    const { container } = render(
-      <ThemeProvider>
-        <BrowserRouter>
-          <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
-        </BrowserRouter>
-      </ThemeProvider>
+    const { container } = renderWithProviders(
+      <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
     );
     const themeButton = container.querySelector('button[aria-label="Toggle theme"]');
     expect(themeButton).toBeDefined();
   });
 
   it('should toggle theme when theme button is clicked', () => {
-    const { container } = render(
-      <ThemeProvider>
-        <BrowserRouter>
-          <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
-        </BrowserRouter>
-      </ThemeProvider>
+    const { container } = renderWithProviders(
+      <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
     );
 
     const themeButton = container.querySelector('button[aria-label="Toggle theme"]');
@@ -54,12 +54,8 @@ describe('Header', () => {
 
   it('should call onNavigate when logo is clicked', () => {
     const mockNavigate = vi.fn();
-    const { container } = render(
-      <ThemeProvider>
-        <BrowserRouter>
-          <Header sections={mockSections} activeSection="home" onNavigate={mockNavigate} />
-        </BrowserRouter>
-      </ThemeProvider>
+    const { container } = renderWithProviders(
+      <Header sections={mockSections} activeSection="home" onNavigate={mockNavigate} />
     );
 
     const logo = container.querySelector('button[aria-label="Scroll to top"]');
@@ -74,12 +70,8 @@ describe('Header', () => {
   it('should render mobile menu button on mobile', () => {
     global.innerWidth = 500;
 
-    const { container } = render(
-      <ThemeProvider>
-        <BrowserRouter>
-          <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
-        </BrowserRouter>
-      </ThemeProvider>
+    const { container } = renderWithProviders(
+      <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
     );
 
     const menuButton = container.querySelector('button[aria-label="Open menu"]');
@@ -89,12 +81,8 @@ describe('Header', () => {
   it('should open and close mobile menu', () => {
     global.innerWidth = 500;
 
-    const { container } = render(
-      <ThemeProvider>
-        <BrowserRouter>
-          <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
-        </BrowserRouter>
-      </ThemeProvider>
+    const { container } = renderWithProviders(
+      <Header sections={mockSections} activeSection="home" onNavigate={vi.fn()} />
     );
 
     const menuButton = container.querySelector('button[aria-label="Open menu"]');
@@ -114,12 +102,8 @@ describe('Header', () => {
     global.innerWidth = 500;
     const mockNavigate = vi.fn();
 
-    const { container } = render(
-      <ThemeProvider>
-        <BrowserRouter>
-          <Header sections={mockSections} activeSection="home" onNavigate={mockNavigate} />
-        </BrowserRouter>
-      </ThemeProvider>
+    const { container } = renderWithProviders(
+      <Header sections={mockSections} activeSection="home" onNavigate={mockNavigate} />
     );
 
     const menuButton = container.querySelector('button[aria-label="Open menu"]');
@@ -139,4 +123,3 @@ describe('Header', () => {
     }
   });
 });
-

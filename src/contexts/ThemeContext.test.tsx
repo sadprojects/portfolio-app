@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react';
 import { act } from 'react';
-import { describe, expect, it, vi } from 'vitest';
 import { ThemeProvider, useTheme } from './ThemeContext';
 
 describe('ThemeContext', () => {

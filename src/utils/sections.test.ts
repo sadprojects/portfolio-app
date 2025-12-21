@@ -1,5 +1,4 @@
 import { getEnabledSections, getSectionOrder, isSectionEnabled, SECTION_METADATA } from '@utils/sections';
-import { describe, expect, it } from 'vitest';
 
 describe('sections utility', () => {
   describe('isSectionEnabled', () => {

@@ -23,18 +23,23 @@ try {
   // Increment patch version
   const newVersion = `${major}.${minor}.${patch + 1}`;
 
-  // Update version info
+  // Update version only, preserve buildTime from the build step
   versionData.version = newVersion;
+  // Note: buildTime is set during prebuild, not here
 
   // Write updated version
   writeFileSync(versionPath, JSON.stringify(versionData, null, 2) + '\n');
 
-  console.log(`✓ Version incremented: ${versionParts.join('.')} → ${newVersion}`);
+  console.log(
+    `✓ Version incremented: ${versionParts.join('.')} → ${newVersion}`,
+  );
 
   // Git add and commit with [skip ci]
   try {
     execSync('git add src/version.json', { stdio: 'inherit' });
-    execSync(`git commit -m "[skip ci] bump version to ${newVersion}"`, { stdio: 'inherit' });
+    execSync(`git commit -m "[skip ci] bump version to ${newVersion}"`, {
+      stdio: 'inherit',
+    });
     console.log('✓ Changes committed to repository');
 
     // Optionally push to remote
@@ -45,7 +50,6 @@ try {
     console.warn('⚠ Git commit failed. You may need to commit manually.');
     console.warn('Error:', gitError.message);
   }
-
 } catch (error) {
   console.error('✗ Post-deployment version bump failed:', error.message);
   process.exit(1);

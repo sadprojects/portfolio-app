@@ -22,7 +22,6 @@ export default defineConfig({
         '**/routes.ts',
         '**/*.test.{ts,tsx}',
         '**/mockData',
-        'src/main.tsx',
         'dist/**',
         '.vite/**',
         '**/*.mjs',

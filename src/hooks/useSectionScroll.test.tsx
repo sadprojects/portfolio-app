@@ -1,6 +1,10 @@
+import { AccessibilityProvider } from '@contexts/AccessibilityContext';
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSectionScroll } from './useSectionScroll';
+
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <AccessibilityProvider>{children}</AccessibilityProvider>
+);
 
 describe('useSectionScroll', () => {
   let mockContainer: HTMLDivElement;
@@ -97,7 +101,7 @@ describe('useSectionScroll', () => {
   });
 
   it('should initialize with default active section', () => {
-    const { result } = renderHook(() => useSectionScroll());
+    const { result } = renderHook(() => useSectionScroll(), { wrapper });
 
     expect(result.current.activeSection).toBeDefined();
     expect(result.current.containerRef).toBeDefined();
@@ -106,7 +110,7 @@ describe('useSectionScroll', () => {
 
   it('should update active section when observer fires', () => {
     const onSectionChange = vi.fn();
-    const { result } = renderHook(() => useSectionScroll({ onSectionChange }));
+    const { result } = renderHook(() => useSectionScroll({ onSectionChange }), { wrapper });
 
     // Set container ref
     result.current.containerRef.current = mockContainer;
@@ -119,7 +123,7 @@ describe('useSectionScroll', () => {
 
   it('should call onSectionChange callback when section changes', () => {
     const onSectionChange = vi.fn();
-    const { result } = renderHook(() => useSectionScroll({ onSectionChange }));
+    const { result } = renderHook(() => useSectionScroll({ onSectionChange }), { wrapper });
     result.current.containerRef.current = mockContainer;
 
     // IntersectionObserver triggers immediately in our mock
@@ -133,7 +137,7 @@ describe('useSectionScroll', () => {
     // Mock scrollIntoView for the section
     mockSections[1].scrollIntoView = scrollIntoViewMock;
 
-    const { result } = renderHook(() => useSectionScroll());
+    const { result } = renderHook(() => useSectionScroll(), { wrapper });
     result.current.scrollToSection('projects');
 
     // Wait for the async scroll logic
@@ -146,7 +150,7 @@ describe('useSectionScroll', () => {
   });
 
   it('should handle scrollToSection with non-existent section', () => {
-    const { result } = renderHook(() => useSectionScroll());
+    const { result } = renderHook(() => useSectionScroll(), { wrapper });
 
     // Should not throw
     expect(() => {
@@ -170,7 +174,7 @@ describe('useSectionScroll', () => {
       toJSON: () => ({}),
     });
 
-    renderHook(() => useSectionScroll());
+    renderHook(() => useSectionScroll(), { wrapper });
 
     // Advance timers to allow hash scroll to execute
     await vi.advanceTimersByTimeAsync(500);
@@ -195,7 +199,7 @@ describe('useSectionScroll', () => {
       toJSON: () => ({}),
     });
 
-    renderHook(() => useSectionScroll());
+    renderHook(() => useSectionScroll(), { wrapper });
 
     // Advance timers to allow scroll and URL cleanup
     await vi.advanceTimersByTimeAsync(1500);
@@ -207,14 +211,14 @@ describe('useSectionScroll', () => {
   it('should retry scrolling to hash if section not found initially', () => {
     window.location.hash = '#delayed';
 
-    renderHook(() => useSectionScroll());
+    renderHook(() => useSectionScroll(), { wrapper });
 
     // Verify hook handles missing sections gracefully
     expect(window.location.hash).toBe('#delayed');
   });
 
   it('should handle scroll events with visibility calculation', () => {
-    const { result } = renderHook(() => useSectionScroll());
+    const { result } = renderHook(() => useSectionScroll(), { wrapper });
     result.current.containerRef.current = mockContainer;
 
     // Mock getBoundingClientRect
@@ -252,7 +256,7 @@ describe('useSectionScroll', () => {
       section.scrollIntoView = scrollIntoViewMock;
     });
 
-    const { result } = renderHook(() => useSectionScroll());
+    const { result } = renderHook(() => useSectionScroll(), { wrapper });
     result.current.containerRef.current = mockContainer;
 
     const scrollEvent = new Event('scroll');
@@ -263,7 +267,7 @@ describe('useSectionScroll', () => {
   });
 
   it('should cleanup observers and listeners on unmount', () => {
-    const { result, unmount } = renderHook(() => useSectionScroll());
+    const { result, unmount } = renderHook(() => useSectionScroll(), { wrapper });
     result.current.containerRef.current = mockContainer;
 
     // Just verify unmount doesn't crash
@@ -271,7 +275,7 @@ describe('useSectionScroll', () => {
   });
 
   it('should not crash if containerRef is null', () => {
-    const { result } = renderHook(() => useSectionScroll());
+    const { result } = renderHook(() => useSectionScroll(), { wrapper });
 
     // Leave containerRef as null
     expect(result.current.containerRef.current).toBeNull();
@@ -287,7 +291,7 @@ describe('useSectionScroll', () => {
     mockContainer.appendChild(sectionWithoutAttr);
 
     const onSectionChange = vi.fn();
-    const { result } = renderHook(() => useSectionScroll({ onSectionChange }));
+    const { result } = renderHook(() => useSectionScroll({ onSectionChange }), { wrapper });
     result.current.containerRef.current = mockContainer;
 
     // Should not crash

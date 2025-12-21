@@ -1,98 +1,62 @@
+import { AccessibilityProvider } from '@contexts/AccessibilityContext';
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Home from './Home';
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <MemoryRouter>
+      <AccessibilityProvider>
+        <ThemeProvider>
+          {ui}
+        </ThemeProvider>
+      </AccessibilityProvider>
+    </MemoryRouter>
+  );
+};
 
 describe('Home Page', () => {
   it('renders home page without crashing', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
     expect(container.firstChild).toBeDefined();
   });
 
   it('renders main container', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
     expect(container.querySelector('[data-section]')).toBeDefined();
   });
 
   it('includes sections structure', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
     const sections = container.querySelectorAll('[data-section]');
     expect(sections.length).toBeGreaterThan(0);
   });
 
   it('implements scroll functionality', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
     // Just verify component renders with scroll container
     expect(container.firstChild).toBeDefined();
   });
 
   it('shows navigation structure', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
     expect(container.firstChild).toBeDefined();
   });
 
   it('renders all main sections', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
     expect(container.querySelector('[data-section]')).toBeDefined();
   });
 
   it('initializes without errors', () => {
     expect(() => {
-      render(
-        <MemoryRouter>
-          <ThemeProvider>
-            <Home />
-          </ThemeProvider>
-        </MemoryRouter>
-      );
+      renderWithProviders(<Home />);
     }).not.toThrow();
   });
 
   it('mounts successfully', () => {
-    const { unmount } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { unmount } = renderWithProviders(<Home />);
     expect(unmount).toBeDefined();
   });
 });
@@ -150,13 +114,7 @@ describe('Home Page - Interactions', () => {
   });
 
   it('should scroll to section when TOC button is clicked', async () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
 
     // Wait for component to render
     await vi.advanceTimersByTimeAsync(100);
@@ -187,13 +145,7 @@ describe('Home Page - Interactions', () => {
   }, 10000);
 
   it('should handle View My Work button click', async () => {
-    const { getByText, container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { getByText, container } = renderWithProviders(<Home />);
 
     await vi.advanceTimersByTimeAsync(100);
 
@@ -228,13 +180,7 @@ describe('Home Page - Interactions', () => {
     // Mock URL.createObjectURL
     global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
 
-    const { getByText, queryByText } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { getByText, queryByText } = renderWithProviders(<Home />);
 
     await vi.advanceTimersByTimeAsync(100);
 
@@ -248,13 +194,7 @@ describe('Home Page - Interactions', () => {
   }, 10000);
 
   it('should handle scroll events on container', async () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
 
     const pageContainer = container.querySelector('[data-section]')?.parentElement;
     if (pageContainer) {
@@ -265,13 +205,7 @@ describe('Home Page - Interactions', () => {
   });
 
   it('should update active section on intersection', async () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
 
     await vi.advanceTimersByTimeAsync(100);
 
@@ -279,13 +213,7 @@ describe('Home Page - Interactions', () => {
   }, 10000);
 
   it('should handle scroll snapping logic', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
 
     const pageContainer = container.querySelector('[data-section]')?.parentElement;
     if (pageContainer) {
@@ -303,13 +231,7 @@ describe('Home Page - Interactions', () => {
       value: 500,
     });
 
-    const { container } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { container } = renderWithProviders(<Home />);
 
     const pageContainer = container.querySelector('[data-section]')?.parentElement;
     if (pageContainer) {
@@ -320,13 +242,7 @@ describe('Home Page - Interactions', () => {
   });
 
   it('should cleanup on unmount', () => {
-    const { unmount } = render(
-      <MemoryRouter>
-        <ThemeProvider>
-          <Home />
-        </ThemeProvider>
-      </MemoryRouter>
-    );
+    const { unmount } = renderWithProviders(<Home />);
 
     expect(() => unmount()).not.toThrow();
   });

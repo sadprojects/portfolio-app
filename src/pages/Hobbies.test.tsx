@@ -1,6 +1,5 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { render } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 import Hobbies from './Hobbies';
 
 describe('Hobbies Page', () => {
