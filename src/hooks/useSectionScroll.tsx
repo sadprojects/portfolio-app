@@ -78,9 +78,9 @@ export const useSectionScroll = ({
     return () => observer.disconnect();
   }, [onSectionChange]);
 
-  // Handle scroll snapping - only when enabled via accessibility setting
+  // Handle scroll snapping based on 50% visibility threshold
   useEffect(() => {
-    // Don't set up snap behavior if disabled
+    // Don't set up snap behavior if disabled via accessibility setting
     if (!scrollSnapEnabled) {
       return;
     }
@@ -93,6 +93,8 @@ export const useSectionScroll = ({
     }
 
     let scrollTimeout: NodeJS.Timeout;
+    let currentVisibleSection: string | null = null;
+    const sectionVisibility = new Map<string, number>();
 
     const handleScroll = () => {
       clearTimeout(scrollTimeout);
@@ -100,9 +102,9 @@ export const useSectionScroll = ({
       scrollTimeout = setTimeout(() => {
         const sections = document.querySelectorAll('[data-section]');
         const viewportHeight = window.innerHeight;
-
         let maxVisibility = 0;
         let mostVisibleSection: HTMLElement | null = null;
+        let mostVisibleSectionId: string | null = null;
 
         sections.forEach((section) => {
           const el = section as HTMLElement;
@@ -117,20 +119,42 @@ export const useSectionScroll = ({
           const sectionHeight = Math.min(rect.height, viewportHeight);
           const visibilityPercentage = (visibleHeight / sectionHeight) * 100;
 
+          sectionVisibility.set(sectionId, visibilityPercentage);
+
           if (visibilityPercentage > maxVisibility) {
             maxVisibility = visibilityPercentage;
             mostVisibleSection = el;
+            mostVisibleSectionId = sectionId;
           }
         });
 
-        // Snap to the most visible section
-        if (mostVisibleSection) {
-          (mostVisibleSection as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (currentVisibleSection && mostVisibleSectionId) {
+          const currentVisibility =
+            sectionVisibility.get(currentVisibleSection) || 0;
+
+          if (
+            currentVisibility < 50 &&
+            mostVisibleSectionId !== currentVisibleSection
+          ) {
+            if (mostVisibleSection) {
+              const targetSection = mostVisibleSection as HTMLElement;
+              targetSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+              currentVisibleSection = mostVisibleSectionId;
+            }
+          } else if (currentVisibility >= 50) {
+            currentVisibleSection = mostVisibleSectionId;
+          }
+        } else {
+          currentVisibleSection = mostVisibleSectionId;
         }
       }, 150);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
