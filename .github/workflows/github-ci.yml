@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+      - 'release/**'
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
   workflow_dispatch:
 
 permissions:
@@ -16,8 +21,9 @@ env:
   CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
 
 jobs:
-  build-and-test:
+  lint-and-test:
     runs-on: ubuntu-latest
+    name: Lint & Test
 
     steps:
       - name: Checkout code
@@ -38,6 +44,24 @@ jobs:
       - name: Run tests
         run: npm run test:coverage
 
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    needs: lint-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build project
         run: npm run build
 
@@ -50,7 +74,9 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-test
+    name: Deploy to Production
+    needs: build
+    # Only deploy on push to main or release branches, not on PRs
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: production

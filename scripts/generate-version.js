@@ -20,13 +20,13 @@ if (existsSync(versionPath)) {
   }
 }
 
-// Keep only the version
+// Set the version and build timestamp (epoch ms for timezone-agnostic storage)
 const versionInfo = {
   version: currentVersion,
+  buildTime: Date.now(),
 };
 
 // Write to src/version.json
 writeFileSync(versionPath, JSON.stringify(versionInfo, null, 2) + '\n');
 
 console.log('✓ version.json ready:', versionInfo);
-

@@ -1,6 +1,6 @@
 import versionInfo from '@/version.json';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Package, X } from 'lucide-react';
+import { Calendar, Package, X } from 'lucide-react';
 import { memo } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
@@ -109,6 +109,26 @@ interface VersionModalProps {
 }
 
 export const VersionModal = memo(({ isOpen, onClose }: VersionModalProps) => {
+  // Format the build time (epoch ms) to user's local timezone
+  const formatBuildDate = (epochMs: number | null | undefined): string => {
+    if (!epochMs) return 'Not available';
+    try {
+      const date = new Date(epochMs);
+      return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return 'Not available';
+    }
+  };
+
+  const buildTime = (versionInfo as { version: string; buildTime?: number })
+    .buildTime;
+
   const modalContent = (
     <AnimatePresence>
       {isOpen && (
@@ -126,7 +146,10 @@ export const VersionModal = memo(({ isOpen, onClose }: VersionModalProps) => {
           >
             <Header>
               <Title>Version Info</Title>
-              <CloseButton onClick={onClose} aria-label="Close modal">
+              <CloseButton
+                onClick={onClose}
+                aria-label="Close modal"
+              >
                 <X size={20} />
               </CloseButton>
             </Header>
@@ -139,6 +162,16 @@ export const VersionModal = memo(({ isOpen, onClose }: VersionModalProps) => {
                 <InfoContent>
                   <InfoLabel>Current Version</InfoLabel>
                   <InfoValue>v{versionInfo.version}</InfoValue>
+                </InfoContent>
+              </InfoItem>
+
+              <InfoItem>
+                <IconWrapper>
+                  <Calendar size={20} />
+                </IconWrapper>
+                <InfoContent>
+                  <InfoLabel>Last Built</InfoLabel>
+                  <InfoValue>{formatBuildDate(buildTime)}</InfoValue>
                 </InfoContent>
               </InfoItem>
             </Content>

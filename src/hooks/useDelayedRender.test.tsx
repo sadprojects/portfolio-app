@@ -1,6 +1,5 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import useDelayedRender from './useDelayedRender';
 
 const TestComponent = () => <div>Test Content</div>;

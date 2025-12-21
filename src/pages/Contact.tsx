@@ -1,6 +1,13 @@
 import { contentData } from '@data/content';
 import { motion } from 'framer-motion';
-import { Calendar, Facebook, Github, Linkedin, Mail, MapPin } from 'lucide-react';
+import {
+  Calendar,
+  Facebook,
+  Github,
+  Linkedin,
+  Mail,
+  MapPin,
+} from 'lucide-react';
 import { memo } from 'react';
 import styled from 'styled-components';
 
@@ -56,7 +63,7 @@ const ContactGrid = styled(motion.div)`
   }
 `;
 
-const ContactCard = styled(motion.a)<{ as?: any }>`
+const ContactCard = styled(motion.a)<{ as?: string }>`
   background-color: ${({ theme }) => theme.colors.card};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
@@ -152,9 +159,9 @@ const Contact = memo(() => {
   const { contact, social } = contentData;
 
   // Find social links
-  const githubLink = social?.find(s => s.name === 'github')?.url;
-  const facebookLink = social?.find(s => s.name === 'facebook')?.url;
-  const twitterLink = social?.find(s => s.name === 'twitter')?.url;
+  const githubLink = social?.find((s) => s.name === 'github')?.url;
+  const facebookLink = social?.find((s) => s.name === 'facebook')?.url;
+  const twitterLink = social?.find((s) => s.name === 'twitter')?.url;
 
   // Check what contact methods exist
   const hasEmail = !!contact?.email;
@@ -170,7 +177,7 @@ const Contact = memo(() => {
           <ProfileImage
             src={`/src/assets/images/${contact.profileImage}`}
             alt={contact.name}
-            loading='lazy'
+            loading="lazy"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
@@ -189,7 +196,8 @@ const Contact = memo(() => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Feel free to reach out! I'm always open to discussing new projects, creative ideas, or opportunities.
+            Feel free to reach out! I'm always open to discussing new projects,
+            creative ideas, or opportunities.
           </Subtitle>
         </div>
       </Header>

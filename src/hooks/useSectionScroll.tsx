@@ -1,3 +1,4 @@
+import { useAccessibility } from '@contexts/AccessibilityContext';
 import { useEffect, useRef, useState } from 'react';
 import { BREAKPOINTS, FEATURES } from '../constants';
 
@@ -6,10 +7,13 @@ interface UseSectionScrollOptions {
   isDraggingTOC?: boolean;
 }
 
-export const useSectionScroll = ({ onSectionChange }: UseSectionScrollOptions = {}) => {
+export const useSectionScroll = ({
+  onSectionChange,
+}: UseSectionScrollOptions = {}) => {
   const [activeSection, setActiveSection] = useState('home');
   const containerRef = useRef<HTMLDivElement>(null);
   const hasScrolledToHash = useRef(false);
+  const { scrollSnapEnabled } = useAccessibility();
 
   // Scroll to section based on URL hash on mount
   useEffect(() => {
@@ -63,7 +67,10 @@ export const useSectionScroll = ({ onSectionChange }: UseSectionScrollOptions = 
       });
     };
 
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    const observer = new IntersectionObserver(
+      observerCallback,
+      observerOptions,
+    );
 
     const sectionElements = document.querySelectorAll('[data-section]');
     sectionElements.forEach((section) => observer.observe(section));
@@ -71,15 +78,21 @@ export const useSectionScroll = ({ onSectionChange }: UseSectionScrollOptions = 
     return () => observer.disconnect();
   }, [onSectionChange]);
 
-  // Handle scroll snapping based on 50% visibility threshold
+  // Handle scroll snapping - only when enabled via accessibility setting
   useEffect(() => {
-    if (FEATURES.DISABLE_MOBILE_SCROLL_SNAP && window.innerWidth <= BREAKPOINTS.mobile) {
+    // Don't set up snap behavior if disabled
+    if (!scrollSnapEnabled) {
+      return;
+    }
+
+    if (
+      FEATURES.DISABLE_MOBILE_SCROLL_SNAP &&
+      window.innerWidth <= BREAKPOINTS.mobile
+    ) {
       return;
     }
 
     let scrollTimeout: NodeJS.Timeout;
-    let currentVisibleSection: string | null = null;
-    const sectionVisibility = new Map<string, number>();
 
     const handleScroll = () => {
       clearTimeout(scrollTimeout);
@@ -87,9 +100,9 @@ export const useSectionScroll = ({ onSectionChange }: UseSectionScrollOptions = 
       scrollTimeout = setTimeout(() => {
         const sections = document.querySelectorAll('[data-section]');
         const viewportHeight = window.innerHeight;
+
         let maxVisibility = 0;
         let mostVisibleSection: HTMLElement | null = null;
-        let mostVisibleSectionId: string | null = null;
 
         sections.forEach((section) => {
           const el = section as HTMLElement;
@@ -104,41 +117,26 @@ export const useSectionScroll = ({ onSectionChange }: UseSectionScrollOptions = 
           const sectionHeight = Math.min(rect.height, viewportHeight);
           const visibilityPercentage = (visibleHeight / sectionHeight) * 100;
 
-          sectionVisibility.set(sectionId, visibilityPercentage);
-
           if (visibilityPercentage > maxVisibility) {
             maxVisibility = visibilityPercentage;
             mostVisibleSection = el;
-            mostVisibleSectionId = sectionId;
           }
         });
 
-        if (currentVisibleSection && mostVisibleSectionId) {
-          const currentVisibility = sectionVisibility.get(currentVisibleSection) || 0;
-
-          if (currentVisibility < 50 && mostVisibleSectionId !== currentVisibleSection) {
-            if (mostVisibleSection) {
-              const targetSection = mostVisibleSection as HTMLElement;
-              targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              currentVisibleSection = mostVisibleSectionId;
-            }
-          } else if (currentVisibility >= 50) {
-            currentVisibleSection = mostVisibleSectionId;
-          }
-        } else {
-          currentVisibleSection = mostVisibleSectionId;
+        // Snap to the most visible section
+        if (mostVisibleSection) {
+          (mostVisibleSection as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 150);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(scrollTimeout);
     };
-  }, []);
+  }, [scrollSnapEnabled]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(`[data-section="${sectionId}"]`);

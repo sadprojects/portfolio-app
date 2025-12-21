@@ -1,7 +1,6 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
 import Skills from '@pages/Skills';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 
 describe('Skills', () => {
   it('renders without crashing', () => {

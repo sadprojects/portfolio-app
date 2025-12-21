@@ -10,14 +10,6 @@ const Home = lazy(() => import('@pages/Home'));
 const NotFound = lazy(() => import('@pages/NotFound'));
 
 const GlobalStyle = createGlobalStyle`
-  @font-face {
-    font-family: 'Scribble';
-    src: url('/src/assets/fonts/Scribble.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-  }
-
   * {
     margin: 0;
     padding: 0;

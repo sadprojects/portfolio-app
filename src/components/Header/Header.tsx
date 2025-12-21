@@ -1,9 +1,10 @@
+import { useAccessibility } from '@contexts/AccessibilityContext';
 import { useTheme } from '@contexts/ThemeContext';
 import useClickOutside from '@hooks/useClickOutside';
 import useDimensions from '@hooks/useDimensions';
 import type { SectionConfig } from '@utils/sectionBuilder';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, Moon, Sun, X } from 'lucide-react';
+import { Menu, Moon, MousePointerClick, Sun, X } from 'lucide-react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -191,6 +192,7 @@ export const Header = memo(({ sections = [], onNavigate, isTOCExpanded = false }
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile] = useDimensions();
   const { mode, toggleTheme } = useTheme();
+  const { scrollSnapEnabled, toggleScrollSnap } = useAccessibility();
   const navRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(true);
@@ -209,6 +211,12 @@ export const Header = memo(({ sections = [], onNavigate, isTOCExpanded = false }
 
   useEffect(() => {
     const handleScroll = () => {
+      // Don't hide header when mobile menu is open
+      if (isOpen) {
+        setIsVisible(true);
+        return;
+      }
+
       const currentScrollY = window.scrollY;
 
       // Show header when scrolling up, hide when scrolling down
@@ -223,7 +231,7 @@ export const Header = memo(({ sections = [], onNavigate, isTOCExpanded = false }
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isOpen]);
 
   const openMenu = useCallback(() => setIsOpen(true), []);
   const closeMenu = useCallback(() => setIsOpen(false), []);
@@ -259,6 +267,14 @@ export const Header = memo(({ sections = [], onNavigate, isTOCExpanded = false }
         </Logo>
 
         <RightActions>
+          <DesktopThemeToggle 
+            onClick={toggleScrollSnap} 
+            aria-label={scrollSnapEnabled ? 'Disable scroll snap' : 'Enable scroll snap'}
+            title={scrollSnapEnabled ? 'Scroll snap: On' : 'Scroll snap: Off'}
+            style={{ opacity: scrollSnapEnabled ? 1 : 0.5 }}
+          >
+            <MousePointerClick size={20} />
+          </DesktopThemeToggle>
           <DesktopThemeToggle onClick={toggleTheme} aria-label="Toggle theme">
             {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
           </DesktopThemeToggle>
@@ -305,6 +321,13 @@ export const Header = memo(({ sections = [], onNavigate, isTOCExpanded = false }
                   })}
 
                   <MobileActions>
+                    <ThemeToggle 
+                      onClick={toggleScrollSnap} 
+                      aria-label={scrollSnapEnabled ? 'Disable scroll snap' : 'Enable scroll snap'}
+                      style={{ opacity: scrollSnapEnabled ? 1 : 0.5 }}
+                    >
+                      <MousePointerClick size={20} />
+                    </ThemeToggle>
                     <ThemeToggle onClick={toggleTheme} aria-label="Toggle theme">
                       {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                     </ThemeToggle>
