@@ -158,7 +158,9 @@ const GameCard = styled(motion.div)`
   align-items: center;
   gap: 1rem;
   padding: clamp(1.25rem, 3vw, 2rem);
-  background-color: ${({ theme }) => theme.colors.card};
+  background-color: ${({ theme }) => `${theme.colors.card}e6`};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   transition: all ${({ theme }) => theme.transitions.normal};
@@ -203,7 +205,9 @@ const SpeedSkatingContainer = styled(motion.div)`
 `;
 
 const SpeedSkatingCard = styled(motion.div)`
-  background-color: ${({ theme }) => theme.colors.card};
+  background-color: ${({ theme }) => `${theme.colors.card}e6`};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   overflow: hidden;
@@ -304,7 +308,11 @@ const Hobbies = memo(() => {
   const hasSpeedSkating = speedSkating && speedSkating.title;
 
   // Set default tab based on what exists
-  const defaultTab = hasSpeedSkating ? 'speedSkating' : hasPhotography ? 'photography' : 'games';
+  const defaultTab = hasSpeedSkating
+    ? 'speedSkating'
+    : hasPhotography
+      ? 'photography'
+      : 'games';
   const [activeTab, setActiveTab] = useState<HobbyTab>(defaultTab);
 
   // If none exists, don't render
@@ -327,7 +335,8 @@ const Hobbies = memo(() => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          When I'm not coding, I enjoy speed skating, capturing moments through photography, and exploring virtual worlds
+          When I'm not coding, I enjoy speed skating, capturing moments through
+          photography, and exploring virtual worlds
         </Subtitle>
 
         <TabsContainer>
@@ -395,7 +404,7 @@ const Hobbies = memo(() => {
             animate="visible"
             exit={{ opacity: 0 }}
           >
-            {photography.map((photo, index) => (
+            {photography.filter(photo => photo.enabled !== false).map((photo, index) => (
               <PhotoCard
                 key={index}
                 href={photo.url}
@@ -427,10 +436,13 @@ const Hobbies = memo(() => {
             animate="visible"
             exit={{ opacity: 0 }}
           >
-            {games.map((game, index) => {
+            {games.filter(game => game.enabled !== false).map((game, index) => {
               const fallbackPaths = getGameIconFallback(game.icon);
               return (
-                <GameCard key={index} variants={itemVariants}>
+                <GameCard
+                  key={index}
+                  variants={itemVariants}
+                >
                   <GameIconWrapper>
                     <img
                       src={getGameIconPath(game.icon)}
@@ -439,8 +451,8 @@ const Hobbies = memo(() => {
                       onError={(e) => {
                         const img = e.target as HTMLImageElement;
                         const currentSrc = img.src;
-                        const currentIndex = fallbackPaths.findIndex(path =>
-                          currentSrc.includes(path.replace('/src/assets/', ''))
+                        const currentIndex = fallbackPaths.findIndex((path) =>
+                          currentSrc.includes(path.replace('/src/assets/', '')),
                         );
                         if (currentIndex < fallbackPaths.length - 1) {
                           img.src = fallbackPaths[currentIndex + 1];

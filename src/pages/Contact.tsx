@@ -64,7 +64,9 @@ const ContactGrid = styled(motion.div)`
 `;
 
 const ContactCard = styled(motion.a)<{ as?: string }>`
-  background-color: ${({ theme }) => theme.colors.card};
+  background-color: ${({ theme }) => `${theme.colors.card}e6`};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   padding: 2rem;

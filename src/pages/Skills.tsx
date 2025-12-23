@@ -35,7 +35,9 @@ const SkillsGrid = styled(motion.div)`
 `;
 
 const SkillSection = styled(motion.section)`
-  background-color: ${({ theme }) => theme.colors.card};
+  background-color: ${({ theme }) => `${theme.colors.card}e6`};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   padding: clamp(1.5rem, 3vw, 2.5rem);
@@ -337,7 +339,9 @@ const Skills = memo(() => {
       }
 
       try {
-        const response = await fetch(`https://www.codewars.com/api/v1/users/${codewars.username}`);
+        const response = await fetch(
+          `https://www.codewars.com/api/v1/users/${codewars.username}`,
+        );
         if (response.ok) {
           const data = await response.json();
           setCodewarsData(data);
@@ -394,6 +398,7 @@ const Skills = memo(() => {
             </SectionHeader>
             <SkillsList>
               {professional
+                .filter(skill => skill.enabled !== false)
                 .sort((a, b) => b.level - a.level)
                 .map((skill, index) => (
                   <SkillItem key={index}>
@@ -403,7 +408,7 @@ const Skills = memo(() => {
                         initial={{ height: 0, width: 0 }}
                         animate={{
                           height: `${skill.level}%`,
-                          width: `${skill.level}%`
+                          width: `${skill.level}%`,
                         }}
                         transition={{ duration: 1, delay: index * 0.05 }}
                       >
@@ -483,7 +488,13 @@ const Skills = memo(() => {
                 <CodewarsStatLabel>Completed Challenges</CodewarsStatLabel>
               </CodewarsStat>
             </CodewarsStats>
-            <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+              }}
+            >
               <CodewarsLink
                 href={`https://www.codewars.com/users/${codewars.username}`}
                 target="_blank"

@@ -1,7 +1,16 @@
 import Blinker from '@components/Blinker/Blinker';
-import { fetchWeatherData, getCompleteGreeting, resetGreetingType } from '@utils/greetings';
+import {
+  fetchWeatherData,
+  getCompleteGreeting,
+  resetGreetingType,
+} from '@utils/greetings';
 import { motion } from 'framer-motion';
-import { ArrowRight, Download, Loader as LoaderIcon, Sparkles } from 'lucide-react';
+import {
+  ArrowRight,
+  Download,
+  Loader as LoaderIcon,
+  Sparkles,
+} from 'lucide-react';
 import { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -180,121 +189,142 @@ interface HeroSectionProps {
   onDownloadCV: () => void;
 }
 
-export const HeroSection = memo(({
-  age,
-  position,
-  location,
-  yearsOfExperience,
-  projectsCount,
-  technologiesCount,
-  hasProjects,
-  firstSectionId,
-  isGeneratingPDF,
-  onViewWork,
-  onDownloadCV,
-}: Omit<HeroSectionProps, 'name'>) => {
-  // Cycle through different greetings every 10 seconds
-  const [currentGreeting, setCurrentGreeting] = useState<string>('');
-  const [weatherData, setWeatherData] = useState<{ temp: number; condition: string } | null>(null);
-  const [isLoadingGreeting, setIsLoadingGreeting] = useState(true);
+export const HeroSection = memo(
+  ({
+    age,
+    position,
+    location,
+    yearsOfExperience,
+    projectsCount,
+    technologiesCount,
+    hasProjects,
+    firstSectionId,
+    isGeneratingPDF,
+    onViewWork,
+    onDownloadCV,
+  }: Omit<HeroSectionProps, 'name'>) => {
+    // Cycle through different greetings every 10 seconds
+    const [currentGreeting, setCurrentGreeting] = useState<string>('');
+    const [weatherData, setWeatherData] = useState<{
+      temp: number;
+      condition: string;
+    } | null>(null);
+    const [isLoadingGreeting, setIsLoadingGreeting] = useState(true);
 
-  // Fetch weather data on mount
-  useEffect(() => {
-    const loadWeather = async () => {
-      const weather = await fetchWeatherData();
-      setWeatherData(weather);
-    };
-    loadWeather();
-  }, []);
+    // Generate initial greeting immediately (always casual on first load)
+    useEffect(() => {
+      // Reset greeting type to ensure first greeting is casual
+      resetGreetingType();
 
-  // Generate initial greeting (always casual on first load)
-  useEffect(() => {
-    // Reset greeting type to ensure first greeting is casual
-    resetGreetingType();
+      const loadInitialGreeting = async () => {
+        const greeting = await getCompleteGreeting(null); // Don't pass weather for first greeting
+        setCurrentGreeting(greeting);
+        setIsLoadingGreeting(false);
+      };
+      loadInitialGreeting();
+    }, []);
 
-    const loadInitialGreeting = async () => {
-      const greeting = await getCompleteGreeting(null); // Don't pass weather for first greeting
-      setCurrentGreeting(greeting);
-      setIsLoadingGreeting(false);
-    };
-    loadInitialGreeting();
-  }, []);
+    // Defer weather data fetch until after initial paint
+    useEffect(() => {
+      // Use requestIdleCallback if available, otherwise setTimeout
+      const scheduleWeatherFetch = () => {
+        const loadWeather = async () => {
+          const weather = await fetchWeatherData();
+          setWeatherData(weather);
+        };
+        loadWeather();
+      };
 
-  const handleCycleComplete = useCallback(async () => {
-    const newGreeting = await getCompleteGreeting(weatherData);
-    setCurrentGreeting(newGreeting);
-  }, [weatherData]);
+      // Defer by 2 seconds to prioritize initial render
+      const timeoutId = setTimeout(scheduleWeatherFetch, 2000);
+      return () => clearTimeout(timeoutId);
+    }, []);
 
-  if (isLoadingGreeting || !currentGreeting) {
-    return null; // Or a loading skeleton
-  }
+    const handleCycleComplete = useCallback(async () => {
+      const newGreeting = await getCompleteGreeting(weatherData);
+      setCurrentGreeting(newGreeting);
+    }, [weatherData]);
 
-  return (
-    <HeroContainer>
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <Greeting variants={itemVariants}>
-          <Sparkles size={16} />
-          Welcome to my portfolio
-        </Greeting>
+    if (isLoadingGreeting || !currentGreeting) {
+      return null; // Or a loading skeleton
+    }
 
-        <Title variants={itemVariants}>
-          <Blinker
-            text={currentGreeting}
-            cycleInterval={10000}
-            onCycleComplete={handleCycleComplete}
-          />
-        </Title>
+    return (
+      <HeroContainer>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <Greeting variants={itemVariants}>
+            <Sparkles size={16} />
+            Welcome to my portfolio
+          </Greeting>
 
-        <Subtitle variants={itemVariants}>
-          {age}-year-old {position} based in {location}.
-          Building exceptional digital experiences with modern web technologies.
-        </Subtitle>
+          <Title variants={itemVariants}>
+            <Blinker
+              text={currentGreeting}
+              cycleInterval={10000}
+              onCycleComplete={handleCycleComplete}
+            />
+          </Title>
 
-        <ButtonGroup variants={itemVariants}>
-          <PrimaryButton onClick={onViewWork} disabled={!firstSectionId}>
-            View My Work
-            <ArrowRight size={20} />
-          </PrimaryButton>
-          <SecondaryButton onClick={onDownloadCV} disabled={isGeneratingPDF}>
-            {isGeneratingPDF ? (
-              <>
-                <LoaderIcon size={20} style={{ animation: 'spin 1s linear infinite' }} />
-                Downloading...
-              </>
-            ) : (
-              <>
-                <Download size={20} />
-                Download CV
-              </>
+          <Subtitle variants={itemVariants}>
+            {age}-year-old {position} based in {location}. Building exceptional
+            digital experiences with modern web technologies.
+          </Subtitle>
+
+          <ButtonGroup variants={itemVariants}>
+            <PrimaryButton
+              onClick={onViewWork}
+              disabled={!firstSectionId}
+            >
+              View My Work
+              <ArrowRight size={20} />
+            </PrimaryButton>
+            <SecondaryButton
+              onClick={onDownloadCV}
+              disabled={isGeneratingPDF}
+            >
+              {isGeneratingPDF ? (
+                <>
+                  <LoaderIcon
+                    size={20}
+                    style={{ animation: 'spin 1s linear infinite' }}
+                  />
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <Download size={20} />
+                  Download CV
+                </>
+              )}
+            </SecondaryButton>
+          </ButtonGroup>
+
+          <Stats variants={itemVariants}>
+            <Stat>
+              <StatValue>{yearsOfExperience}+</StatValue>
+              <StatLabel>Years Experience</StatLabel>
+            </Stat>
+            {hasProjects && (
+              <Stat>
+                <StatValue>{projectsCount}+</StatValue>
+                <StatLabel>Projects Completed</StatLabel>
+              </Stat>
             )}
-          </SecondaryButton>
-        </ButtonGroup>
-
-        <Stats variants={itemVariants}>
-          <Stat>
-            <StatValue>{yearsOfExperience}+</StatValue>
-            <StatLabel>Years Experience</StatLabel>
-          </Stat>
-          {hasProjects && (
-            <Stat>
-              <StatValue>{projectsCount}+</StatValue>
-              <StatLabel>Projects Completed</StatLabel>
-            </Stat>
-          )}
-          {technologiesCount > 0 && (
-            <Stat>
-              <StatValue>{technologiesCount}+</StatValue>
-              <StatLabel>Technologies</StatLabel>
-            </Stat>
-          )}
-        </Stats>
-      </motion.div>
-    </HeroContainer>
-  );
-});
+            {technologiesCount > 0 && (
+              <Stat>
+                <StatValue>{technologiesCount}+</StatValue>
+                <StatLabel>Technologies</StatLabel>
+              </Stat>
+            )}
+          </Stats>
+        </motion.div>
+      </HeroContainer>
+    );
+  },
+);
 
 HeroSection.displayName = 'HeroSection';

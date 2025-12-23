@@ -106,7 +106,7 @@ export const Footer = memo(() => {
       <FooterContainer>
         <FooterContent>
           <SocialLinks>
-            {social.map(({ name, url }) => {
+            {social.filter(link => link.enabled !== false).map(({ name, url }) => {
               const Icon = socialIcons[name];
               return Icon ? (
                 <SocialLink

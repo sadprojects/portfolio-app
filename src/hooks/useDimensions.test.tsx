@@ -40,7 +40,7 @@ describe('useDimensions', () => {
       global.innerWidth = 1200;
       global.innerHeight = 900;
       window.dispatchEvent(new Event('resize'));
-      vi.advanceTimersByTime(600); // Wait for debounce
+      vi.advanceTimersByTime(200); // Wait for debounce (150ms + buffer)
     });
 
     const [, width, height] = result.current;
@@ -56,7 +56,10 @@ describe('useDimensions', () => {
     const { unmount } = renderHook(() => useDimensions());
     unmount();
 
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'resize',
+      expect.any(Function),
+    );
 
     removeEventListenerSpy.mockRestore();
   });

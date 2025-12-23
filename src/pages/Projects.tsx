@@ -1,8 +1,21 @@
 import { contentData } from '@data/content';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Calendar, ChevronDown, ChevronUp, ExternalLink, FileText, Github, MapPin, Play } from 'lucide-react';
-import { memo, useState } from 'react';
+import {
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  FileText,
+  Gamepad2,
+  Github,
+  MapPin,
+  Play,
+} from 'lucide-react';
+import { lazy, memo, Suspense, useState } from 'react';
 import styled from 'styled-components';
+
+// Lazy load the Sudoku game for performance
+const Sudoku = lazy(() => import('@components/Sudoku/Sudoku'));
 
 const ProjectsContainer = styled.div`
   max-width: 1200px;
@@ -46,7 +59,11 @@ const ProjectsGrid = styled.div`
   }
 `;
 
-const ProjectCardWrapper = styled(motion.div)<{ $isExpanded: boolean; $expandedIndex: number | null; $currentIndex: number }>`
+const ProjectCardWrapper = styled(motion.div)<{
+  $isExpanded: boolean;
+  $expandedIndex: number | null;
+  $currentIndex: number;
+}>`
   ${({ $isExpanded, $expandedIndex, $currentIndex }) => {
     // Default column span in 6-column grid (each card spans 2 columns = 1/3 width)
     const defaultSpan = 2;
@@ -69,7 +86,9 @@ const ProjectCardWrapper = styled(motion.div)<{ $isExpanded: boolean; $expandedI
 
       // Cards in the same row as the expanded card - pushed to new row with 50/50 split
       if (expandedRow === currentRow) {
-        const otherCardsInRow = [0, 1, 2].filter(pos => pos !== expandedPosition);
+        const otherCardsInRow = [0, 1, 2].filter(
+          (pos) => pos !== expandedPosition,
+        );
         const myIndexInOtherCards = otherCardsInRow.indexOf(currentPosition);
 
         // 50/50 split: first card spans columns 1-3, second card spans columns 4-6
@@ -88,7 +107,7 @@ const ProjectCardWrapper = styled(motion.div)<{ $isExpanded: boolean; $expandedI
 
       // Cards in rows after the expanded row need to shift down by 1
       if (currentRow > expandedRow) {
-        const startCol = (currentPosition * defaultSpan) + 1;
+        const startCol = currentPosition * defaultSpan + 1;
         return `
           grid-column: ${startCol} / span ${defaultSpan};
           grid-row: ${currentRow + 2};
@@ -97,25 +116,29 @@ const ProjectCardWrapper = styled(motion.div)<{ $isExpanded: boolean; $expandedI
     }
 
     // Default: normal grid positioning (span 2 columns in 6-column grid = 1/3 width)
-    const startCol = (currentPosition * defaultSpan) + 1;
+    const startCol = currentPosition * defaultSpan + 1;
     return `
       grid-column: ${startCol} / span ${defaultSpan};
     `;
   }}
 
-  background-color: ${({ theme }) => theme.colors.card};
+  background-color: ${({ theme }) => `${theme.colors.card}e6`};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   overflow: hidden;
-  transition: grid-column 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              grid-row 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.2s ease,
-              border-color 0.2s ease;
+  transition:
+    grid-column 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    grid-row 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
   cursor: ${({ $isExpanded }) => ($isExpanded ? 'default' : 'pointer')};
 
   /* Tablet: 2-column layout - disable complex grid logic */
   @media (max-width: 1024px) {
-    grid-column: ${({ $isExpanded }) => $isExpanded ? '1 / -1' : 'auto'} !important;
+    grid-column: ${({ $isExpanded }) =>
+      $isExpanded ? '1 / -1' : 'auto'} !important;
     grid-row: auto !important;
     transition: none !important;
   }
@@ -136,7 +159,8 @@ const ProjectCardWrapper = styled(motion.div)<{ $isExpanded: boolean; $expandedI
     outline: 2px solid ${({ theme }) => theme.colors.foreground};
     outline-offset: 2px;
   }
-`;const ProjectCardContent = styled.div`
+`;
+const ProjectCardContent = styled.div`
   padding: 2rem;
 
   @media (max-width: 768px) {
@@ -381,6 +405,38 @@ const SecondaryLink = styled(LinkButton)`
   color: ${({ theme }) => theme.colors.foreground};
 `;
 
+const EasterEggContainer = styled.div`
+  padding: 1rem;
+  background-color: ${({ theme }) => theme.colors.accent};
+  border-radius: 0.5rem;
+  min-height: 400px;
+  position: relative;
+`;
+
+const EasterEggLoading = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 0.875rem;
+`;
+
+const EasterEggBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(147, 51, 234, 0.2);
+  border: 1px solid rgba(147, 51, 234, 0.4);
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #a855f7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
+
 const Projects = memo(() => {
   const { projects } = contentData;
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -416,7 +472,10 @@ const Projects = memo(() => {
       try {
         return (
           <Video controls>
-            <source src={`/src/assets/videos/${video}.mp4`} type="video/mp4" />
+            <source
+              src={`/src/assets/videos/${video}.mp4`}
+              type="video/mp4"
+            />
             Your browser does not support the video tag.
           </Video>
         );
@@ -433,7 +492,10 @@ const Projects = memo(() => {
     // External video URL
     return (
       <Video controls>
-        <source src={video} type="video/mp4" />
+        <source
+          src={video}
+          type="video/mp4"
+        />
         Your browser does not support the video tag.
       </Video>
     );
@@ -454,12 +516,13 @@ const Projects = memo(() => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          A collection of projects showcasing my skills and passion for development
+          A collection of projects showcasing my skills and passion for
+          development
         </Subtitle>
       </Header>
 
       <ProjectsGrid>
-        {projects.map((project, index) => {
+        {projects.filter(project => project.enabled !== false).map((project, index) => {
           const isExpanded = expandedId === index;
 
           return (
@@ -472,10 +535,20 @@ const Projects = memo(() => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
             >
-              <ProjectCardContent onClick={() => !isExpanded && toggleExpand(index)}>
+              <ProjectCardContent
+                onClick={() => !isExpanded && toggleExpand(index)}
+              >
                 <ProjectHeader>
                   <ProjectTitleSection>
-                    <ProjectTitle>{project.title}</ProjectTitle>
+                    <ProjectTitle>
+                      {project.title}
+                      {project.easterEgg && (
+                        <EasterEggBadge>
+                          <Gamepad2 size={10} />
+                          Playable
+                        </EasterEggBadge>
+                      )}
+                    </ProjectTitle>
                     <ProjectMeta>
                       <MetaItem>
                         <Calendar size={12} />
@@ -521,11 +594,22 @@ const Projects = memo(() => {
                       <Github size={18} />
                     </IconButton>
                     <ExpandButton
-                      onClick={(e) => { e.stopPropagation(); toggleExpand(index); }}
-                      aria-label={isExpanded ? 'Collapse project details' : 'Expand project details'}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleExpand(index);
+                      }}
+                      aria-label={
+                        isExpanded
+                          ? 'Collapse project details'
+                          : 'Expand project details'
+                      }
                       aria-expanded={isExpanded}
                     >
-                      {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      {isExpanded ? (
+                        <ChevronUp size={18} />
+                      ) : (
+                        <ChevronDown size={18} />
+                      )}
                     </ExpandButton>
                   </ProjectActions>
                 </ProjectHeader>
@@ -537,7 +621,9 @@ const Projects = memo(() => {
                     {project.tools.slice(0, 6).map((tool, i) => (
                       <Tag key={i}>{tool}</Tag>
                     ))}
-                    {project.tools.length > 6 && <Tag>+{project.tools.length - 6}</Tag>}
+                    {project.tools.length > 6 && (
+                      <Tag>+{project.tools.length - 6}</Tag>
+                    )}
                   </Tags>
                 )}
               </ProjectCardContent>
@@ -550,60 +636,78 @@ const Projects = memo(() => {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <ExpandedGrid>
-                      {project.video && (
-                        <VideoSection>
-                          <VideoContainer>
-                            {getVideoEmbed(project.video)}
-                          </VideoContainer>
-                        </VideoSection>
-                      )}
-
-                      <DetailsSection>
-                        <DetailBlock>
-                          <DetailTitle>Technologies</DetailTitle>
-                          <DetailTags>
-                            {project.tools.map((tool, i) => (
-                              <DetailTag key={i}>{tool}</DetailTag>
-                            ))}
-                          </DetailTags>
-                        </DetailBlock>
-                      </DetailsSection>
-                    </ExpandedGrid>
-
-                    <LinksSection>
-                      {project.publication && (
-                        <LinkButton
-                          href={project.publication}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
+                    {/* Easter Egg: Sudoku Game */}
+                    {project.easterEgg === 'sudoku' && (
+                      <EasterEggContainer>
+                        <Suspense
+                          fallback={
+                            <EasterEggLoading>Loading game...</EasterEggLoading>
+                          }
                         >
-                          <FileText size={16} />
-                          Research Paper
-                        </LinkButton>
-                      )}
-                      {project.website && (
-                        <LinkButton
-                          href={project.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <ExternalLink size={16} />
-                          Visit Website
-                        </LinkButton>
-                      )}
-                      <SecondaryLink
-                        href={project.repo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Github size={16} />
-                        View Code
-                      </SecondaryLink>
-                    </LinksSection>
+                          <Sudoku />
+                        </Suspense>
+                      </EasterEggContainer>
+                    )}
+
+                    {/* Regular project content */}
+                    {!project.easterEgg && (
+                      <>
+                        <ExpandedGrid>
+                          {project.video && (
+                            <VideoSection>
+                              <VideoContainer>
+                                {getVideoEmbed(project.video)}
+                              </VideoContainer>
+                            </VideoSection>
+                          )}
+
+                          <DetailsSection>
+                            <DetailBlock>
+                              <DetailTitle>Technologies</DetailTitle>
+                              <DetailTags>
+                                {project.tools.map((tool, i) => (
+                                  <DetailTag key={i}>{tool}</DetailTag>
+                                ))}
+                              </DetailTags>
+                            </DetailBlock>
+                          </DetailsSection>
+                        </ExpandedGrid>
+
+                        <LinksSection>
+                          {project.publication && (
+                            <LinkButton
+                              href={project.publication}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <FileText size={16} />
+                              Research Paper
+                            </LinkButton>
+                          )}
+                          {project.website && (
+                            <LinkButton
+                              href={project.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ExternalLink size={16} />
+                              Visit Website
+                            </LinkButton>
+                          )}
+                          <SecondaryLink
+                            href={project.repo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Github size={16} />
+                            View Code
+                          </SecondaryLink>
+                        </LinksSection>
+                      </>
+                    )}
                   </ExpandedContent>
                 )}
               </AnimatePresence>

@@ -84,8 +84,9 @@ const ExperienceCard = styled(motion.div)<{ $isCurrent?: boolean }>`
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    border: 2px solid ${({ theme, $isCurrent }) =>
-      $isCurrent ? theme.colors.foreground : theme.colors.border};
+    border: 2px solid
+      ${({ theme, $isCurrent }) =>
+        $isCurrent ? theme.colors.foreground : theme.colors.border};
     z-index: 1;
 
     @media (max-width: 768px) {
@@ -99,12 +100,13 @@ const ExperienceCard = styled(motion.div)<{ $isCurrent?: boolean }>`
 `;
 
 const CardContent = styled.div`
-  background-color: ${({ theme }) => theme.colors.card};
+  background-color: ${({ theme }) => `${theme.colors.card}e6`};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   padding: 2rem;
   transition: all ${({ theme }) => theme.transitions.normal};
-  cursor: pointer;
   outline: none;
 
   &:hover,
@@ -141,7 +143,11 @@ const Company = styled.div`
 
 const CompanyBadge = styled.span`
   padding: 0.25rem 0.75rem;
-  background: linear-gradient(135deg, ${({ theme }) => theme.colors.accent} 0%, ${({ theme }) => theme.colors.border} 100%);
+  background: linear-gradient(
+    135deg,
+    ${({ theme }) => theme.colors.accent} 0%,
+    ${({ theme }) => theme.colors.border} 100%
+  );
   border-radius: 0.375rem;
   font-size: 0.75rem;
   font-weight: 700;
@@ -249,13 +255,17 @@ const Experience = memo(() => {
           initial="hidden"
           animate="visible"
         >
-          {experience.map((job, index) => {
+          {experience.filter(job => job.enabled !== false).map((job, index) => {
             const duration = calculateDuration(job.startDate, job.endDate);
             const dateRange = formatDateRange(job.startDate, job.endDate);
             const isCurrent = job.endDate.toLowerCase() === 'present';
 
             return (
-              <ExperienceCard key={index} variants={itemVariants} $isCurrent={isCurrent}>
+              <ExperienceCard
+                key={index}
+                variants={itemVariants}
+                $isCurrent={isCurrent}
+              >
                 <CardContent
                   tabIndex={0}
                   role="article"

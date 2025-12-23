@@ -42,10 +42,19 @@ try {
     });
     console.log('✓ Changes committed to repository');
 
-    // Optionally push to remote
-    // Uncomment the next line if you want to auto-push
-    // execSync('git push', { stdio: 'inherit' });
-    // console.log('✓ Changes pushed to remote');
+    // Create git tag for easy rollback
+    const tagName = `v${newVersion}`;
+    try {
+      execSync(`git tag -a ${tagName} -m "Release ${newVersion}"`, {
+        stdio: 'inherit',
+      });
+      console.log(`✓ Git tag created: ${tagName}`);
+    } catch (tagError) {
+      console.warn(`⚠ Git tag creation failed: ${tagError.message}`);
+    }
+
+    // execSync('git push --follow-tags', { stdio: 'inherit' });
+    // console.log('✓ Changes and tags pushed to remote');
   } catch (gitError) {
     console.warn('⚠ Git commit failed. You may need to commit manually.');
     console.warn('Error:', gitError.message);

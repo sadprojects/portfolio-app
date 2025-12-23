@@ -2,6 +2,7 @@ export interface Certification {
   title: string;
   url: string;
   date: string;
+  enabled?: boolean;
 }
 
 export interface Contact {
@@ -24,15 +25,20 @@ export interface Education {
   city: string;
   period: string;
   responsibilities?: string[];
+  enabled?: boolean;
 }
 
 export interface Game {
   title: string;
   icon: string;
+  enabled?: boolean;
 }
 
 export interface Greetings {
-  timeBasedGreetings: Array<{ type: 'morning' | 'afternoon' | 'evening'; message: string }>;
+  timeBasedGreetings: Array<{
+    type: 'morning' | 'afternoon' | 'evening';
+    message: string;
+  }>;
   casualGreetings: string[];
   introductions: string[];
   weatherGreetings: {
@@ -53,6 +59,7 @@ export interface Photography {
   alt: string;
   type: string;
   altUrl?: string;
+  enabled?: boolean;
 }
 
 export interface SpeedSkating {
@@ -72,14 +79,17 @@ export interface Project {
   tools: string[];
   website?: string;
   repo: string;
-  video: string;
+  video?: string;
   publication?: string;
+  easterEgg?: 'sudoku'; // Expandable for future easter eggs
+  enabled?: boolean;
 }
 
 export interface Skill {
   name: string;
   level: number;
   priority: number;
+  enabled?: boolean;
 }
 
 export interface Skills {
@@ -93,12 +103,14 @@ export interface SocialMediaLink {
   name: string;
   url: string;
   icon: string;
+  enabled?: boolean;
 }
 
 export interface TechnologyItem {
   key: string;
   name: string;
   icon: string;
+  enabled?: boolean;
 }
 
 export interface Technologies {
@@ -113,6 +125,7 @@ export interface Experience {
   startDate: string;
   endDate: string;
   responsibilities: string[];
+  enabled?: boolean;
 }
 
 export interface Codewars {

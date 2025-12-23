@@ -11,300 +11,471 @@ export const contentData: ContentData = {
   },
   certifications: [
     {
-      title: "Published Research: Neural Network Based System for Disease Prediction",
-      url: "https://www.researchgate.net/publication/357430190_Neural_Network_Based_System_for_Disease_Prediction",
-      date: "Dec 2021"
+      title:
+        'Published Research: Neural Network Based System for Disease Prediction',
+      url: 'https://www.researchgate.net/publication/357430190_Neural_Network_Based_System_for_Disease_Prediction',
+      date: 'Dec 2021',
+      enabled: true,
     },
     {
-      title: "Microsoft Certified - Azure Fundamentals",
-      url: "https://learn.microsoft.com/api/credentials/share/en-gb/SilviuDinu-1202/D2162FE9FCA167E1?sharingId=79B7C1ADC9510DE6",
-      date: "18 Sep 2023"
+      title: 'Microsoft Certified - Azure Fundamentals',
+      url: 'https://learn.microsoft.com/api/credentials/share/en-gb/SilviuDinu-1202/D2162FE9FCA167E1?sharingId=79B7C1ADC9510DE6',
+      date: '18 Sep 2023',
+      enabled: true,
     },
     {
-      title: "MongoDB - SI Associate Certification",
-      url: "https://learn.mongodb.com/c/yHhzIyEdQC6KznCAMnlgsg",
-      date: "16 Jun 2023"
-    }
+      title: 'MongoDB - SI Associate Certification',
+      url: 'https://learn.mongodb.com/c/yHhzIyEdQC6KznCAMnlgsg',
+      date: '16 Jun 2023',
+      enabled: true,
+    },
   ],
   contact: {
-    email: "silviualexd@gmail.com",
-    phone: "+40730799252",
-    name: "Silviu Dinu",
-    position: "Senior Software Engineer",
-    location: "Bucharest, Romania",
-    birthDate: "1996-09-18",
-    firstJobDate: "2018-07-01",
-    linkedin: "https://www.linkedin.com/in/silviu-alexandru-dinu-138128151/",
-    linkedinMessaging: "https://www.linkedin.com/messaging/compose/?recipientId=silviu-alexandru-dinu-138128151",
-    profileImage: "me.jpg",
+    email: 'silviualexd@gmail.com',
+    phone: '+40730799252',
+    name: 'Silviu Dinu',
+    position: 'Senior Software Engineer',
+    location: 'Bucharest, Romania',
+    birthDate: '1996-09-18',
+    firstJobDate: '2018-07-01',
+    linkedin: 'https://www.linkedin.com/in/silviu-alexandru-dinu-138128151/',
+    linkedinMessaging:
+      'https://www.linkedin.com/messaging/compose/?recipientId=silviu-alexandru-dinu-138128151',
+    profileImage: 'me.jpg',
   },
   education: [
     {
-      position: "MASTER'S DEGREE IN ADVANCED SIGNAL PROCESSING IN MULTIMEDIA APPs",
-      company: "Automatic Control and Computer Science, POLITEHNICA University",
-      city: "Bucharest",
-      period: "2020 - 2022"
+      position:
+        "MASTER'S DEGREE IN ADVANCED SIGNAL PROCESSING IN MULTIMEDIA APPs",
+      company: 'Automatic Control and Computer Science, POLITEHNICA University',
+      city: 'Bucharest',
+      period: '2020 - 2022',
+      enabled: true,
     },
     {
       position: "BACHELOR'S DEGREE IN SYSTEMS ENGINEERING",
-      company: "Automatic Control and Computer Science, POLITEHNICA University",
-      city: "Bucharest",
-      period: "2016 - 2020"
+      company: 'Automatic Control and Computer Science, POLITEHNICA University',
+      city: 'Bucharest',
+      period: '2016 - 2020',
+      enabled: true,
     },
     {
-      position: "High School",
-      company: "Alexandru Ioan Cuza National College",
-      city: "Ploiești",
-      period: "2012 - 2016"
-    }
+      position: 'High School',
+      company: 'Alexandru Ioan Cuza National College',
+      city: 'Ploiești',
+      period: '2012 - 2016',
+      enabled: true,
+    },
   ],
   games: [
-    { title: "Witcher 3: Wild Hunt", icon: "witcher3.svg" },
-    { title: "Elden Ring", icon: "elden_ring.jpg" },
-    { title: "Red Dead Redemption 2", icon: "rdr2.svg" },
-    { title: "The Last Of Us", icon: "tlou.svg" },
-    { title: "Serious Sam", icon: "serious_sam.svg" }
+    { title: 'Witcher 3: Wild Hunt', icon: 'witcher3.svg', enabled: true },
+    { title: 'Elden Ring', icon: 'elden_ring.jpg', enabled: true },
+    { title: 'Red Dead Redemption 2', icon: 'rdr2.svg', enabled: true },
+    { title: 'The Last Of Us', icon: 'tlou.svg', enabled: true },
+    { title: 'Serious Sam', icon: 'serious_sam.svg', enabled: true },
   ],
   photography: [
-    { path: "mountains.jpg", width: 300, height: 300, url: "https://unsplash.com/photos/FAekx3o6JSk", alt: "Mountains picture", type: "generic" },
-    { path: "tree.jpg", width: 300, height: 300, url: "https://unsplash.com/photos/qJIgaF44sTg", alt: "Tree picture", type: "generic" },
-    { path: "lake-house.jpg", width: 300, height: 300, url: "https://unsplash.com/photos/qWvKHnu9lyY", alt: "Lake house picture", type: "generic" },
-    { path: "chicken.jpg", width: 300, height: 300, url: "https://unsplash.com/photos/E0UIsf77SkQ", alt: "Chicken picture", type: "generic" },
-    { path: "nike.jpg", width: 300, height: 300, url: "https://unsplash.com/photos/CuxlhYpBsfA", alt: "Person standing on a rock over a cliff", type: "generic" },
-    { path: "jack.jpg", width: 300, height: 300, url: "https://unsplash.com/photos/U172-ZN0Jjg", alt: "Jack Daniels glass with Nikon and Airpods", type: "generic" },
-    { path: "sunflower.jpg", width: 300, height: 300, url: "https://unsplash.com/photos/KvB0Cgz3SSs", alt: "Sunflower picture", type: "generic" },
-    { path: "boat.jpg", width: 300, height: 300, url: "https://unsplash.com/photos/BBYbtPQU9LQ", alt: "Green sailing boat on the beach", type: "generic" },
-    { path: "drone.jpg", width: 300, height: 300, url: "https://unsplash.com/photos/2vajkRGV08E", alt: "Picture of DJI Air 2S drone", type: "generic" }
+    {
+      path: 'mountains.jpg',
+      width: 300,
+      height: 300,
+      url: 'https://unsplash.com/photos/FAekx3o6JSk',
+      alt: 'Mountains picture',
+      type: 'generic',
+      enabled: true,
+    },
+    {
+      path: 'tree.jpg',
+      width: 300,
+      height: 300,
+      url: 'https://unsplash.com/photos/qJIgaF44sTg',
+      alt: 'Tree picture',
+      type: 'generic',
+      enabled: true,
+    },
+    {
+      path: 'lake-house.jpg',
+      width: 300,
+      height: 300,
+      url: 'https://unsplash.com/photos/qWvKHnu9lyY',
+      alt: 'Lake house picture',
+      type: 'generic',
+      enabled: true,
+    },
+    {
+      path: 'chicken.jpg',
+      width: 300,
+      height: 300,
+      url: 'https://unsplash.com/photos/E0UIsf77SkQ',
+      alt: 'Chicken picture',
+      type: 'generic',
+      enabled: true,
+    },
+    {
+      path: 'nike.jpg',
+      width: 300,
+      height: 300,
+      url: 'https://unsplash.com/photos/CuxlhYpBsfA',
+      alt: 'Person standing on a rock over a cliff',
+      type: 'generic',
+      enabled: true,
+    },
+    {
+      path: 'jack.jpg',
+      width: 300,
+      height: 300,
+      url: 'https://unsplash.com/photos/U172-ZN0Jjg',
+      alt: 'Jack Daniels glass with Nikon and Airpods',
+      type: 'generic',
+      enabled: true,
+    },
+    {
+      path: 'sunflower.jpg',
+      width: 300,
+      height: 300,
+      url: 'https://unsplash.com/photos/KvB0Cgz3SSs',
+      alt: 'Sunflower picture',
+      type: 'generic',
+      enabled: true,
+    },
+    {
+      path: 'boat.jpg',
+      width: 300,
+      height: 300,
+      url: 'https://unsplash.com/photos/BBYbtPQU9LQ',
+      alt: 'Green sailing boat on the beach',
+      type: 'generic',
+      enabled: true,
+    },
+    {
+      path: 'drone.jpg',
+      width: 300,
+      height: 300,
+      url: 'https://unsplash.com/photos/2vajkRGV08E',
+      alt: 'Picture of DJI Air 2S drone',
+      type: 'generic',
+      enabled: true,
+    },
   ],
   speedSkating: {
-    title: "Speed Skating",
+    title: 'Speed Skating',
     description: [
       "Speed skating was my passion throughout my youth - a sport that might not be mainstream, but it's intense, competitive, and incredibly rewarding. Whether gliding on ice during winter or rolling through summer tracks, it's an all-season thrill that pushes you to your limits.",
-      "Over seven years of racing, I collected awards, forged lifelong friendships, and built the kind of discipline you can only get from pushing yourself on the track. It shaped who I am today."
+      'Over seven years of racing, I collected awards, forged lifelong friendships, and built the kind of discipline you can only get from pushing yourself on the track. It shaped who I am today.',
     ],
     image: {
-      path: "tg_mures.jpg",
-      alt: "A kid skating"
-    }
+      path: 'tg_mures.jpg',
+      alt: 'A kid skating',
+    },
   },
   introduction: [
-    "{{age}}-year-old Senior Software Engineer based in Bucharest, Romania. Building exceptional digital experiences with modern web technologies."
+    '{{age}}-year-old Senior Software Engineer based in Bucharest, Romania. Building exceptional digital experiences with modern web technologies.',
   ],
-  footer: "Built with ❤️ by Silviu Dinu",
-  homepage: { title: "Hello there!" },
+  footer: 'Built with ❤️ by Silviu Dinu',
+  homepage: { title: 'Hello there!' },
   greetings: {
     timeBasedGreetings: [
       { type: 'morning', message: 'Good morning!' },
       { type: 'afternoon', message: 'Good afternoon!' },
-      { type: 'evening', message: 'Good evening!' }
+      { type: 'evening', message: 'Good evening!' },
     ],
-    casualGreetings: [
-      'Hi!',
-      'Hey!',
-      'Hello!'
-    ],
-    introductions: [
-      "I'm Silviu"
-    ],
+    casualGreetings: ['Hi!', 'Hey!', 'Hello!'],
+    introductions: ["I'm Silviu"],
     weatherGreetings: {
-      sunny: [
-        'Lovely day!',
-        'Sunshine!',
-        'Beautiful!'
-      ],
-      rainy: [
-        'Rainy day!',
-        'Cozy weather!',
-        'Perfect for coding!'
-      ],
-      cloudy: [
-        'Cloudy today!',
-        'Grey skies!'
-      ],
-      snowy: [
-        'Winter vibes!',
-        'Stay warm!',
-        'Snowy day!'
-      ],
-      cold: [
-        'Stay warm!',
-        'Brr! Cold!',
-        'Cold today!'
-      ],
-      hot: [
-        'Hot day!',
-        'Stay cool!',
-        'Summer heat!'
-      ]
-    }
+      sunny: ['Lovely day!', 'Sunshine!', 'Beautiful!'],
+      rainy: ['Rainy day!', 'Cozy weather!', 'Perfect for coding!'],
+      cloudy: ['Cloudy today!', 'Grey skies!'],
+      snowy: ['Winter vibes!', 'Stay warm!', 'Snowy day!'],
+      cold: ['Stay warm!', 'Brr! Cold!', 'Cold today!'],
+      hot: ['Hot day!', 'Stay cool!', 'Summer heat!'],
+    },
   },
   projects: [
     {
-      title: "Resume / Presentation Website",
-      city: "Ploiești",
-      description: "A presentation app built for myself containing information like resume, who I am and what I do, hobbies, and more.",
-      period: "Aug 2021",
-      tools: ["Angular 12", "Angular Router", "Angular Material", "Typescript", "RxJS"],
-      website: "#",
-      repo: "https://github.com/SilviuDinu/portfolio-app",
-      video: "portfolio-app"
+      title: '🎮 Sudoku Solver & Game',
+      city: 'Bucharest',
+      description:
+        'An interactive Sudoku game with multiple difficulty levels, built using a backtracking algorithm. Features include puzzle generation, real-time validation, timer, and local storage for high scores. Click to play!',
+      period: 'Dec 2025',
+      tools: [
+        'React',
+        'TypeScript',
+        'Backtracking Algorithm',
+        'LocalStorage',
+        'Styled Components',
+      ],
+      repo: 'https://github.com/SilviuDinu/portfolio-app',
+      easterEgg: 'sudoku',
+      enabled: true,
     },
     {
-      title: "React Weather App",
-      city: "Ploiești",
-      description: "A weather app built with React and Express which enables the user to search the weather in certain cities around the world. The app automatically detects your location and displays the weather information that is most relevant to you.",
-      period: "Jun 2021 - Jul 2021",
-      tools: ["React Hooks", "React Router", "Express", "REST APIs", "Typescript", "MongoDB"],
-      website: "https://forecast-report.com/",
-      repo: "https://github.com/SilviuDinu/react-weather-app",
-      video: "react-weather-app"
+      title: 'Resume / Presentation Website',
+      city: 'Ploiești',
+      description:
+        'A presentation app built for myself containing information like resume, who I am and what I do, hobbies, and more.',
+      period: 'Aug 2021',
+      tools: [
+        'Angular 12',
+        'Angular Router',
+        'Angular Material',
+        'Typescript',
+        'RxJS',
+      ],
+      website: '#',
+      repo: 'https://github.com/SilviuDinu/portfolio-app',
+      video: 'portfolio-app',
+      enabled: true,
     },
     {
-      title: "WebSockets Chat",
-      city: "Ploiești",
-      description: "A web chat application built with React on the frontend and Socket.io running on the backend. Users can connect to the chat room and exchange messages in real-time.",
-      period: "Apr 2021",
-      tools: ["React Hooks", "Node.JS", "Websockets", "Socket.io", "Typescript"],
-      repo: "https://github.com/SilviuDinu/web-sockets-chat",
-      video: "web-sockets-chat"
+      title: 'React Weather App',
+      city: 'Ploiești',
+      description:
+        'A weather app built with React and Express which enables the user to search the weather in certain cities around the world. The app automatically detects your location and displays the weather information that is most relevant to you.',
+      period: 'Jun 2021 - Jul 2021',
+      tools: [
+        'React Hooks',
+        'React Router',
+        'Express',
+        'REST APIs',
+        'Typescript',
+        'MongoDB',
+      ],
+      website: 'https://forecast-report.com/',
+      repo: 'https://github.com/SilviuDinu/react-weather-app',
+      video: 'react-weather-app',
+      enabled: true,
     },
     {
-      title: "URL Shortener",
-      city: "Ploiești",
-      description: "A web app created with VueJS and Express that enables users to create short URLs (similar to bit.ly). The 'Copy to clipboard' feature might not work due to the SSL certificate expiration (https -> http).",
-      period: "Oct 2020",
-      tools: ["VueJS", "NodeJS", "Express", "MongoDB", "REST APIs"],
-      repo: "https://github.com/SilviuDinu/url-shortener",
-      video: "url-shortener"
+      title: 'WebSockets Chat',
+      city: 'Ploiești',
+      description:
+        'A web chat application built with React on the frontend and Socket.io running on the backend. Users can connect to the chat room and exchange messages in real-time.',
+      period: 'Apr 2021',
+      tools: [
+        'React Hooks',
+        'Node.JS',
+        'Websockets',
+        'Socket.io',
+        'Typescript',
+      ],
+      repo: 'https://github.com/SilviuDinu/web-sockets-chat',
+      video: 'web-sockets-chat',
+      enabled: true,
     },
     {
-      title: "Disease Predictor",
-      city: "Ploiești",
-      description: "Engineered, fine-tuned, and validated a Neural Network that takes medical symptoms as input and forecasts the most likely corresponding disease. This model serves as the central element of a Flask-based backend server. The server is part of a custom API designed to interact with a frontend, accepting symptom data and returning the predicted disease.",
-      period: "Apr 2021 - May 2021",
-      tools: ["Python", "PyTorch", "Machine Learning", "Flask", "REST APIs", "Data Science"],
-      repo: "https://github.com/SilviuDinu/cercetare_sem2_BE",
-      video: "disease-predictor",
-      publication: "https://www.researchgate.net/publication/357430190_Neural_Network_Based_System_for_Disease_Prediction"
+      title: 'URL Shortener',
+      city: 'Ploiești',
+      description:
+        "A web app created with VueJS and Express that enables users to create short URLs (similar to bit.ly). The 'Copy to clipboard' feature might not work due to the SSL certificate expiration (https -> http).",
+      period: 'Oct 2020',
+      tools: ['VueJS', 'NodeJS', 'Express', 'MongoDB', 'REST APIs'],
+      repo: 'https://github.com/SilviuDinu/url-shortener',
+      video: 'url-shortener',
+      enabled: true,
     },
     {
-      title: "Smoke Detector",
-      city: "Bucharest",
-      description: "A smoke-detection system built using Python. When a certain threshold of gas or smoke is detected, I receive email notifications with detailed warnings.",
-      period: "Nov 2018 – Dec 2018",
-      tools: ["Linux", "Raspberry PI", "Python", "Electronics", "SMTP"],
-      repo: "https://github.com/SilviuDinu/smoke-detector",
-      video: "https://youtu.be/-RQZF3_onj4"
-    }
+      title: 'Disease Predictor',
+      city: 'Ploiești',
+      description:
+        'Engineered, fine-tuned, and validated a Neural Network that takes medical symptoms as input and forecasts the most likely corresponding disease. This model serves as the central element of a Flask-based backend server. The server is part of a custom API designed to interact with a frontend, accepting symptom data and returning the predicted disease.',
+      period: 'Apr 2021 - May 2021',
+      tools: [
+        'Python',
+        'PyTorch',
+        'Machine Learning',
+        'Flask',
+        'REST APIs',
+        'Data Science',
+      ],
+      repo: 'https://github.com/SilviuDinu/cercetare_sem2_BE',
+      video: 'disease-predictor',
+      publication:
+        'https://www.researchgate.net/publication/357430190_Neural_Network_Based_System_for_Disease_Prediction',
+      enabled: true,
+    },
+    {
+      title: 'Smoke Detector',
+      city: 'Bucharest',
+      description:
+        'A smoke-detection system built using Python. When a certain threshold of gas or smoke is detected, I receive email notifications with detailed warnings.',
+      period: 'Nov 2018 – Dec 2018',
+      tools: ['Linux', 'Raspberry PI', 'Python', 'Electronics', 'SMTP'],
+      repo: 'https://github.com/SilviuDinu/smoke-detector',
+      video: 'https://youtu.be/-RQZF3_onj4',
+      enabled: true,
+    },
   ],
   skills: {
     professional: [
-      { name: "Javascript", level: 95, priority: 1 },
-      { name: "Angular", level: 86, priority: 1 },
-      { name: "AngularJS", level: 75, priority: 1 },
-      { name: "ReactJS", level: 95, priority: 1 },
-      { name: "VueJS", level: 65, priority: 2 },
-      { name: "NodeJS / Express", level: 80, priority: 1 },
-      { name: "Socket.io", level: 68, priority: 2 },
-      { name: "HTML / CSS", level: 90, priority: 2 },
-      { name: "MongoDB", level: 72, priority: 2 },
-      { name: "REST APIs", level: 82, priority: 2 },
-      { name: "Python / PyTorch for ML", level: 72, priority: 2 },
-      { name: "PHP", level: 57, priority: 2 }
+      { name: 'Javascript', level: 95, priority: 1, enabled: true },
+      { name: 'Angular', level: 86, priority: 1, enabled: true },
+      { name: 'AngularJS', level: 75, priority: 1, enabled: true },
+      { name: 'ReactJS', level: 95, priority: 1, enabled: true },
+      { name: 'VueJS', level: 65, priority: 2, enabled: true },
+      { name: 'NodeJS / Express', level: 80, priority: 1, enabled: true },
+      { name: 'Socket.io', level: 68, priority: 2, enabled: true },
+      { name: 'HTML / CSS', level: 90, priority: 2, enabled: true },
+      { name: 'MongoDB', level: 72, priority: 2, enabled: true },
+      { name: 'REST APIs', level: 82, priority: 2, enabled: true },
+      {
+        name: 'Python / PyTorch for ML',
+        level: 72,
+        priority: 2,
+        enabled: true,
+      },
+      { name: 'PHP', level: 57, priority: 2, enabled: true },
     ],
-    languages: ["English", "Romanian", "Japanese (N5)"],
-    developmentTools: ["Git", "Jira", "Azure", "MongoDB Compass", "AWS", "Jenkins", "SonarQube"],
-    personal: ["Reliable and professional", "Efficient communicator", "Organized", "Punctual", "Team player", "Fast learner", "Motivated", "Curious"]
+    languages: ['English', 'Romanian', 'Japanese (N5)'],
+    developmentTools: [
+      'Git',
+      'Jira',
+      'Azure',
+      'MongoDB Compass',
+      'AWS',
+      'Jenkins',
+      'SonarQube',
+    ],
+    personal: [
+      'Reliable and professional',
+      'Efficient communicator',
+      'Organized',
+      'Punctual',
+      'Team player',
+      'Fast learner',
+      'Motivated',
+      'Curious',
+    ],
   },
   social: [
-    { name: "github", url: "https://github.com/SilviuDinu", icon: "github-logo" },
-    { name: "facebook", url: "https://www.facebook.com/slv.alex96", icon: "facebook-circle" },
-    { name: "twitter", url: "https://twitter.com/silviualexd", icon: "twitter" },
-    { name: "linkedin", url: "https://www.linkedin.com/in/silviu-alexandru-dinu-138128151/", icon: "linkedin-circle" }
+    {
+      name: 'github',
+      url: 'https://github.com/SilviuDinu',
+      icon: 'github-logo',
+      enabled: true,
+    },
+    {
+      name: 'facebook',
+      url: 'https://www.facebook.com/slv.alex96',
+      icon: 'facebook-circle',
+      enabled: true,
+    },
+    {
+      name: 'twitter',
+      url: 'https://twitter.com/silviualexd',
+      icon: 'twitter',
+      enabled: true,
+    },
+    {
+      name: 'linkedin',
+      url: 'https://www.linkedin.com/in/silviu-alexandru-dinu-138128151/',
+      icon: 'linkedin-circle',
+      enabled: true,
+    },
   ],
   technologies: {
-    description: "When it comes to web technologies, I'm very passionate about everything that's out there, and since they are always changing, I try to keep up with the latest and greatest. Here are a few that I've worked with:",
+    description:
+      "When it comes to web technologies, I'm very passionate about everything that's out there, and since they are always changing, I try to keep up with the latest and greatest. Here are a few that I've worked with:",
     items: [
-      { key: "react", name: "ReactJS", icon: "reactjs.svg" },
-      { key: "angular", name: "Angular", icon: "angular.svg" },
-      { key: "angularjs", name: "AngularJS", icon: "angularjs.svg" },
-      { key: "typescript", name: "Typescript", icon: "typescript.svg" },
-      { key: "node", name: "NodeJS", icon: "nodejs.svg" },
-      { key: "express", name: "Express", icon: "express.svg" },
-      { key: "vue", name: "VueJS", icon: "vuejs.svg" },
-      { key: "socket", name: "Socket.io", icon: "socketio.svg" },
-      { key: "js", name: "Javascript", icon: "javascript.svg" },
-      { key: "rest", name: "REST APIs", icon: "rest.svg" },
-      { key: "mongo", name: "MongoDB", icon: "mongodb.svg" },
-      { key: "postgres", name: "PostgreSQL", icon: "postgresql.svg" },
-      { key: "mysql", name: "MySQL", icon: "mysql.svg" },
-      { key: "php", name: "PHP", icon: "php.svg" },
-      { key: "python", name: "Python", icon: "python.svg" },
-      { key: "pytorch", name: "Pytorch", icon: "pytorch.svg" },
-      { key: "html", name: "HTML", icon: "html.svg" },
-      { key: "css", name: "CSS", icon: "css.svg" },
-      { key: "sass", name: "SASS", icon: "sass.svg" }
-    ]
+      { key: 'react', name: 'ReactJS', icon: 'reactjs.svg', enabled: true },
+      { key: 'angular', name: 'Angular', icon: 'angular.svg', enabled: true },
+      {
+        key: 'angularjs',
+        name: 'AngularJS',
+        icon: 'angularjs.svg',
+        enabled: true,
+      },
+      {
+        key: 'typescript',
+        name: 'Typescript',
+        icon: 'typescript.svg',
+        enabled: true,
+      },
+      { key: 'node', name: 'NodeJS', icon: 'nodejs.svg', enabled: true },
+      { key: 'express', name: 'Express', icon: 'express.svg', enabled: true },
+      { key: 'vue', name: 'VueJS', icon: 'vuejs.svg', enabled: true },
+      { key: 'socket', name: 'Socket.io', icon: 'socketio.svg', enabled: true },
+      { key: 'js', name: 'Javascript', icon: 'javascript.svg', enabled: true },
+      { key: 'rest', name: 'REST APIs', icon: 'rest.svg', enabled: true },
+      { key: 'mongo', name: 'MongoDB', icon: 'mongodb.svg', enabled: true },
+      {
+        key: 'postgres',
+        name: 'PostgreSQL',
+        icon: 'postgresql.svg',
+        enabled: true,
+      },
+      { key: 'mysql', name: 'MySQL', icon: 'mysql.svg', enabled: true },
+      { key: 'php', name: 'PHP', icon: 'php.svg', enabled: true },
+      { key: 'python', name: 'Python', icon: 'python.svg', enabled: true },
+      { key: 'pytorch', name: 'Pytorch', icon: 'pytorch.svg', enabled: true },
+      { key: 'html', name: 'HTML', icon: 'html.svg', enabled: true },
+      { key: 'css', name: 'CSS', icon: 'css.svg', enabled: true },
+      { key: 'sass', name: 'SASS', icon: 'sass.svg', enabled: true },
+    ],
   },
   experience: [
     {
-      position: "Senior Software Engineer",
-      company: "London Stock Exchange Group",
-      city: "Bucharest",
-      startDate: "2024-02-01",
-      endDate: "Present",
+      position: 'Senior Software Engineer',
+      company: 'London Stock Exchange Group',
+      city: 'Bucharest',
+      startDate: '2024-02-01',
+      endDate: 'Present',
       responsibilities: [
-        "In my role as a Senior Software Engineer, I focus on developing cutting-edge software solutions that simplify financial operations and elevate the user experience. My contributions are central to equipping our users with dependable and effective financial tools",
-        "Working with tools like: React, Websockets, SharedWorkers, CI/CD"
-      ]
+        'In my role as a Senior Software Engineer, I focus on developing cutting-edge software solutions that simplify financial operations and elevate the user experience. My contributions are central to equipping our users with dependable and effective financial tools',
+        'Working with tools like: React, Websockets, SharedWorkers, CI/CD',
+      ],
+      enabled: true,
     },
     {
-      position: "Full Stack Developer",
-      company: "Cognizant",
-      city: "Bucharest",
-      startDate: "2022-10-01",
-      endDate: "2024-02-01",
+      position: 'Full Stack Developer',
+      company: 'Cognizant',
+      city: 'Bucharest',
+      startDate: '2022-10-01',
+      endDate: '2024-02-01',
       responsibilities: [
-        "As a Full Stack Developer in my current project, I not only engineer scalable and efficient software solutions but also contribute strategic business ideas aimed at boosting customer revenue",
-        "Working with tools like: React, NodeJS, MongoDB, AEM, Algolia"
-      ]
+        'As a Full Stack Developer in my current project, I not only engineer scalable and efficient software solutions but also contribute strategic business ideas aimed at boosting customer revenue',
+        'Working with tools like: React, NodeJS, MongoDB, AEM, Algolia',
+      ],
+      enabled: true,
     },
     {
-      position: "Full Stack Developer",
-      company: "EPAM Systems",
-      city: "Bucharest",
-      startDate: "2021-10-01",
-      endDate: "2022-10-01",
+      position: 'Full Stack Developer',
+      company: 'EPAM Systems',
+      city: 'Bucharest',
+      startDate: '2021-10-01',
+      endDate: '2022-10-01',
       responsibilities: [
-        "Consistently delivering superior quality services to our valued clients",
-        "Working with tools like: AngularJS, Angular, NodeJS, Ionic, Cordova, Typescript"
-      ]
+        'Consistently delivering superior quality services to our valued clients',
+        'Working with tools like: AngularJS, Angular, NodeJS, Ionic, Cordova, Typescript',
+      ],
+      enabled: true,
     },
     {
-      position: "Consultant - Middle Frontend Developer",
-      company: "Deloitte Digital",
-      city: "Bucharest",
-      startDate: "2020-02-01",
-      endDate: "2021-10-01",
+      position: 'Consultant - Middle Frontend Developer',
+      company: 'Deloitte Digital',
+      city: 'Bucharest',
+      startDate: '2020-02-01',
+      endDate: '2021-10-01',
       responsibilities: [
-        "Proactively collaborating with clients to deliver premium services and consultancy, ensuring excellence in my contributions",
-        "Working with tools like: AngularJS, Angular, React, SCSS, NodeJS, Jira"
-      ]
+        'Proactively collaborating with clients to deliver premium services and consultancy, ensuring excellence in my contributions',
+        'Working with tools like: AngularJS, Angular, React, SCSS, NodeJS, Jira',
+      ],
+      enabled: true,
     },
     {
-      position: "Junior Programmer - Technical Support Engineer",
-      company: "Themeisle",
-      city: "Bucharest",
-      startDate: "2018-07-01",
-      endDate: "2020-02-01",
+      position: 'Junior Programmer - Technical Support Engineer',
+      company: 'Themeisle',
+      city: 'Bucharest',
+      startDate: '2018-07-01',
+      endDate: '2020-02-01',
       responsibilities: [
-        "Assisting clients in developing robust WordPress websites",
-        "Solving/reporting bugs and debugging (PHP, CSS, JavaScript, MySQL)"
-      ]
-    }
+        'Assisting clients in developing robust WordPress websites',
+        'Solving/reporting bugs and debugging (PHP, CSS, JavaScript, MySQL)',
+      ],
+      enabled: true,
+    },
   ],
   codewars: {
-    username: "SilviuDinu",
-    enabled: true
-  }
+    username: 'SilviuDinu',
+    enabled: true,
+  },
 };

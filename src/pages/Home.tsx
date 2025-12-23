@@ -83,7 +83,7 @@ const Home = memo(() => {
             location={contact.location}
             yearsOfExperience={yearsOfExperience}
             projectsCount={projects.length}
-            technologiesCount={technologies?.items?.length || 0}
+            technologiesCount={technologies?.items?.filter(t => t.enabled !== false).length || 0}
             hasProjects={sectionChecks.hasProjects}
             firstSectionId={firstSection?.id}
             isGeneratingPDF={isGeneratingPDF}

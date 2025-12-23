@@ -70,7 +70,7 @@ const SkillsGrid = styled.div`
 `;
 
 export const SkillsSkeleton = () => {
-  const technologiesCount = contentData.technologies?.items?.length || 6;
+  const technologiesCount = contentData.technologies?.items?.filter(t => t.enabled !== false).length || 6;
   const languagesCount = contentData.skills?.languages?.length || 4;
   const toolsCount = contentData.skills?.developmentTools?.length || 6;
   const softSkillsCount = contentData.skills?.personal?.length || 6;

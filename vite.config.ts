@@ -19,7 +19,7 @@ function copyAssetsPlugin() {
         }
 
         mkdirSync(dest, { recursive: true });
-        readdirSync(src).forEach(file => {
+        readdirSync(src).forEach((file) => {
           const srcPath = path.join(src, file);
           const destPath = path.join(dest, file);
           copyRecursive(srcPath, destPath);
@@ -28,7 +28,7 @@ function copyAssetsPlugin() {
 
       copyRecursive(srcDir, destDir);
       console.log('✓ Copied assets to dist/src/assets');
-    }
+    },
   };
 }
 
@@ -81,10 +81,25 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          styled: ['styled-components', 'framer-motion', 'lucide-react'],
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          styled: ['styled-components'],
+          animation: ['framer-motion'],
+          icons: ['lucide-react'],
+          dates: ['date-fns'],
         },
       },
     },
+  },
+  // Pre-bundle these deps for faster dev server startup
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'styled-components',
+      'framer-motion',
+      'date-fns',
+    ],
   },
 });

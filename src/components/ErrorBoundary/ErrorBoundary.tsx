@@ -1,4 +1,4 @@
-import { AlertTriangle, Copy, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Check, Copy, RefreshCw } from 'lucide-react';
 import { Component, ErrorInfo, ReactNode } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 
@@ -174,11 +174,7 @@ const ExternalLink = styled.a`
   }
 `;
 
-const CopySuccess = styled.span`
-  color: #10b981;
-  font-size: 0.875rem;
-  margin-left: 0.5rem;
-`;
+
 
 interface Props {
   children: ReactNode;
@@ -271,9 +267,8 @@ class ErrorBoundary extends Component<Props, State> {
                 </Button>
 
                 <SecondaryButton onClick={this.handleCopy}>
-                  <Copy size={18} />
-                  Copy Error
-                  {copied && <CopySuccess>✓ Copied!</CopySuccess>}
+                  {copied ? <Check size={18} /> : <Copy size={18} />}
+                  {copied ? 'Copied' : 'Copy Error'}
                 </SecondaryButton>
               </MainButtons>
 

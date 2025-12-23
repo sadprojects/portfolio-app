@@ -41,7 +41,9 @@ const CertificationsGrid = styled(motion.div)`
 `;
 
 const CertificationCard = styled(motion.a)`
-  background-color: ${({ theme }) => theme.colors.card};
+  background-color: ${({ theme }) => `${theme.colors.card}e6`};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   padding: 2rem;
@@ -202,7 +204,7 @@ const Certifications = memo(() => {
         initial="hidden"
         animate="visible"
       >
-        {certifications.map((cert, index) => (
+        {certifications.filter(cert => cert.enabled !== false).map((cert, index) => (
           <CertificationCard
             key={index}
             href={cert.url}
