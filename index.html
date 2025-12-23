@@ -42,6 +42,19 @@
         font-style: normal;
         font-display: block;
       }
+      /* Critical CSS to prevent FOUC and reduce CLS */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #000000;
+        min-height: 100vh;
+      }
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
     </style>
 
     <!-- Preconnect to font origins for faster DNS resolution -->
@@ -58,7 +71,7 @@
     <!-- Preload Inter font CSS for non-blocking load -->
     <link
       rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       as="style"
       onload="
         this.onload = null;
@@ -68,7 +81,7 @@
     <noscript
       ><link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     /></noscript>
 
     <title>Silviu Dinu | Portfolio</title>

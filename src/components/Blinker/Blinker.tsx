@@ -6,6 +6,7 @@ export interface BlinkerProps {
   className?: string;
   cycleInterval?: number; // Time in ms before cycling to next text
   onCycleComplete?: () => void; // Callback when cycle is complete (text fully erased)
+  startDelay?: number; // Delay before animation starts (helps reduce CLS)
 }
 
 const Blinker = ({
@@ -13,13 +14,30 @@ const Blinker = ({
   as: Tag = 'span',
   className = '',
   cycleInterval,
-  onCycleComplete
+  onCycleComplete,
+  startDelay = 0,
 }: BlinkerProps) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const [displayedText, setDisplayedText] = useState(
+    startDelay > 0 ? text : '',
+  );
+  const [isTypingComplete, setIsTypingComplete] = useState(startDelay > 0);
   const [isErasing, setIsErasing] = useState(false);
+  const [hasStarted, setHasStarted] = useState(startDelay === 0);
 
   useEffect(() => {
+    if (startDelay > 0 && !hasStarted) {
+      const delayTimer = setTimeout(() => {
+        setHasStarted(true);
+        setDisplayedText('');
+        setIsTypingComplete(false);
+      }, startDelay);
+      return () => clearTimeout(delayTimer);
+    }
+  }, [startDelay, hasStarted]);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+
     setDisplayedText('');
     setIsTypingComplete(false);
     setIsErasing(false);
@@ -40,7 +58,7 @@ const Blinker = ({
     }, charDelay);
 
     return () => clearInterval(interval);
-  }, [text]);
+  }, [text, hasStarted]);
 
   useEffect(() => {
     if (!isTypingComplete || !cycleInterval || !onCycleComplete) return;
@@ -72,7 +90,10 @@ const Blinker = ({
   }, [isTypingComplete, cycleInterval, onCycleComplete, text]);
 
   return (
-    <Tag className={className} style={{ minHeight: '1.2em', display: 'inline-block' }}>
+    <Tag
+      className={className}
+      style={{ minHeight: '1.2em', display: 'inline-block' }}
+    >
       {displayedText}
       <span
         className="blinker-cursor"
@@ -82,7 +103,10 @@ const Blinker = ({
           height: '0.1rem',
           backgroundColor: 'currentColor',
           marginLeft: '0.1em',
-          animation: (isTypingComplete && !isErasing) ? 'blink 1s step-end infinite' : 'none',
+          animation:
+            isTypingComplete && !isErasing
+              ? 'blink 1s step-end infinite'
+              : 'none',
           verticalAlign: 'baseline',
         }}
       />

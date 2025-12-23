@@ -10,6 +10,8 @@ const FooterContainer = styled.footer`
   padding: 2rem;
   margin-top: auto;
   min-height: 100px;
+  /* Prevent layout shift with contain */
+  contain: layout style;
 `;
 
 const FooterContent = styled.div`
@@ -18,6 +20,8 @@ const FooterContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  /* Reserve space for social icons + copyright */
+  min-height: 68px;
 `;
 
 const SocialLinks = styled.div`
@@ -28,8 +32,9 @@ const SocialLinks = styled.div`
 
 const SocialLink = styled.a`
   color: ${({ theme }) => theme.colors.secondary};
-  transition: color ${({ theme }) => theme.transitions.fast},
-              transform ${({ theme }) => theme.transitions.fast};
+  transition:
+    color ${({ theme }) => theme.transitions.fast},
+    transform ${({ theme }) => theme.transitions.fast};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,7 +64,6 @@ const NameLink = styled.span`
     color: ${({ theme }) => theme.colors.foreground};
   }
 `;
-
 
 const socialIcons: Record<string, React.ComponentType<{ size?: number }>> = {
   github: Github,
@@ -106,24 +110,32 @@ export const Footer = memo(() => {
       <FooterContainer>
         <FooterContent>
           <SocialLinks>
-            {social.filter(link => link.enabled !== false).map(({ name, url }) => {
-              const Icon = socialIcons[name];
-              return Icon ? (
-                <SocialLink
-                  key={name}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={name}
-                >
-                  <Icon size={24} />
-                </SocialLink>
-              ) : null;
-            })}
+            {social
+              .filter((link) => link.enabled !== false)
+              .map(({ name, url }) => {
+                const Icon = socialIcons[name];
+                return Icon ? (
+                  <SocialLink
+                    key={name}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={name}
+                  >
+                    <Icon size={24} />
+                  </SocialLink>
+                ) : null;
+              })}
           </SocialLinks>
 
           <Copyright>
-            © {currentYear} <NameLink onClick={handleNameClick} onTouchEnd={handleNameTouch}>{footer}</NameLink>
+            © {currentYear}{' '}
+            <NameLink
+              onClick={handleNameClick}
+              onTouchEnd={handleNameTouch}
+            >
+              {footer}
+            </NameLink>
           </Copyright>
         </FooterContent>
       </FooterContainer>

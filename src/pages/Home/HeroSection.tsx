@@ -44,6 +44,8 @@ const Title = styled(motion.h1)`
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 1.5rem;
+  /* Reserve space to prevent CLS during text animation */
+  min-height: clamp(2.75rem, 8.8vw, 5.5rem);
   background: linear-gradient(
     135deg,
     ${({ theme }) => theme.colors.foreground} 0%,
@@ -55,6 +57,7 @@ const Title = styled(motion.h1)`
 
   @media (max-width: 768px) {
     font-size: clamp(1.75rem, 6vw, 2.25rem);
+    min-height: clamp(1.925rem, 6.6vw, 2.475rem);
   }
 `;
 
@@ -245,9 +248,8 @@ export const HeroSection = memo(
       setCurrentGreeting(newGreeting);
     }, [weatherData]);
 
-    if (isLoadingGreeting || !currentGreeting) {
-      return null; // Or a loading skeleton
-    }
+    // Use a placeholder greeting to prevent layout shift during initial load
+    const displayGreeting = currentGreeting || "Hello! I'm Silviu";
 
     return (
       <HeroContainer>
@@ -263,9 +265,10 @@ export const HeroSection = memo(
 
           <Title variants={itemVariants}>
             <Blinker
-              text={currentGreeting}
+              text={displayGreeting}
               cycleInterval={10000}
               onCycleComplete={handleCycleComplete}
+              startDelay={isLoadingGreeting ? 0 : 2500}
             />
           </Title>
 
