@@ -30,7 +30,9 @@ try {
     console.log(`✓ Git tag created for deployed version: ${deployedTagName}`);
   } catch (tagError) {
     // Tag might already exist, that's okay
-    console.warn(`⚠ Git tag creation skipped (may already exist): ${deployedTagName}`);
+    console.warn(
+      `⚠ Git tag creation skipped (may already exist): ${deployedTagName}`,
+    );
   }
 
   // Now increment version for NEXT deployment
