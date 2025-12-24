@@ -26,7 +26,7 @@ const Section = styled(motion.section)`
   scroll-margin-top: 4rem;
 
   @media (max-width: 768px) {
-    padding: 6rem 1.5rem 3rem;
+    padding: 6rem 0.5rem 3rem;
     scroll-margin-top: 3.5rem;
   }
 `;

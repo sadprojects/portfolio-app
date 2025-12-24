@@ -7,11 +7,6 @@ export const GameContainer = styled.div`
   gap: 1.5rem;
   padding: 0;
   max-width: 100%;
-  overflow-x: auto;
-
-  @media (min-width: 480px) {
-    overflow-x: visible;
-  }
 
   @media (min-width: 768px) {
     flex-direction: row;
@@ -25,10 +20,6 @@ export const BoardSection = styled.div`
   flex-direction: column;
   gap: 1rem;
   align-items: center;
-  
-  @media (max-width: 767px) {
-    padding: 0 1rem;
-  }
 `;
 
 export const StatusBar = styled.div`
@@ -81,7 +72,7 @@ export const GridWrapper = styled.div`
     0 8px 32px rgba(0, 0, 0, 0.12);
   
   @media (max-width: 767px) {
-    max-width: 88vw;
+    max-width: 100%;
   }
 `;
 
@@ -117,8 +108,8 @@ const cellBase = css`
   position: relative;
 
   @media (max-width: 767px) {
-    width: clamp(26px, 7vw, 42px);
-    height: clamp(26px, 7vw, 42px);
+    width: clamp(32px, 8.2vw, 42px);
+    height: clamp(32px, 8.2vw, 42px);
   }
 
   @media (min-width: 768px) {
