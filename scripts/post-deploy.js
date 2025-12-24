@@ -52,7 +52,7 @@ try {
   // Git add and commit with [skip ci]
   try {
     execSync('git add src/version.json', { stdio: 'inherit' });
-    execSync(`git commit -m "[skip ci] prepare next version ${nextVersion}"`, {
+    execSync(`git commit -m "[skip ci] bump next version to ${nextVersion}"`, {
       stdio: 'inherit',
     });
     console.log('✓ Changes committed to repository');
