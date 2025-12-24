@@ -26,7 +26,7 @@ const Section = styled(motion.section)`
   scroll-margin-top: 4rem;
 
   @media (max-width: 768px) {
-    padding: 6rem 0.5rem 3rem;
+    padding: 6rem 0.25rem 3rem;
     scroll-margin-top: 3.5rem;
   }
 `;
@@ -34,16 +34,16 @@ const Section = styled(motion.section)`
 const sectionVariants = {
   hidden: {
     opacity: 0,
-    y: 50
+    y: 50,
   },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 1.2,
-      ease: [0.22, 1, 0.36, 1]
-    }
-  }
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
 };
 
 interface DynamicSectionsProps {
@@ -58,115 +58,141 @@ interface DynamicSectionsProps {
   };
 }
 
-export const DynamicSections = memo(({ sections, sectionChecks }: DynamicSectionsProps) => {
-  const { hasProjects, hasCertifications, hasSkills, hasExperience, hasHobbies, hasContact } = sectionChecks;
+export const DynamicSections = memo(
+  ({ sections, sectionChecks }: DynamicSectionsProps) => {
+    const {
+      hasProjects,
+      hasCertifications,
+      hasSkills,
+      hasExperience,
+      hasHobbies,
+      hasContact,
+    } = sectionChecks;
 
-  const getFallback = (useSkeleton: boolean, SkeletonComponent: React.ComponentType) => {
-    return useSkeleton ? <SkeletonComponent /> : <div style={{ minHeight: '80vh' }} />;
-  };
+    const getFallback = (
+      useSkeleton: boolean,
+      SkeletonComponent: React.ComponentType,
+    ) => {
+      return useSkeleton ? (
+        <SkeletonComponent />
+      ) : (
+        <div style={{ minHeight: '80vh' }} />
+      );
+    };
 
-  return (
-    <>
-      {sections.slice(1).map((section) => {
-        const useSkeleton = section.useSkeleton ?? false;
+    return (
+      <>
+        {sections.slice(1).map((section) => {
+          const useSkeleton = section.useSkeleton ?? false;
 
-        switch (section.id) {
-          case 'projects':
-            return hasProjects ? (
-              <Section
-                key={section.id}
-                data-section="projects"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={sectionVariants}
-              >
-                <Suspense fallback={getFallback(useSkeleton, ProjectsSkeleton)}>
-                  <Projects />
-                </Suspense>
-              </Section>
-            ) : null;
-          case 'certifications':
-            return hasCertifications ? (
-              <Section
-                key={section.id}
-                data-section="certifications"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={sectionVariants}
-              >
-                <Suspense fallback={getFallback(useSkeleton, CertificationsSkeleton)}>
-                  <Certifications />
-                </Suspense>
-              </Section>
-            ) : null;
-          case 'skills':
-            return hasSkills ? (
-              <Section
-                key={section.id}
-                data-section="skills"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={sectionVariants}
-              >
-                <Suspense fallback={getFallback(useSkeleton, SkillsSkeleton)}>
-                  <Skills />
-                </Suspense>
-              </Section>
-            ) : null;
-          case 'experience':
-            return hasExperience ? (
-              <Section
-                key={section.id}
-                data-section="experience"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={sectionVariants}
-              >
-                <Suspense fallback={getFallback(useSkeleton, ExperienceSkeleton)}>
-                  <Experience />
-                </Suspense>
-              </Section>
-            ) : null;
-          case 'hobbies':
-            return hasHobbies ? (
-              <Section
-                key={section.id}
-                data-section="hobbies"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={sectionVariants}
-              >
-                <Suspense fallback={getFallback(useSkeleton, HobbiesSkeleton)}>
-                  <Hobbies />
-                </Suspense>
-              </Section>
-            ) : null;
-          case 'contact':
-            return hasContact ? (
-              <Section
-                key={section.id}
-                data-section="contact"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={sectionVariants}
-              >
-                <Suspense fallback={getFallback(useSkeleton, ContactSkeleton)}>
-                  <Contact />
-                </Suspense>
-              </Section>
-            ) : null;
-          default:
-            return null;
-        }
-      })}
-    </>
-  );
-});
+          switch (section.id) {
+            case 'projects':
+              return hasProjects ? (
+                <Section
+                  key={section.id}
+                  data-section="projects"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-100px' }}
+                  variants={sectionVariants}
+                >
+                  <Suspense
+                    fallback={getFallback(useSkeleton, ProjectsSkeleton)}
+                  >
+                    <Projects />
+                  </Suspense>
+                </Section>
+              ) : null;
+            case 'certifications':
+              return hasCertifications ? (
+                <Section
+                  key={section.id}
+                  data-section="certifications"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-100px' }}
+                  variants={sectionVariants}
+                >
+                  <Suspense
+                    fallback={getFallback(useSkeleton, CertificationsSkeleton)}
+                  >
+                    <Certifications />
+                  </Suspense>
+                </Section>
+              ) : null;
+            case 'skills':
+              return hasSkills ? (
+                <Section
+                  key={section.id}
+                  data-section="skills"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-100px' }}
+                  variants={sectionVariants}
+                >
+                  <Suspense fallback={getFallback(useSkeleton, SkillsSkeleton)}>
+                    <Skills />
+                  </Suspense>
+                </Section>
+              ) : null;
+            case 'experience':
+              return hasExperience ? (
+                <Section
+                  key={section.id}
+                  data-section="experience"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-100px' }}
+                  variants={sectionVariants}
+                >
+                  <Suspense
+                    fallback={getFallback(useSkeleton, ExperienceSkeleton)}
+                  >
+                    <Experience />
+                  </Suspense>
+                </Section>
+              ) : null;
+            case 'hobbies':
+              return hasHobbies ? (
+                <Section
+                  key={section.id}
+                  data-section="hobbies"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-100px' }}
+                  variants={sectionVariants}
+                >
+                  <Suspense
+                    fallback={getFallback(useSkeleton, HobbiesSkeleton)}
+                  >
+                    <Hobbies />
+                  </Suspense>
+                </Section>
+              ) : null;
+            case 'contact':
+              return hasContact ? (
+                <Section
+                  key={section.id}
+                  data-section="contact"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-100px' }}
+                  variants={sectionVariants}
+                >
+                  <Suspense
+                    fallback={getFallback(useSkeleton, ContactSkeleton)}
+                  >
+                    <Contact />
+                  </Suspense>
+                </Section>
+              ) : null;
+            default:
+              return null;
+          }
+        })}
+      </>
+    );
+  },
+);
 
 DynamicSections.displayName = 'DynamicSections';

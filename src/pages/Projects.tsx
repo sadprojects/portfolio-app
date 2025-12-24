@@ -522,198 +522,202 @@ const Projects = memo(() => {
       </Header>
 
       <ProjectsGrid>
-        {projects.filter(project => project.enabled !== false).map((project, index) => {
-          const isExpanded = expandedId === index;
+        {projects
+          .filter((project) => project.enabled !== false)
+          .map((project, index) => {
+            const isExpanded = expandedId === index;
 
-          return (
-            <ProjectCardWrapper
-              key={index}
-              $isExpanded={isExpanded}
-              $expandedIndex={expandedId}
-              $currentIndex={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-            >
-              <ProjectCardContent
-                onClick={() => !isExpanded && toggleExpand(index)}
+            return (
+              <ProjectCardWrapper
+                key={index}
+                $isExpanded={isExpanded}
+                $expandedIndex={expandedId}
+                $currentIndex={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
               >
-                <ProjectHeader>
-                  <ProjectTitleSection>
-                    <ProjectTitle>
-                      {project.title}
-                      {project.easterEgg && (
-                        <EasterEggBadge>
-                          <Gamepad2 size={10} />
-                          Playable
-                        </EasterEggBadge>
-                      )}
-                    </ProjectTitle>
-                    <ProjectMeta>
-                      <MetaItem>
-                        <Calendar size={12} />
-                        {project.period}
-                      </MetaItem>
-                      <MetaItem>
-                        <MapPin size={12} />
-                        {project.city}
-                      </MetaItem>
-                    </ProjectMeta>
-                  </ProjectTitleSection>
-                  <ProjectActions>
-                    {project.publication && (
-                      <IconButton
-                        href={project.publication}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label={`View ${project.title} research publication`}
-                        title="Published Research Paper"
-                      >
-                        <FileText size={18} />
-                      </IconButton>
-                    )}
-                    {project.website && (
-                      <IconButton
-                        href={project.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label={`Visit ${project.title} website`}
-                      >
-                        <ExternalLink size={18} />
-                      </IconButton>
-                    )}
-                    <IconButton
-                      href={project.repo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      aria-label={`View ${project.title} source code`}
-                    >
-                      <Github size={18} />
-                    </IconButton>
-                    <ExpandButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleExpand(index);
-                      }}
-                      aria-label={
-                        isExpanded
-                          ? 'Collapse project details'
-                          : 'Expand project details'
-                      }
-                      aria-expanded={isExpanded}
-                    >
-                      {isExpanded ? (
-                        <ChevronUp size={18} />
-                      ) : (
-                        <ChevronDown size={18} />
-                      )}
-                    </ExpandButton>
-                  </ProjectActions>
-                </ProjectHeader>
-
-                <Description>{project.description}</Description>
-
-                {!isExpanded && (
-                  <Tags>
-                    {project.tools.slice(0, 6).map((tool, i) => (
-                      <Tag key={i}>{tool}</Tag>
-                    ))}
-                    {project.tools.length > 6 && (
-                      <Tag>+{project.tools.length - 6}</Tag>
-                    )}
-                  </Tags>
-                )}
-              </ProjectCardContent>
-
-              <AnimatePresence>
-                {isExpanded && (
-                  <ExpandedContent
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {/* Easter Egg: Sudoku Game */}
-                    {project.easterEgg === 'sudoku' && (
-                      <EasterEggContainer>
-                        <Suspense
-                          fallback={
-                            <EasterEggLoading>Loading game...</EasterEggLoading>
-                          }
+                <ProjectCardContent
+                  onClick={() => !isExpanded && toggleExpand(index)}
+                >
+                  <ProjectHeader>
+                    <ProjectTitleSection>
+                      <ProjectTitle>
+                        {project.title}
+                        {project.easterEgg && (
+                          <EasterEggBadge>
+                            <Gamepad2 size={10} />
+                            Playable
+                          </EasterEggBadge>
+                        )}
+                      </ProjectTitle>
+                      <ProjectMeta>
+                        <MetaItem>
+                          <Calendar size={12} />
+                          {project.period}
+                        </MetaItem>
+                        <MetaItem>
+                          <MapPin size={12} />
+                          {project.city}
+                        </MetaItem>
+                      </ProjectMeta>
+                    </ProjectTitleSection>
+                    <ProjectActions>
+                      {project.publication && (
+                        <IconButton
+                          href={project.publication}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`View ${project.title} research publication`}
+                          title="Published Research Paper"
                         >
-                          <Sudoku />
-                        </Suspense>
-                      </EasterEggContainer>
-                    )}
+                          <FileText size={18} />
+                        </IconButton>
+                      )}
+                      {project.website && (
+                        <IconButton
+                          href={project.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Visit ${project.title} website`}
+                        >
+                          <ExternalLink size={18} />
+                        </IconButton>
+                      )}
+                      <IconButton
+                        href={project.repo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label={`View ${project.title} source code`}
+                      >
+                        <Github size={18} />
+                      </IconButton>
+                      <ExpandButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleExpand(index);
+                        }}
+                        aria-label={
+                          isExpanded
+                            ? 'Collapse project details'
+                            : 'Expand project details'
+                        }
+                        aria-expanded={isExpanded}
+                      >
+                        {isExpanded ? (
+                          <ChevronUp size={18} />
+                        ) : (
+                          <ChevronDown size={18} />
+                        )}
+                      </ExpandButton>
+                    </ProjectActions>
+                  </ProjectHeader>
 
-                    {/* Regular project content */}
-                    {!project.easterEgg && (
-                      <>
-                        <ExpandedGrid>
-                          {project.video && (
-                            <VideoSection>
-                              <VideoContainer>
-                                {getVideoEmbed(project.video)}
-                              </VideoContainer>
-                            </VideoSection>
-                          )}
+                  <Description>{project.description}</Description>
 
-                          <DetailsSection>
-                            <DetailBlock>
-                              <DetailTitle>Technologies</DetailTitle>
-                              <DetailTags>
-                                {project.tools.map((tool, i) => (
-                                  <DetailTag key={i}>{tool}</DetailTag>
-                                ))}
-                              </DetailTags>
-                            </DetailBlock>
-                          </DetailsSection>
-                        </ExpandedGrid>
+                  {!isExpanded && (
+                    <Tags>
+                      {project.tools.slice(0, 6).map((tool, i) => (
+                        <Tag key={i}>{tool}</Tag>
+                      ))}
+                      {project.tools.length > 6 && (
+                        <Tag>+{project.tools.length - 6}</Tag>
+                      )}
+                    </Tags>
+                  )}
+                </ProjectCardContent>
 
-                        <LinksSection>
-                          {project.publication && (
-                            <LinkButton
-                              href={project.publication}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <FileText size={16} />
-                              Research Paper
-                            </LinkButton>
-                          )}
-                          {project.website && (
-                            <LinkButton
-                              href={project.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <ExternalLink size={16} />
-                              Visit Website
-                            </LinkButton>
-                          )}
-                          <SecondaryLink
-                            href={project.repo}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
+                <AnimatePresence>
+                  {isExpanded && (
+                    <ExpandedContent
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {/* Easter Egg: Sudoku Game */}
+                      {project.easterEgg === 'sudoku' && (
+                        <EasterEggContainer>
+                          <Suspense
+                            fallback={
+                              <EasterEggLoading>
+                                Loading game...
+                              </EasterEggLoading>
+                            }
                           >
-                            <Github size={16} />
-                            View Code
-                          </SecondaryLink>
-                        </LinksSection>
-                      </>
-                    )}
-                  </ExpandedContent>
-                )}
-              </AnimatePresence>
-            </ProjectCardWrapper>
-          );
-        })}
+                            <Sudoku />
+                          </Suspense>
+                        </EasterEggContainer>
+                      )}
+
+                      {/* Regular project content */}
+                      {!project.easterEgg && (
+                        <>
+                          <ExpandedGrid>
+                            {project.video && (
+                              <VideoSection>
+                                <VideoContainer>
+                                  {getVideoEmbed(project.video)}
+                                </VideoContainer>
+                              </VideoSection>
+                            )}
+
+                            <DetailsSection>
+                              <DetailBlock>
+                                <DetailTitle>Technologies</DetailTitle>
+                                <DetailTags>
+                                  {project.tools.map((tool, i) => (
+                                    <DetailTag key={i}>{tool}</DetailTag>
+                                  ))}
+                                </DetailTags>
+                              </DetailBlock>
+                            </DetailsSection>
+                          </ExpandedGrid>
+
+                          <LinksSection>
+                            {project.publication && (
+                              <LinkButton
+                                href={project.publication}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <FileText size={16} />
+                                Research Paper
+                              </LinkButton>
+                            )}
+                            {project.website && (
+                              <LinkButton
+                                href={project.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ExternalLink size={16} />
+                                Visit Website
+                              </LinkButton>
+                            )}
+                            <SecondaryLink
+                              href={project.repo}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Github size={16} />
+                              View Code
+                            </SecondaryLink>
+                          </LinksSection>
+                        </>
+                      )}
+                    </ExpandedContent>
+                  )}
+                </AnimatePresence>
+              </ProjectCardWrapper>
+            );
+          })}
       </ProjectsGrid>
     </ProjectsContainer>
   );

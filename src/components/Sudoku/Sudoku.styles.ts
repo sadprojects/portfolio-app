@@ -70,8 +70,9 @@ export const GridWrapper = styled.div`
   box-shadow:
     0 0 0 2px ${({ theme }) => theme.colors.foreground},
     0 8px 32px rgba(0, 0, 0, 0.12);
-  
+
   @media (max-width: 767px) {
+    width: 100%;
     max-width: 100%;
   }
 `;
@@ -98,7 +99,7 @@ const cellBase = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
   border: none;
   padding: 0;
   transition:
@@ -108,14 +109,16 @@ const cellBase = css`
   position: relative;
 
   @media (max-width: 767px) {
-    width: clamp(32px, 8.2vw, 42px);
-    height: clamp(32px, 8.2vw, 42px);
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
   }
 
   @media (min-width: 768px) {
     width: 48px;
     height: 48px;
-    font-size: 1.375rem;
+    font-size: clamp(1.5rem, 2vw, 2rem);
   }
 `;
 
@@ -139,26 +142,30 @@ export const CellButton = styled.button<{
     $isSameNumber,
     $isNumberSelected,
   }) => {
-    if ($isError) return 'rgba(239, 68, 68, 0.15)';
+    const isDark = theme.colors.foreground === '#FFFFFF';
+    
+    if ($isError) return isDark ? 'rgba(239, 68, 68, 0.25)' : 'rgba(239, 68, 68, 0.15)';
     if ($isSelected)
-      return theme.colors.foreground === '#FFFFFF'
-        ? 'rgba(255, 255, 255, 0.15)'
+      return isDark
+        ? 'rgba(59, 130, 246, 0.3)'
         : 'rgba(0, 0, 0, 0.1)';
     if ($isSameNumber || $isNumberSelected)
-      return theme.colors.foreground === '#FFFFFF'
-        ? 'rgba(255, 255, 255, 0.1)'
+      return isDark
+        ? 'rgba(59, 130, 246, 0.18)'
         : 'rgba(0, 0, 0, 0.06)';
     if ($isHighlighted)
-      return theme.colors.foreground === '#FFFFFF'
-        ? 'rgba(255, 255, 255, 0.04)'
+      return isDark
+        ? 'rgba(255, 255, 255, 0.06)'
         : 'rgba(0, 0, 0, 0.03)';
     return theme.colors.background;
   }};
 
   color: ${({ theme, $isInitial, $isError }) => {
-    if ($isError) return '#dc2626';
+    const isDark = theme.colors.foreground === '#FFFFFF';
+    
+    if ($isError) return isDark ? '#ef4444' : '#dc2626';
     if ($isInitial) return theme.colors.foreground;
-    return '#3b82f6';
+    return isDark ? '#60a5fa' : '#2563eb';
   }};
 
   &:hover {
@@ -169,17 +176,19 @@ export const CellButton = styled.button<{
       $isSameNumber,
       $isNumberSelected,
     }) => {
-      if ($isError) return 'rgba(239, 68, 68, 0.2)';
+      const isDark = theme.colors.foreground === '#FFFFFF';
+      
+      if ($isError) return isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.2)';
       if ($isSelected)
-        return theme.colors.foreground === '#FFFFFF'
-          ? 'rgba(255, 255, 255, 0.2)'
+        return isDark
+          ? 'rgba(59, 130, 246, 0.4)'
           : 'rgba(0, 0, 0, 0.12)';
       if ($isSameNumber || $isNumberSelected)
-        return theme.colors.foreground === '#FFFFFF'
-          ? 'rgba(255, 255, 255, 0.12)'
+        return isDark
+          ? 'rgba(59, 130, 246, 0.25)'
           : 'rgba(0, 0, 0, 0.08)';
-      return theme.colors.foreground === '#FFFFFF'
-        ? 'rgba(255, 255, 255, 0.06)'
+      return isDark
+        ? 'rgba(255, 255, 255, 0.09)'
         : 'rgba(0, 0, 0, 0.04)';
     }};
   }
@@ -206,7 +215,7 @@ export const NumberButton = styled.button<{ $isActive?: boolean }>`
   align-items: center;
   justify-content: center;
   aspect-ratio: 1;
-  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-size: clamp(1.25rem, 3.5vw, 1.5rem);
   font-weight: 700;
   background: ${({ theme, $isActive }) =>
     $isActive ? theme.colors.foreground : 'transparent'};
