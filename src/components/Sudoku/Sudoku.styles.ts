@@ -8,7 +8,12 @@ export const GameContainer = styled.div`
   padding: 0;
   max-width: 100%;
 
-  @media (min-width: 768px) {
+  @media (min-width: 768px) and (max-width: 1024px) {
+    gap: 2rem;
+    align-items: center;
+  }
+
+  @media (min-width: 1025px) {
     flex-direction: row;
     gap: 2.5rem;
     align-items: flex-start;
@@ -38,7 +43,11 @@ export const ControlsSection = styled.div`
   min-width: 0;
   width: 100%;
 
-  @media (min-width: 768px) {
+  @media (min-width: 768px) and (max-width: 1024px) {
+    max-width: 500px;
+  }
+
+  @media (min-width: 1025px) {
     min-width: 240px;
     width: auto;
   }
@@ -74,6 +83,11 @@ export const GridWrapper = styled.div`
   @media (max-width: 767px) {
     width: 100%;
     max-width: 100%;
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    max-width: 500px;
+    width: 100%;
   }
 `;
 
@@ -208,6 +222,10 @@ export const NumberPad = styled.div`
   @media (min-width: 768px) {
     grid-template-columns: repeat(5, 1fr);
   }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    gap: 0.5rem;
+  }
 `;
 
 export const NumberButton = styled.button<{ $isActive?: boolean }>`
@@ -227,6 +245,12 @@ export const NumberButton = styled.button<{ $isActive?: boolean }>`
   transition: all 120ms ease;
   min-width: clamp(36px, 10vw, 44px);
   min-height: clamp(36px, 10vw, 44px);
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    min-width: 48px;
+    min-height: 48px;
+    font-size: 1.375rem;
+  }
 
   &:hover:not(:disabled) {
     background: ${({ theme, $isActive }) =>
@@ -253,6 +277,10 @@ export const NumberButton = styled.button<{ $isActive?: boolean }>`
 export const ActionRow = styled.div`
   display: flex;
   gap: 0.5rem;
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    gap: 0.625rem;
+  }
 `;
 
 export const ActionButton = styled.button<{ $variant?: 'primary' | 'danger' }>`
@@ -283,6 +311,11 @@ export const ActionButton = styled.button<{ $variant?: 'primary' | 'danger' }>`
   cursor: pointer;
   transition: all 120ms ease;
   min-height: 44px;
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    min-height: 48px;
+    font-size: 0.875rem;
+  }
 
   &:hover {
     transform: translateY(-1px);
@@ -340,6 +373,12 @@ export const DifficultyTab = styled.button<{ $isActive: boolean }>`
   @media (min-width: 480px) {
     padding: 0.625rem 0.75rem;
     letter-spacing: 0.05em;
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.75rem;
+    min-height: 40px;
   }
 
   &:hover:not([data-active='true']) {
