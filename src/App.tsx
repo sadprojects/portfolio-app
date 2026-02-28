@@ -3,14 +3,12 @@ import { Footer } from '@components/Footer/Footer';
 import { Loader } from '@components/Loader/Loader';
 import { Toast } from '@components/Toast/Toast';
 import { useAccessibility } from '@contexts/AccessibilityContext';
-import { Suspense, lazy, useState, useEffect } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import styled, { createGlobalStyle, useTheme } from 'styled-components';
 
-// Lazy load Snowfall since it's only used conditionally
 const Snowfall = lazy(() => import('react-snowfall'));
 
-// Lazy load pages
 const Home = lazy(() => import('@pages/Home'));
 const NotFound = lazy(() => import('@pages/NotFound'));
 
@@ -76,7 +74,6 @@ const AppContent = () => {
   const theme = useTheme();
   const [showSnow, setShowSnow] = useState(false);
 
-  // Delay snow start by 4 seconds after page load
   useEffect(() => {
     if (snowfallEnabled) {
       const timer = setTimeout(() => {
@@ -88,7 +85,6 @@ const AppContent = () => {
     }
   }, [snowfallEnabled]);
 
-  // Snow is white/bright in dark mode, soft blue in light mode
   const isDarkMode = theme.colors.background === '#000000';
   const snowColor = isDarkMode
     ? 'rgba(255, 255, 255, 0.9)'
