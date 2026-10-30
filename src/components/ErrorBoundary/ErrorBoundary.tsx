@@ -18,7 +18,15 @@ const ErrorContainer = styled.div`
   padding: 0;
   margin: 0;
   background-color: ${({ theme }) => theme.colors.background};
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
 `;
 
 const ErrorCard = styled.div`
@@ -130,7 +138,7 @@ const Button = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: ${({ theme }) => theme.shadows.medium};
+    box-shadow: ${({ theme }) => theme.shadows.md};
   }
 
   @media (max-width: 768px) {
@@ -165,7 +173,7 @@ const ExternalLink = styled.a`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: ${({ theme }) => theme.shadows.medium};
+    box-shadow: ${({ theme }) => theme.shadows.md};
   }
 
   @media (max-width: 768px) {
@@ -173,8 +181,6 @@ const ExternalLink = styled.a`
     width: 100%;
   }
 `;
-
-
 
 interface Props {
   children: ReactNode;
@@ -240,12 +246,15 @@ class ErrorBoundary extends Component<Props, State> {
             <Title>Oops! Something went wrong</Title>
 
             <Message>
-              The application encountered an unexpected error. You can try refreshing the page or return to the home page.
-              If the problem persists, please report this issue so I can fix it.
+              The application encountered an unexpected error. You can try
+              refreshing the page or return to the home page. If the problem
+              persists, please report this issue so I can fix it.
             </Message>
 
             <StackTraceContainer>
-              <StackTraceLabel htmlFor="stack-trace">Error Details:</StackTraceLabel>
+              <StackTraceLabel htmlFor="stack-trace">
+                Error Details:
+              </StackTraceLabel>
               <StackTrace id="stack-trace">
                 {error?.message || 'Unknown error'}
                 {'\n\n'}

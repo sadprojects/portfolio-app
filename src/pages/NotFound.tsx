@@ -1,8 +1,9 @@
 import { Header } from '@components/Header/Header';
 import { motion } from 'framer-motion';
 import { Home } from 'lucide-react';
-import { memo } from 'react';
+
 import { Link } from 'react-router-dom';
+import { fadeUp, stagger } from '@styles/motion';
 import styled from 'styled-components';
 
 const PageWrapper = styled.div`
@@ -78,50 +79,28 @@ const PrimaryButton = styled(Link)`
   }
 `;
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5 },
-  },
-};
-
-const NotFound = memo(() => {
+const NotFound = () => {
   return (
     <PageWrapper>
       <Header
-        sections={[{ id: 'home', label: 'Home', icon: Home, enabled: true, order: 0 }]}
+        sections={[
+          { id: 'home', label: 'Home', icon: Home, enabled: true, order: 0 },
+        ]}
         activeSection="home"
         onNavigate={() => {}}
       />
       <NotFoundContainer>
-        <Content
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <ErrorCode variants={itemVariants}>404</ErrorCode>
+        <Content variants={stagger()} initial="hidden" animate="visible">
+          <ErrorCode variants={fadeUp}>404</ErrorCode>
 
-          <Title variants={itemVariants}>
-            Page Not Found
-          </Title>
+          <Title variants={fadeUp}>Page Not Found</Title>
 
-          <Description variants={itemVariants}>
-            Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
+          <Description variants={fadeUp}>
+            Oops! The page you're looking for doesn't exist. It might have been
+            moved or deleted.
           </Description>
 
-          <ButtonGroup variants={itemVariants}>
+          <ButtonGroup variants={fadeUp}>
             <PrimaryButton to="/">
               <Home size={20} />
               Back to Home
@@ -131,6 +110,6 @@ const NotFound = memo(() => {
       </NotFoundContainer>
     </PageWrapper>
   );
-});
+};
 
 export default NotFound;

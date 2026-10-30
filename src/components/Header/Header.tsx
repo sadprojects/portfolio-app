@@ -4,8 +4,8 @@ import useClickOutside from '@hooks/useClickOutside';
 import useDimensions from '@hooks/useDimensions';
 import type { SectionConfig } from '@utils/sectionBuilder';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, Moon, MousePointerClick, Snowflake, Sun, X } from 'lucide-react';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { Menu, Moon, Snowflake, Sun, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
@@ -48,28 +48,16 @@ const Logo = styled.button`
   text-decoration: none;
   color: ${({ theme }) => theme.colors.foreground};
   transition: opacity ${({ theme }) => theme.transitions.fast};
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   line-height: 1;
-  font-family: 'Scribble', cursive;
-  font-weight: 400;
-  font-style: normal;
+  white-space: nowrap;
+  font-family: ${({ theme }) => theme.typography.fonts.hand};
+  font-size: 2.1rem;
+  font-weight: 600;
   padding: 0;
 
   &:hover {
     opacity: 0.8;
   }
-`;
-
-const LogoFirstName = styled.span`
-  font-size: 2.75rem;
-`;
-
-const LogoLastName = styled.span`
-  font-size: 2.75rem;
-  padding-left: 2rem;
-  margin-top: -0.5rem;
 `;
 
 const RightActions = styled.div`
@@ -130,12 +118,6 @@ const FeatureToggle = styled.button<{ $disabled?: boolean }>`
   ${({ $disabled }) => $disabled && disabledToggleStyle}
 `;
 
-const DesktopFeatureToggle = styled(FeatureToggle)`
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
 const MobileMenuButton = styled.button`
   display: none;
   background: none;
@@ -151,7 +133,11 @@ const MobileMenuButton = styled.button`
   }
 `;
 
-const DesktopThemeToggle = styled(ThemeToggle)`
+const DesktopToggles = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
   @media (max-width: 768px) {
     display: none;
   }
@@ -242,275 +228,207 @@ interface HeaderProps {
   sections?: SectionConfig[];
   activeSection?: string;
   onNavigate?: (sectionId: string) => void;
-  isTOCExpanded?: boolean;
 }
 
-export const Header = memo(
-  ({ sections = [], onNavigate, isTOCExpanded = false }: HeaderProps = {}) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isMobile] = useDimensions();
-    const { mode, toggleTheme } = useTheme();
-    const {
-      scrollSnapEnabled,
-      toggleScrollSnap,
-      snowfallEnabled,
-      toggleSnowfall,
-    } = useAccessibility();
-    const navRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
-    const [isVisible, setIsVisible] = useState(true);
-    const [isHovering, setIsHovering] = useState(false);
-    const lastScrollY = useRef(0);
-    const [isTabletOrMobile, setIsTabletOrMobile] = useState(false);
-    const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+export const Header = ({ sections = [], onNavigate }: HeaderProps = {}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile] = useDimensions();
+  const { mode, toggleTheme } = useTheme();
+  const { snowfallEnabled, toggleSnowfall } = useAccessibility();
+  const navRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(true);
+  const [isHovering, setIsHovering] = useState(false);
+  const lastScrollY = useRef(0);
+  const [isTabletOrMobile, setIsTabletOrMobile] = useState(false);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Detect mobile/tablet viewport
-    useEffect(() => {
-      const checkViewport = () => {
-        setIsTabletOrMobile(window.innerWidth <= 1024);
-      };
-      checkViewport();
-      window.addEventListener('resize', checkViewport);
-      return () => window.removeEventListener('resize', checkViewport);
-    }, []);
+  // Detect mobile/tablet viewport
+  useEffect(() => {
+    const checkViewport = () => {
+      setIsTabletOrMobile(window.innerWidth <= 1024);
+    };
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+    return () => window.removeEventListener('resize', checkViewport);
+  }, []);
 
-    // Handle hover trigger for desktop dock-like behavior
-    const handleTriggerEnter = useCallback(() => {
-      if (isTabletOrMobile) return;
+  // Handle hover trigger for desktop dock-like behavior
+  const handleTriggerEnter = useCallback(() => {
+    if (isTabletOrMobile) return;
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setIsHovering(true);
+  }, [isTabletOrMobile]);
+
+  const handleHeaderLeave = useCallback(() => {
+    if (isTabletOrMobile) return;
+    // Delay before hiding to allow moving between trigger zone and header
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsHovering(false);
+    }, 150);
+  }, [isTabletOrMobile]);
+
+  const handleHeaderEnter = useCallback(() => {
+    // Keep header visible when mouse enters it
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setIsHovering(true);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
-        hoverTimeoutRef.current = null;
-      }
-      setIsHovering(true);
-    }, [isTabletOrMobile]);
-
-    const handleHeaderLeave = useCallback(() => {
-      if (isTabletOrMobile) return;
-      // Delay before hiding to allow moving between trigger zone and header
-      hoverTimeoutRef.current = setTimeout(() => {
-        setIsHovering(false);
-      }, 150);
-    }, [isTabletOrMobile]);
-
-    const handleHeaderEnter = useCallback(() => {
-      // Keep header visible when mouse enters it
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-        hoverTimeoutRef.current = null;
-      }
-      setIsHovering(true);
-    }, []);
-
-    // Cleanup timeout on unmount
-    useEffect(() => {
-      return () => {
-        if (hoverTimeoutRef.current) {
-          clearTimeout(hoverTimeoutRef.current);
-        }
-      };
-    }, []);
-
-    useEffect(() => {
-      const handleScroll = () => {
-        // Don't hide header when mobile menu is open
-        if (isOpen) {
-          setIsVisible(true);
-          return;
-        }
-
-        const currentScrollY = window.scrollY;
-
-        // Show header when scrolling up, hide when scrolling down
-        if (currentScrollY < lastScrollY.current || currentScrollY < 100) {
-          setIsVisible(true);
-        } else if (
-          currentScrollY > lastScrollY.current &&
-          currentScrollY > 100
-        ) {
-          setIsVisible(false);
-        }
-
-        lastScrollY.current = currentScrollY;
-      };
-
-      window.addEventListener('scroll', handleScroll, { passive: true });
-      return () => window.removeEventListener('scroll', handleScroll);
-    }, [isOpen]);
-
-    const openMenu = useCallback(() => setIsOpen(true), []);
-    const closeMenu = useCallback(() => setIsOpen(false), []);
-
-    useClickOutside(navRef, closeMenu);
-
-    const handleLogoClick = () => {
-      const homeSection = document.querySelector('[data-section="home"]');
-      if (homeSection) {
-        navigate('/');
-        onNavigate?.('home');
       }
     };
+  }, []);
 
-    const handleNavClick = (sectionId: string) => {
-      if (onNavigate) {
-        onNavigate(sectionId);
+  useEffect(() => {
+    const handleScroll = () => {
+      // Don't hide header when mobile menu is open
+      if (isOpen) {
+        setIsVisible(true);
+        return;
       }
-      closeMenu();
+
+      const currentScrollY = window.scrollY;
+
+      // Show header when scrolling up, hide when scrolling down
+      if (currentScrollY < lastScrollY.current || currentScrollY < 100) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setIsVisible(false);
+      }
+
+      lastScrollY.current = currentScrollY;
     };
 
-    // Header should be visible if: scrolling up OR hovering (desktop only) OR at top
-    const shouldShowHeader =
-      (isVisible || isHovering) && !(isTabletOrMobile && isTOCExpanded);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isOpen]);
 
-    return (
-      <>
-        {/* Invisible trigger zone at top of screen for dock-like behavior (desktop only) */}
-        <HoverTriggerZone
-          $isActive={!isVisible && !isTabletOrMobile}
-          onMouseEnter={handleTriggerEnter}
-        />
-        <HeaderContainer
-          initial={{ y: 0 }}
-          animate={{
-            y: shouldShowHeader ? 0 : '-100%',
-          }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          onMouseEnter={handleHeaderEnter}
-          onMouseLeave={handleHeaderLeave}
-        >
-          <Nav>
-            <Logo
-              onClick={handleLogoClick}
-              aria-label="Scroll to top"
-            >
-              <LogoFirstName>Silviu</LogoFirstName>
-              <LogoLastName>Dinu</LogoLastName>
-            </Logo>
+  const openMenu = useCallback(() => setIsOpen(true), []);
+  const closeMenu = useCallback(() => setIsOpen(false), []);
 
-            <RightActions>
-              <DesktopFeatureToggle
-                onClick={toggleSnowfall}
-                aria-label={
-                  snowfallEnabled ? 'Disable snowfall' : 'Enable snowfall'
-                }
-                title={snowfallEnabled ? 'Snowfall: On' : 'Snowfall: Off'}
-                $disabled={!snowfallEnabled}
-              >
-                <Snowflake size={20} />
-              </DesktopFeatureToggle>
-              <DesktopFeatureToggle
-                onClick={toggleScrollSnap}
-                aria-label={
-                  scrollSnapEnabled
-                    ? 'Disable scroll snap'
-                    : 'Enable scroll snap'
-                }
-                title={
-                  scrollSnapEnabled ? 'Scroll snap: On' : 'Scroll snap: Off'
-                }
-                $disabled={!scrollSnapEnabled}
-              >
-                <MousePointerClick size={20} />
-              </DesktopFeatureToggle>
-              <DesktopThemeToggle
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-              >
-                {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-              </DesktopThemeToggle>
+  useClickOutside(navRef, closeMenu);
 
-              {isMobile && (
-                <MobileMenuButton
-                  onClick={openMenu}
-                  aria-label="Open menu"
-                >
-                  <Menu size={24} />
-                </MobileMenuButton>
-              )}
-            </RightActions>
+  const handleLogoClick = () => {
+    const homeSection = document.querySelector('[data-section="home"]');
+    if (homeSection) {
+      navigate('/');
+      onNavigate?.('home');
+    }
+  };
+
+  const handleNavClick = (sectionId: string) => {
+    if (onNavigate) {
+      onNavigate(sectionId);
+    }
+    closeMenu();
+  };
+
+  // Header should be visible if: scrolling up OR hovering (desktop only) OR at top
+  const shouldShowHeader = isVisible || isHovering;
+
+  const toggles = (
+    <>
+      <FeatureToggle
+        onClick={toggleSnowfall}
+        aria-label={snowfallEnabled ? 'Disable snowfall' : 'Enable snowfall'}
+        title={snowfallEnabled ? 'Snowfall: On' : 'Snowfall: Off'}
+        $disabled={!snowfallEnabled}
+      >
+        <Snowflake size={20} />
+      </FeatureToggle>
+      <ThemeToggle onClick={toggleTheme} aria-label="Toggle theme">
+        {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+      </ThemeToggle>
+    </>
+  );
+
+  return (
+    <>
+      {/* Invisible trigger zone at top of screen for dock-like behavior (desktop only) */}
+      <HoverTriggerZone
+        $isActive={!isVisible && !isTabletOrMobile}
+        onMouseEnter={handleTriggerEnter}
+      />
+      <HeaderContainer
+        initial={{ y: 0 }}
+        animate={{
+          y: shouldShowHeader ? 0 : '-100%',
+        }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        onMouseEnter={handleHeaderEnter}
+        onMouseLeave={handleHeaderLeave}
+      >
+        <Nav>
+          <Logo onClick={handleLogoClick} aria-label="Scroll to top">
+            Silviu Dinu
+          </Logo>
+
+          <RightActions>
+            <DesktopToggles>{toggles}</DesktopToggles>
 
             {isMobile && (
-              <AnimatePresence>
-                {isOpen && (
-                  <>
-                    <Overlay
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      onClick={closeMenu}
-                    />
-                    <MobileNav
-                      ref={navRef}
-                      initial={{ x: '100%' }}
-                      animate={{ x: 0 }}
-                      exit={{ x: '100%' }}
-                      transition={{
-                        type: 'spring',
-                        damping: 25,
-                        stiffness: 200,
-                      }}
-                    >
-                      <CloseButton
-                        onClick={closeMenu}
-                        aria-label="Close menu"
-                      >
-                        <X size={24} />
-                      </CloseButton>
-
-                      {sections.map((section) => {
-                        const Icon = section.icon;
-                        return (
-                          <MobileNavLink
-                            key={section.id}
-                            onClick={() => handleNavClick(section.id)}
-                          >
-                            <Icon size={20} />
-                            {section.label}
-                          </MobileNavLink>
-                        );
-                      })}
-
-                      <MobileActions>
-                        <FeatureToggle
-                          onClick={toggleSnowfall}
-                          aria-label={
-                            snowfallEnabled
-                              ? 'Disable snowfall'
-                              : 'Enable snowfall'
-                          }
-                          $disabled={!snowfallEnabled}
-                        >
-                          <Snowflake size={20} />
-                        </FeatureToggle>
-                        <FeatureToggle
-                          onClick={toggleScrollSnap}
-                          aria-label={
-                            scrollSnapEnabled
-                              ? 'Disable scroll snap'
-                              : 'Enable scroll snap'
-                          }
-                          $disabled={!scrollSnapEnabled}
-                        >
-                          <MousePointerClick size={20} />
-                        </FeatureToggle>
-                        <ThemeToggle
-                          onClick={toggleTheme}
-                          aria-label="Toggle theme"
-                        >
-                          {mode === 'dark' ? (
-                            <Sun size={20} />
-                          ) : (
-                            <Moon size={20} />
-                          )}
-                        </ThemeToggle>
-                      </MobileActions>
-                    </MobileNav>
-                  </>
-                )}
-              </AnimatePresence>
+              <MobileMenuButton onClick={openMenu} aria-label="Open menu">
+                <Menu size={24} />
+              </MobileMenuButton>
             )}
-          </Nav>
-        </HeaderContainer>
-      </>
-    );
-  },
-);
+          </RightActions>
+
+          {isMobile && (
+            <AnimatePresence>
+              {isOpen && (
+                <>
+                  <Overlay
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={closeMenu}
+                  />
+                  <MobileNav
+                    ref={navRef}
+                    initial={{ x: '100%' }}
+                    animate={{ x: 0 }}
+                    exit={{ x: '100%' }}
+                    transition={{
+                      type: 'spring',
+                      damping: 25,
+                      stiffness: 200,
+                    }}
+                  >
+                    <CloseButton onClick={closeMenu} aria-label="Close menu">
+                      <X size={24} />
+                    </CloseButton>
+
+                    {sections.map((section) => {
+                      const Icon = section.icon;
+                      return (
+                        <MobileNavLink
+                          key={section.id}
+                          onClick={() => handleNavClick(section.id)}
+                        >
+                          <Icon size={20} />
+                          {section.label}
+                        </MobileNavLink>
+                      );
+                    })}
+
+                    <MobileActions>{toggles}</MobileActions>
+                  </MobileNav>
+                </>
+              )}
+            </AnimatePresence>
+          )}
+        </Nav>
+      </HeaderContainer>
+    </>
+  );
+};

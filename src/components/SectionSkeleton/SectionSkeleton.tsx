@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import styled, { keyframes } from 'styled-components';
 
 const shimmer = keyframes`
@@ -68,13 +67,9 @@ const SkeletonCard = styled.div`
   }
 `;
 
-interface SectionSkeletonProps {
-  sectionId: string;
-}
-
-export const SectionSkeleton = memo(({ sectionId }: SectionSkeletonProps) => {
+export const SectionSkeleton = () => {
   return (
-    <SkeletonSection data-section={sectionId}>
+    <SkeletonSection>
       <SkeletonTitle />
       <SkeletonContent>
         <SkeletonCard />
@@ -83,6 +78,4 @@ export const SectionSkeleton = memo(({ sectionId }: SectionSkeletonProps) => {
       </SkeletonContent>
     </SkeletonSection>
   );
-});
-
-SectionSkeleton.displayName = 'SectionSkeleton';
+};

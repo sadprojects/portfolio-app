@@ -94,6 +94,12 @@ describe('Date Utilities', () => {
       expect(duration).toContain('1 month');
       expect(duration).not.toContain('months');
     });
+
+    it('describes a role that started this month instead of "0 months"', () => {
+      expect(calculateDuration('2023-01-05', '2023-01-20')).toBe(
+        'Less than a month',
+      );
+    });
   });
 
   describe('formatDateRange', () => {
@@ -140,6 +146,3 @@ describe('Date Utilities', () => {
     });
   });
 });
-
-
-

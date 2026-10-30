@@ -1,10 +1,10 @@
 import { downloadCV } from '@utils/pdfGenerator';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 export const usePDFDownload = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
-  const handleDownloadCV = useCallback(async () => {
+  const handleDownloadCV = async () => {
     setIsGeneratingPDF(true);
     try {
       await downloadCV();
@@ -13,10 +13,7 @@ export const usePDFDownload = () => {
     } finally {
       setIsGeneratingPDF(false);
     }
-  }, []);
-
-  return {
-    isGeneratingPDF,
-    handleDownloadCV,
   };
+
+  return { isGeneratingPDF, handleDownloadCV };
 };

@@ -125,4 +125,4 @@ const Blinker = ({
   );
 };
 
-export default React.memo(Blinker);
+export default Blinker;

@@ -1,333 +1,289 @@
 import Blinker from '@components/Blinker/Blinker';
+import { RevealMedia } from '@components/motion/RevealMedia';
+import { RevealText } from '@components/motion/RevealText';
+import { contentData } from '@data/content';
+import { EASE, Grid, col } from '@styles/grid';
 import {
   fetchWeatherData,
   getCompleteGreeting,
   resetGreetingType,
 } from '@utils/greetings';
-import { motion } from 'framer-motion';
-import {
-  ArrowRight,
-  Download,
-  Loader as LoaderIcon,
-  Sparkles,
-} from 'lucide-react';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowDown, Download } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-const HeroContainer = styled.div`
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-`;
-
-const Greeting = styled(motion.div)`
-  display: inline-flex;
+/* ---------- hero statement ---------- */
+const Hero = styled(Grid)`
+  min-height: calc(100vh - 4rem);
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: ${({ theme }) => theme.colors.accent};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 2rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 2rem;
-  color: ${({ theme }) => theme.colors.secondary};
+  row-gap: 2.5rem;
+  padding-top: 3rem;
+  padding-bottom: clamp(3rem, 6vw, 6rem);
 `;
 
-const Title = styled(motion.h1)`
-  font-size: clamp(2.5rem, 8vw, 5rem);
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-  /* Reserve space to prevent CLS during text animation */
-  min-height: clamp(2.75rem, 8.8vw, 5.5rem);
-  background: linear-gradient(
-    135deg,
-    ${({ theme }) => theme.colors.foreground} 0%,
-    ${({ theme }) => theme.colors.secondary} 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-
-  @media (max-width: 768px) {
-    font-size: clamp(1.75rem, 6vw, 2.25rem);
-    min-height: clamp(1.925rem, 6.6vw, 2.475rem);
-  }
-`;
-
-const Subtitle = styled(motion.h2)`
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: 400;
-  color: ${({ theme }) => theme.colors.secondary};
-  margin-bottom: 3rem;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-`;
-
-const ButtonGroup = styled(motion.div)`
+const Copy = styled(motion.div)`
+  ${col('2 / 10', '1 / 12')}
   display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 1.75rem;
+  min-width: 0;
 `;
 
-const PrimaryButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  background-color: ${({ theme }) => theme.colors.foreground};
-  color: ${({ theme }) => theme.colors.background};
-  border: 2px solid ${({ theme }) => theme.colors.foreground};
-  border-radius: 0.5rem;
+const Greeting = styled.p`
+  margin: 0;
+  min-height: 1.2em;
+  font-family: ${({ theme }) => theme.typography.fonts.hand};
   font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.fast};
+  font-size: clamp(1.5rem, 2.2vw, 2.6rem);
+  line-height: 1.1;
+  color: ${({ theme }) => theme.colors.secondary};
+`;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${({ theme }) => theme.shadows.large};
+const Title = styled(RevealText)`
+  margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.display};
+  font-weight: 400;
+  font-size: clamp(2.4rem, 4.8vw, 5.8rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+`;
+
+const Actions = styled(motion.div)`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem 2.5rem;
+`;
+
+const ScrollHint = styled(motion.div)`
+  ${col('11 / 13', '11 / 13')}
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.secondary};
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
-const SecondaryButton = styled.button`
+const HintLine = styled(motion.span)`
+  display: block;
+  width: 1px;
+  height: 2.5rem;
+  background: currentColor;
+  transform-origin: top;
+`;
+
+/* Immersive-style underlined text button: the line wipes out on hover and back in from the left. */
+export const LineButton = styled.button`
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 1rem 2rem;
-  background-color: transparent;
-  color: ${({ theme }) => theme.colors.foreground};
-  border: 2px solid ${({ theme }) => theme.colors.border};
-  border-radius: 0.5rem;
-  font-weight: 600;
+  padding: 0 0 0.55rem;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   text-decoration: none;
   cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.fast};
 
-  &:hover:not(:disabled) {
-    border-color: ${({ theme }) => theme.colors.foreground};
-    transform: translateY(-2px);
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform-origin: right;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(0);
+    transform-origin: left;
   }
 
   &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    opacity: 0.5;
+    cursor: wait;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
   }
 `;
 
-const Stats = styled(motion.div)`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  margin-top: 4rem;
-  padding-top: 2rem;
-  border-top: 1px solid ${({ theme }) => theme.colors.border};
-  justify-content: center;
+/* ---------- about ---------- */
 
-  @media (max-width: 768px) {
-    gap: 1.5rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    margin-bottom: 2rem;
-  }
+const About = styled(Grid)`
+  align-items: center;
+  row-gap: 2rem;
+  margin-top: clamp(6rem, 12vw, 14rem);
 `;
 
-const Stat = styled.div`
-  text-align: center;
+const Portrait = styled.figure`
+  ${col('2 / 6', '1 / 6', '1 / 9')}
+  margin: 0;
 `;
 
-const StatValue = styled.div`
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.foreground};
-  margin-bottom: 0.5rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
+const PortraitCaption = styled.figcaption`
+  margin-top: 0.75rem;
+  font-family: ${({ theme }) => theme.typography.fonts.hand};
+  font-weight: 600;
+  font-size: 1.35rem;
   color: ${({ theme }) => theme.colors.secondary};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 `;
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
+const AboutText = styled.div`
+  ${col('7 / 12', '6 / 13')}
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5 },
-  },
-};
+const AboutParagraph = styled(RevealText)`
+  margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.display};
+  font-size: clamp(1.35rem, 1.95vw, 2.3rem);
+  line-height: 1.3;
+`;
 
 interface HeroSectionProps {
-  name: string;
   age: number;
-  position: string;
-  location: string;
   yearsOfExperience: number;
-  projectsCount: number;
-  technologiesCount: number;
-  hasProjects: boolean;
   firstSectionId?: string;
   isGeneratingPDF: boolean;
   onViewWork: () => void;
   onDownloadCV: () => void;
 }
 
-export const HeroSection = memo(
-  ({
-    age,
-    position,
-    location,
-    yearsOfExperience,
-    projectsCount,
-    technologiesCount,
-    hasProjects,
-    firstSectionId,
-    isGeneratingPDF,
-    onViewWork,
-    onDownloadCV,
-  }: Omit<HeroSectionProps, 'name'>) => {
-    // Cycle through different greetings every 10 seconds
-    const [currentGreeting, setCurrentGreeting] = useState<string>('');
-    const [weatherData, setWeatherData] = useState<{
-      temp: number;
-      condition: string;
-    } | null>(null);
-    const [isLoadingGreeting, setIsLoadingGreeting] = useState(true);
+const fillPlaceholders = (text: string, values: Record<string, number>) =>
+  text.replace(/\{\{(\w+)\}\}/g, (_, key: string) =>
+    String(values[key] ?? `{{${key}}}`),
+  );
 
-    // Generate initial greeting immediately (always casual on first load)
-    useEffect(() => {
-      // Reset greeting type to ensure first greeting is casual
-      resetGreetingType();
+export const HeroSection = ({
+  age,
+  yearsOfExperience,
+  firstSectionId,
+  isGeneratingPDF,
+  onViewWork,
+  onDownloadCV,
+}: HeroSectionProps) => {
+  const { homepage, introduction, contact } = contentData;
+  const [currentGreeting, setCurrentGreeting] = useState('');
+  const [weatherData, setWeatherData] = useState<{
+    temp: number;
+    condition: string;
+  } | null>(null);
+  const [isLoadingGreeting, setIsLoadingGreeting] = useState(true);
 
-      const loadInitialGreeting = async () => {
-        const greeting = await getCompleteGreeting(null); // Don't pass weather for first greeting
-        setCurrentGreeting(greeting);
-        setIsLoadingGreeting(false);
-      };
-      loadInitialGreeting();
-    }, []);
+  useEffect(() => {
+    resetGreetingType();
+    getCompleteGreeting(null).then((greeting) => {
+      setCurrentGreeting(greeting);
+      setIsLoadingGreeting(false);
+    });
+  }, []);
 
-    // Defer weather data fetch until after initial paint
-    useEffect(() => {
-      // Use requestIdleCallback if available, otherwise setTimeout
-      const scheduleWeatherFetch = () => {
-        const loadWeather = async () => {
-          const weather = await fetchWeatherData();
-          setWeatherData(weather);
-        };
-        loadWeather();
-      };
+  useEffect(() => {
+    const timeoutId = setTimeout(
+      () => fetchWeatherData().then(setWeatherData),
+      2000,
+    );
+    return () => clearTimeout(timeoutId);
+  }, []);
 
-      // Defer by 2 seconds to prioritize initial render
-      const timeoutId = setTimeout(scheduleWeatherFetch, 2000);
-      return () => clearTimeout(timeoutId);
-    }, []);
+  const handleCycleComplete = useCallback(async () => {
+    setCurrentGreeting(await getCompleteGreeting(weatherData));
+  }, [weatherData]);
 
-    const handleCycleComplete = useCallback(async () => {
-      const newGreeting = await getCompleteGreeting(weatherData);
-      setCurrentGreeting(newGreeting);
-    }, [weatherData]);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const copyY = useTransform(heroProgress, [0, 1], [0, -260]);
+  const copyOpacity = useTransform(heroProgress, [0.05, 0.55], [1, 0]);
 
-    // Use a placeholder greeting to prevent layout shift during initial load
-    const displayGreeting = currentGreeting || "Hello! I'm Silviu";
+  const paragraphs = introduction.map((p) =>
+    fillPlaceholders(p, { age, years: yearsOfExperience }),
+  );
 
-    return (
-      <HeroContainer>
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <Greeting variants={itemVariants}>
-            <Sparkles size={16} />
-            Welcome to my portfolio
-          </Greeting>
-
-          <Title variants={itemVariants}>
+  return (
+    <>
+      <Hero ref={heroRef}>
+        <Copy style={{ y: copyY, opacity: copyOpacity }}>
+          <Greeting aria-live="polite">
             <Blinker
-              text={displayGreeting}
+              text={currentGreeting || "Hi! I'm Silviu"}
               cycleInterval={10000}
               onCycleComplete={handleCycleComplete}
               startDelay={isLoadingGreeting ? 0 : 2500}
             />
-          </Title>
+          </Greeting>
 
-          <Subtitle variants={itemVariants}>
-            {age}-year-old {position} based in {location}. Building exceptional
-            digital experiences with modern web technologies.
-          </Subtitle>
+          <Title tag="h1" text={homepage.title} delay={0.2} />
 
-          <ButtonGroup variants={itemVariants}>
-            <PrimaryButton
-              onClick={onViewWork}
-              disabled={!firstSectionId}
-            >
+          <Actions
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.9, ease: EASE }}
+          >
+            <LineButton onClick={onViewWork} disabled={!firstSectionId}>
               View My Work
-              <ArrowRight size={20} />
-            </PrimaryButton>
-            <SecondaryButton
-              onClick={onDownloadCV}
-              disabled={isGeneratingPDF}
-            >
-              {isGeneratingPDF ? (
-                <>
-                  <LoaderIcon
-                    size={20}
-                    style={{ animation: 'spin 1s linear infinite' }}
-                  />
-                  Downloading...
-                </>
-              ) : (
-                <>
-                  <Download size={20} />
-                  Download CV
-                </>
-              )}
-            </SecondaryButton>
-          </ButtonGroup>
+              <ArrowDown size={14} />
+            </LineButton>
 
-          <Stats variants={itemVariants}>
-            <Stat>
-              <StatValue>{yearsOfExperience}+</StatValue>
-              <StatLabel>Years Experience</StatLabel>
-            </Stat>
-            {hasProjects && (
-              <Stat>
-                <StatValue>{projectsCount}+</StatValue>
-                <StatLabel>Projects Completed</StatLabel>
-              </Stat>
-            )}
-            {technologiesCount > 0 && (
-              <Stat>
-                <StatValue>{technologiesCount}+</StatValue>
-                <StatLabel>Technologies</StatLabel>
-              </Stat>
-            )}
-          </Stats>
-        </motion.div>
-      </HeroContainer>
-    );
-  },
-);
+            <LineButton onClick={onDownloadCV} disabled={isGeneratingPDF}>
+              <Download size={14} />
+              {isGeneratingPDF ? 'Downloading...' : 'Download CV'}
+            </LineButton>
+          </Actions>
+        </Copy>
 
-HeroSection.displayName = 'HeroSection';
+        <ScrollHint aria-hidden="true" style={{ opacity: copyOpacity }}>
+          Scroll
+          <HintLine
+            animate={{ scaleY: [0, 1, 1, 0], originY: [0, 0, 1, 1] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </ScrollHint>
+      </Hero>
+
+      <About>
+        {contact.profileImage && (
+          <Portrait>
+            <RevealMedia ratio="4 / 5" parallax={40}>
+              <img
+                src={`/media/images/${contact.profileImage}`}
+                alt={contact.name}
+              />
+            </RevealMedia>
+            {homepage.portraitCaption && (
+              <PortraitCaption>{homepage.portraitCaption}</PortraitCaption>
+            )}
+          </Portrait>
+        )}
+        <AboutText>
+          {paragraphs.map((text, i) => (
+            <AboutParagraph key={text} text={text} tag="p" delay={i * 0.15} />
+          ))}
+        </AboutText>
+      </About>
+    </>
+  );
+};

@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import styled, { keyframes } from 'styled-components';
 
 const spin = keyframes`
@@ -38,11 +37,11 @@ const LoadingText = styled.div`
   animation: ${pulse} 1.5s ease-in-out infinite;
 `;
 
-export const Loader = memo(() => {
+export const Loader = () => {
   return (
     <LoaderContainer>
       <Spinner />
       <LoadingText>Loading...</LoadingText>
     </LoaderContainer>
   );
-});
+};

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, CircleOff, Info, X } from 'lucide-react';
-import { memo, useEffect } from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
 type ToastVariant = 'enabled' | 'disabled' | 'info';
@@ -78,59 +78,52 @@ interface ToastProps {
   icon?: React.ReactNode;
 }
 
-export const Toast = memo(
-  ({
-    message,
-    isVisible,
-    onClose,
-    variant = 'info',
-    duration = 4500,
-    icon,
-  }: ToastProps) => {
-    useEffect(() => {
-      if (isVisible) {
-        const timer = setTimeout(onClose, duration);
-        return () => clearTimeout(timer);
-      }
-    }, [isVisible, onClose, duration]);
+export const Toast = ({
+  message,
+  isVisible,
+  onClose,
+  variant = 'info',
+  duration = 4500,
+  icon,
+}: ToastProps) => {
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(onClose, duration);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, onClose, duration]);
 
-    const getDefaultIcon = () => {
-      switch (variant) {
-        case 'enabled':
-          return <Check size={20} strokeWidth={2.5} />;
-        case 'disabled':
-          return <CircleOff size={20} />;
-        case 'info':
-        default:
-          return <Info size={20} />;
-      }
-    };
+  const getDefaultIcon = () => {
+    switch (variant) {
+      case 'enabled':
+        return <Check size={20} strokeWidth={2.5} />;
+      case 'disabled':
+        return <CircleOff size={20} />;
+      case 'info':
+      default:
+        return <Info size={20} />;
+    }
+  };
 
-    return (
-      <AnimatePresence>
-        {isVisible && (
-          <ToastContainer
-            initial={{ opacity: 0, y: 50, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: 50, x: '-50%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            <ToastIcon>{icon || getDefaultIcon()}</ToastIcon>
-            <ToastMessage>{message}</ToastMessage>
-            <DismissButton
-              onClick={onClose}
-              aria-label="Dismiss notification"
-            >
-              <X size={18} />
-            </DismissButton>
-          </ToastContainer>
-        )}
-      </AnimatePresence>
-    );
-  },
-);
-
-Toast.displayName = 'Toast';
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <ToastContainer
+          initial={{ opacity: 0, y: 50, x: '-50%' }}
+          animate={{ opacity: 1, y: 0, x: '-50%' }}
+          exit={{ opacity: 0, y: 50, x: '-50%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <ToastIcon>{icon || getDefaultIcon()}</ToastIcon>
+          <ToastMessage>{message}</ToastMessage>
+          <DismissButton onClick={onClose} aria-label="Dismiss notification">
+            <X size={18} />
+          </DismissButton>
+        </ToastContainer>
+      )}
+    </AnimatePresence>
+  );
+};

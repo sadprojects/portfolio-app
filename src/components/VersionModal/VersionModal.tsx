@@ -1,7 +1,7 @@
 import versionInfo from '@/version.json';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Calendar, Package, X } from 'lucide-react';
-import { memo } from 'react';
+
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 
@@ -27,7 +27,7 @@ const Modal = styled(motion.div)`
   max-width: 400px;
   width: 100%;
   position: relative;
-  box-shadow: ${({ theme }) => theme.shadows.large};
+  box-shadow: ${({ theme }) => theme.shadows.lg};
 `;
 
 const Header = styled.div`
@@ -108,7 +108,7 @@ interface VersionModalProps {
   onClose: () => void;
 }
 
-export const VersionModal = memo(({ isOpen, onClose }: VersionModalProps) => {
+export const VersionModal = ({ isOpen, onClose }: VersionModalProps) => {
   // Format the build time (epoch ms) to user's local timezone
   const formatBuildDate = (epochMs: number | null | undefined): string => {
     if (!epochMs) return 'Not available';
@@ -146,10 +146,7 @@ export const VersionModal = memo(({ isOpen, onClose }: VersionModalProps) => {
           >
             <Header>
               <Title>Version Info</Title>
-              <CloseButton
-                onClick={onClose}
-                aria-label="Close modal"
-              >
+              <CloseButton onClick={onClose} aria-label="Close modal">
                 <X size={20} />
               </CloseButton>
             </Header>
@@ -183,6 +180,4 @@ export const VersionModal = memo(({ isOpen, onClose }: VersionModalProps) => {
 
   // Render modal in a portal to ensure proper stacking
   return createPortal(modalContent, document.body);
-});
-
-VersionModal.displayName = 'VersionModal';
+};

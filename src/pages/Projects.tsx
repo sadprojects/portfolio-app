@@ -1,728 +1,189 @@
+import { RevealMedia } from '@components/motion/RevealMedia';
+import { RevealText } from '@components/motion/RevealText';
+import { Scrub } from '@components/motion/Scrub';
 import { contentData } from '@data/content';
-import { AnimatePresence, motion } from 'framer-motion';
-import {
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-  FileText,
-  Gamepad2,
-  Github,
-  MapPin,
-  Play,
-} from 'lucide-react';
-import { lazy, memo, Suspense, useState } from 'react';
+import { LineButton } from '@pages/Home/HeroSection';
+import { Grid, col } from '@styles/grid';
+import { ExternalLink, FileText, Github } from 'lucide-react';
+import { lazy, Suspense } from 'react';
 import styled from 'styled-components';
 
-// Lazy load the Sudoku game for performance
 const Sudoku = lazy(() => import('@components/Sudoku/Sudoku'));
 
-const ProjectsContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
+const Block = styled(Grid).attrs({ as: 'article' })<{ $flip: boolean }>`
+  align-items: center;
+  grid-auto-flow: dense;
+  row-gap: 1.75rem;
   padding: 0;
-  width: 100%;
-`;
 
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 3rem;
-`;
-
-const Title = styled(motion.h1)`
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 800;
-  margin-bottom: 1rem;
-`;
-
-const Subtitle = styled(motion.p)`
-  font-size: 1.125rem;
-  color: ${({ theme }) => theme.colors.secondary};
-  max-width: 600px;
-  margin: 0 auto;
-`;
-
-const ProjectsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 2rem;
-  grid-auto-rows: auto;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  & + & {
+    margin-top: clamp(4rem, 10vw, 12rem);
   }
 `;
 
-const ProjectCardWrapper = styled(motion.div)<{
-  $isExpanded: boolean;
-  $expandedIndex: number | null;
-  $currentIndex: number;
-}>`
-  ${({ $isExpanded, $expandedIndex, $currentIndex }) => {
-    // Default column span in 6-column grid (each card spans 2 columns = 1/3 width)
-    const defaultSpan = 2;
-    const currentPosition = $currentIndex % 3;
-
-    // If this card is expanded, take full row and stay in its original position
-    if ($isExpanded) {
-      const originalRow = Math.floor($currentIndex / 3);
-      return `
-        grid-column: 1 / -1;
-        grid-row: ${originalRow + 1};
-      `;
-    }
-
-    // If another card is expanded somewhere
-    if ($expandedIndex !== null) {
-      const expandedRow = Math.floor($expandedIndex / 3);
-      const currentRow = Math.floor($currentIndex / 3);
-      const expandedPosition = $expandedIndex % 3; // 0, 1, or 2
-
-      // Cards in the same row as the expanded card - pushed to new row with 50/50 split
-      if (expandedRow === currentRow) {
-        const otherCardsInRow = [0, 1, 2].filter(
-          (pos) => pos !== expandedPosition,
-        );
-        const myIndexInOtherCards = otherCardsInRow.indexOf(currentPosition);
-
-        // 50/50 split: first card spans columns 1-3, second card spans columns 4-6
-        if (myIndexInOtherCards === 0) {
-          return `
-            grid-column: 1 / 4;
-            grid-row: ${expandedRow + 2};
-          `;
-        } else {
-          return `
-            grid-column: 4 / 7;
-            grid-row: ${expandedRow + 2};
-          `;
-        }
-      }
-
-      // Cards in rows after the expanded row need to shift down by 1
-      if (currentRow > expandedRow) {
-        const startCol = currentPosition * defaultSpan + 1;
-        return `
-          grid-column: ${startCol} / span ${defaultSpan};
-          grid-row: ${currentRow + 2};
-        `;
-      }
-    }
-
-    // Default: normal grid positioning (span 2 columns in 6-column grid = 1/3 width)
-    const startCol = currentPosition * defaultSpan + 1;
-    return `
-      grid-column: ${startCol} / span ${defaultSpan};
-    `;
-  }}
-
-  background-color: ${({ theme }) => `${theme.colors.card}e6`};
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 1rem;
-  overflow: hidden;
-  transition:
-    grid-column 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    grid-row 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-  cursor: ${({ $isExpanded }) => ($isExpanded ? 'default' : 'pointer')};
-
-  /* Tablet: 2-column layout - disable complex grid logic */
-  @media (max-width: 1024px) {
-    grid-column: ${({ $isExpanded }) =>
-      $isExpanded ? '1 / -1' : 'auto'} !important;
-    grid-row: auto !important;
-    transition: none !important;
-  }
-
-  /* Mobile: single column layout - all cards full width */
-  @media (max-width: 768px) {
-    grid-column: 1 / -1 !important;
-    grid-row: auto !important;
-    transition: none !important;
-  }
-
-  &:hover {
-    box-shadow: ${({ theme }) => theme.shadows.xl};
-    border-color: ${({ theme }) => theme.colors.foreground};
-  }
-
-  &:focus-within {
-    outline: 2px solid ${({ theme }) => theme.colors.foreground};
-    outline-offset: 2px;
-  }
-`;
-const ProjectCardContent = styled.div`
-  padding: 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
+const Media = styled.div<{ $flip: boolean }>`
+  ${({ $flip }) => ($flip ? col('6 / 12', '6 / 13') : col('2 / 8', '1 / 8'))}
 `;
 
-const ProjectHeader = styled.div`
+const Text = styled.div<{ $flip: boolean }>`
+  ${({ $flip }) => ($flip ? col('2 / 5', '1 / 6') : col('9 / 13', '8 / 13'))}
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 1rem;
-  margin-bottom: 1rem;
 `;
 
-const ProjectTitleSection = styled.div`
-  flex: 1;
-`;
-
-const ProjectTitle = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-`;
-
-const ProjectMeta = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+const Kicker = styled.p`
+  margin: 0;
   font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-const MetaItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-
-const ProjectActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-shrink: 0;
-`;
-
-const IconButton = styled.a`
-  color: ${({ theme }) => theme.colors.secondary};
-  transition: color ${({ theme }) => theme.transitions.fast};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.foreground};
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.foreground};
-    outline-offset: 2px;
-    border-radius: 0.25rem;
-  }
-`;
-
-const ExpandButton = styled.button`
-  background: none;
-  border: none;
-  color: ${({ theme }) => theme.colors.secondary};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  transition: color ${({ theme }) => theme.transitions.fast};
-
-  &:hover,
-  &:focus-visible {
-    color: ${({ theme }) => theme.colors.foreground};
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.foreground};
-    outline-offset: 2px;
-    border-radius: 0.25rem;
-  }
+const Title = styled(RevealText)`
+  margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.display};
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.4vw, 2.9rem);
+  line-height: 1.1;
 `;
 
 const Description = styled.p`
-  color: ${({ theme }) => theme.colors.secondary};
+  margin: 0;
   line-height: 1.6;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-`;
-
-const Tags = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-`;
-
-const Tag = styled.span`
-  padding: 0.25rem 0.75rem;
-  background-color: ${({ theme }) => theme.colors.accent};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.foreground};
-`;
-
-const ExpandedContent = styled(motion.div)`
-  padding: 0 2rem 2rem;
-
-  @media (max-width: 768px) {
-    padding: 0 1.5rem 1.5rem;
-  }
-`;
-
-const ExpandedGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
-
-  @media (max-width: 968px) {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-`;
-
-const VideoSection = styled.div``;
-
-const VideoContainer = styled.div`
-  position: relative;
-  width: 100%;
-  padding-bottom: 56.25%; /* 16:9 aspect ratio */
-  background-color: ${({ theme }) => theme.colors.background};
-  border-radius: 0.5rem;
-  overflow: hidden;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const Video = styled.video`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-`;
-
-const YouTubeEmbed = styled.iframe`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-`;
-
-const VideoPlaceholder = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 1rem;
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-const DetailsSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+const Tools = styled.p`
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
 `;
 
-const DetailBlock = styled.div``;
-
-const DetailTitle = styled.h4`
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: ${({ theme }) => theme.colors.foreground};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-`;
-
-const DetailTags = styled.div`
+const Links = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 1rem 1.75rem;
+  margin-top: 0.5rem;
 `;
 
-const DetailTag = styled.span`
-  padding: 0.5rem 0.75rem;
-  background-color: ${({ theme }) => theme.colors.accent};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-`;
-
-const LinksSection = styled.div`
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding-top: 1rem;
-`;
-
-const LinkButton = styled.a`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background-color: ${({ theme }) => theme.colors.foreground};
-  color: ${({ theme }) => theme.colors.background};
-  border: 2px solid ${({ theme }) => theme.colors.foreground};
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-decoration: none;
-  transition: all ${({ theme }) => theme.transitions.fast};
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${({ theme }) => theme.shadows.lg};
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.foreground};
-    outline-offset: 2px;
+/** The game sits in a half-width column, so stack its board over its controls. */
+const GameSlot = styled(Scrub)`
+  & > div {
+    flex-direction: column;
+    align-items: stretch;
   }
 `;
 
-const SecondaryLink = styled(LinkButton)`
-  background-color: transparent;
-  color: ${({ theme }) => theme.colors.foreground};
+const Frame = styled.iframe`
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
 `;
 
-const EasterEggContainer = styled.div`
-  padding: 1rem;
-  background-color: ${({ theme }) => theme.colors.accent};
-  border-radius: 0.5rem;
-  min-height: 400px;
-  position: relative;
-`;
-
-const EasterEggLoading = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  color: ${({ theme }) => theme.colors.secondary};
-  font-size: 0.875rem;
-`;
-
-const EasterEggBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  background-color: rgba(147, 51, 234, 0.2);
-  border: 1px solid rgba(147, 51, 234, 0.4);
-  border-radius: 9999px;
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: #a855f7;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-`;
-
-const Projects = memo(() => {
-  const { projects } = contentData;
-  const [expandedId, setExpandedId] = useState<number | null>(null);
-
-  // Only render if projects exist
-  if (!projects || projects.length === 0) {
-    return null;
-  }
-
-  const toggleExpand = (index: number) => {
-    setExpandedId(expandedId === index ? null : index);
-  };
-
-  const getVideoEmbed = (video: string) => {
-    // Check if it's a YouTube URL
-    if (video.includes('youtube.com') || video.includes('youtu.be')) {
-      const videoId = video.includes('youtu.be')
-        ? video.split('/').pop()?.split('?')[0]
-        : new URLSearchParams(video.split('?')[1]).get('v');
-
-      return (
-        <YouTubeEmbed
-          src={`https://www.youtube.com/embed/${videoId}`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          title="Project video"
-        />
-      );
-    }
-
-    // Check if it's a local video file
-    if (!video.startsWith('http')) {
-      try {
-        return (
-          <Video controls>
-            <source
-              src={`/src/assets/videos/${video}.mp4`}
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </Video>
-        );
-      } catch {
-        return (
-          <VideoPlaceholder>
-            <Play size={48} />
-            <span>Video not available</span>
-          </VideoPlaceholder>
-        );
-      }
-    }
-
-    // External video URL
+const ProjectMedia = ({ video, title }: { video: string; title: string }) => {
+  if (video.includes('youtu')) {
+    const id = video.includes('youtu.be')
+      ? video.split('/').pop()?.split('?')[0]
+      : new URLSearchParams(video.split('?')[1]).get('v');
     return (
-      <Video controls>
-        <source
-          src={video}
-          type="video/mp4"
-        />
-        Your browser does not support the video tag.
-      </Video>
+      <Frame
+        src={`https://www.youtube.com/embed/${id}`}
+        title={`${title} video`}
+        allowFullScreen
+      />
     );
-  };
+  }
+  return (
+    <video
+      src={`/media/videos/${video}.mp4`}
+      poster={`/media/videos/${video}.gif`}
+      muted
+      loop
+      autoPlay
+      playsInline
+      preload="metadata"
+      aria-label={`${title} demo`}
+    />
+  );
+};
+
+const Projects = () => {
+  const projects = contentData.projects.filter(
+    (project) => project.enabled !== false,
+  );
+
+  if (projects.length === 0) return null;
 
   return (
-    <ProjectsContainer>
-      <Header>
-        <Title
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          My Projects
-        </Title>
-        <Subtitle
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          A collection of projects showcasing my skills and passion for
-          development
-        </Subtitle>
-      </Header>
-
-      <ProjectsGrid>
-        {projects
-          .filter((project) => project.enabled !== false)
-          .map((project, index) => {
-            const isExpanded = expandedId === index;
-
-            return (
-              <ProjectCardWrapper
-                key={index}
-                $isExpanded={isExpanded}
-                $expandedIndex={expandedId}
-                $currentIndex={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-              >
-                <ProjectCardContent
-                  onClick={() => !isExpanded && toggleExpand(index)}
-                >
-                  <ProjectHeader>
-                    <ProjectTitleSection>
-                      <ProjectTitle>
-                        {project.title}
-                        {project.easterEgg && (
-                          <EasterEggBadge>
-                            <Gamepad2 size={10} />
-                            Playable
-                          </EasterEggBadge>
-                        )}
-                      </ProjectTitle>
-                      <ProjectMeta>
-                        <MetaItem>
-                          <Calendar size={12} />
-                          {project.period}
-                        </MetaItem>
-                        <MetaItem>
-                          <MapPin size={12} />
-                          {project.city}
-                        </MetaItem>
-                      </ProjectMeta>
-                    </ProjectTitleSection>
-                    <ProjectActions>
-                      {project.publication && (
-                        <IconButton
-                          href={project.publication}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label={`View ${project.title} research publication`}
-                          title="Published Research Paper"
-                        >
-                          <FileText size={18} />
-                        </IconButton>
-                      )}
-                      {project.website && (
-                        <IconButton
-                          href={project.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label={`Visit ${project.title} website`}
-                        >
-                          <ExternalLink size={18} />
-                        </IconButton>
-                      )}
-                      <IconButton
-                        href={project.repo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label={`View ${project.title} source code`}
-                      >
-                        <Github size={18} />
-                      </IconButton>
-                      <ExpandButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleExpand(index);
-                        }}
-                        aria-label={
-                          isExpanded
-                            ? 'Collapse project details'
-                            : 'Expand project details'
-                        }
-                        aria-expanded={isExpanded}
-                      >
-                        {isExpanded ? (
-                          <ChevronUp size={18} />
-                        ) : (
-                          <ChevronDown size={18} />
-                        )}
-                      </ExpandButton>
-                    </ProjectActions>
-                  </ProjectHeader>
-
-                  <Description>{project.description}</Description>
-
-                  {!isExpanded && (
-                    <Tags>
-                      {project.tools.slice(0, 6).map((tool, i) => (
-                        <Tag key={i}>{tool}</Tag>
-                      ))}
-                      {project.tools.length > 6 && (
-                        <Tag>+{project.tools.length - 6}</Tag>
-                      )}
-                    </Tags>
-                  )}
-                </ProjectCardContent>
-
-                <AnimatePresence>
-                  {isExpanded && (
-                    <ExpandedContent
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
+    <div>
+      {projects.map((project, index) => {
+        const flip = index % 2 === 1;
+        return (
+          <Block key={project.title} $flip={flip} aria-label={project.title}>
+            <Media $flip={flip}>
+              {project.easterEgg === 'sudoku' || !project.video ? (
+                <GameSlot>
+                  <Suspense fallback={<Kicker>Loading game...</Kicker>}>
+                    <Sudoku />
+                  </Suspense>
+                </GameSlot>
+              ) : (
+                <RevealMedia ratio="16 / 10" parallax={40}>
+                  <ProjectMedia video={project.video} title={project.title} />
+                </RevealMedia>
+              )}
+            </Media>
+            <Text $flip={flip}>
+              <Scrub>
+                <Kicker>
+                  {project.period} · {project.city}
+                </Kicker>
+                <Title text={project.title} tag="h3" exitOnScroll={false} />
+                <Description>{project.description}</Description>
+                <Tools>{project.tools.join(', ')}</Tools>
+                <Links>
+                  {project.website && project.website !== '#' && (
+                    <LineButton
+                      as="a"
+                      href={project.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                      {/* Easter Egg: Sudoku Game */}
-                      {project.easterEgg === 'sudoku' && (
-                        <EasterEggContainer>
-                          <Suspense
-                            fallback={
-                              <EasterEggLoading>
-                                Loading game...
-                              </EasterEggLoading>
-                            }
-                          >
-                            <Sudoku />
-                          </Suspense>
-                        </EasterEggContainer>
-                      )}
-
-                      {/* Regular project content */}
-                      {!project.easterEgg && (
-                        <>
-                          <ExpandedGrid>
-                            {project.video && (
-                              <VideoSection>
-                                <VideoContainer>
-                                  {getVideoEmbed(project.video)}
-                                </VideoContainer>
-                              </VideoSection>
-                            )}
-
-                            <DetailsSection>
-                              <DetailBlock>
-                                <DetailTitle>Technologies</DetailTitle>
-                                <DetailTags>
-                                  {project.tools.map((tool, i) => (
-                                    <DetailTag key={i}>{tool}</DetailTag>
-                                  ))}
-                                </DetailTags>
-                              </DetailBlock>
-                            </DetailsSection>
-                          </ExpandedGrid>
-
-                          <LinksSection>
-                            {project.publication && (
-                              <LinkButton
-                                href={project.publication}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <FileText size={16} />
-                                Research Paper
-                              </LinkButton>
-                            )}
-                            {project.website && (
-                              <LinkButton
-                                href={project.website}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <ExternalLink size={16} />
-                                Visit Website
-                              </LinkButton>
-                            )}
-                            <SecondaryLink
-                              href={project.repo}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Github size={16} />
-                              View Code
-                            </SecondaryLink>
-                          </LinksSection>
-                        </>
-                      )}
-                    </ExpandedContent>
+                      <ExternalLink size={14} />
+                      Website
+                    </LineButton>
                   )}
-                </AnimatePresence>
-              </ProjectCardWrapper>
-            );
-          })}
-      </ProjectsGrid>
-    </ProjectsContainer>
+                  {project.publication && (
+                    <LineButton
+                      as="a"
+                      href={project.publication}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <FileText size={14} />
+                      Paper
+                    </LineButton>
+                  )}
+                  <LineButton
+                    as="a"
+                    href={project.repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`View ${project.title} source code`}
+                  >
+                    <Github size={14} />
+                    Code
+                  </LineButton>
+                </Links>
+              </Scrub>
+            </Text>
+          </Block>
+        );
+      })}
+    </div>
   );
-});
-
-Projects.displayName = 'Projects';
+};
 
 export default Projects;

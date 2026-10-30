@@ -1,54 +1,49 @@
-import { differenceInMonths, differenceInYears, format, parseISO } from 'date-fns';
-
-/**
- * Calculate age from birth date
- */
-export const calculateAge = (birthDate: string): number => {
-  return differenceInYears(new Date(), parseISO(birthDate));
+/** Parse 'YYYY-MM-DD' as a local date (no timezone shift). */
+const parseISO = (iso: string): Date => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
 };
 
-/**
- * Calculate years of experience from first job date
- */
-export const calculateYearsOfExperience = (firstJobDate: string): number => {
-  return differenceInYears(new Date(), parseISO(firstJobDate));
+const isPresent = (date: string) => date.toLowerCase() === 'present';
+
+/** Whole months between two dates. */
+const monthsBetween = (start: Date, end: Date): number =>
+  (end.getFullYear() - start.getFullYear()) * 12 +
+  (end.getMonth() - start.getMonth()) -
+  (end.getDate() < start.getDate() ? 1 : 0);
+
+const plural = (n: number, unit: string) => `${n} ${unit}${n === 1 ? '' : 's'}`;
+
+const monthYear = new Intl.DateTimeFormat('en', {
+  month: 'short',
+  year: 'numeric',
+});
+
+export const calculateAge = (birthDate: string): number =>
+  Math.floor(monthsBetween(parseISO(birthDate), new Date()) / 12);
+
+export const calculateYearsOfExperience = (firstJobDate: string): number =>
+  Math.floor(monthsBetween(parseISO(firstJobDate), new Date()) / 12);
+
+/** "2 years 3 months", "6 months", "1 year" or "Less than a month". */
+export const calculateDuration = (
+  startDate: string,
+  endDate: string,
+): string => {
+  const total = monthsBetween(
+    parseISO(startDate),
+    isPresent(endDate) ? new Date() : parseISO(endDate),
+  );
+  const years = Math.floor(total / 12);
+  const months = total % 12;
+  if (total <= 0) return 'Less than a month';
+  if (years === 0) return plural(months, 'month');
+  if (months === 0) return plural(years, 'year');
+  return `${plural(years, 'year')} ${plural(months, 'month')}`;
 };
 
-/**
- * Calculate duration between two dates
- * Returns a formatted string like "2 years 3 months" or "6 months"
- */
-export const calculateDuration = (startDate: string, endDate: string): string => {
-  const start = parseISO(startDate);
-  const end = endDate.toLowerCase() === 'present' ? new Date() : parseISO(endDate);
+/** "Feb 2024 - Present" */
+export const formatDateRange = (startDate: string, endDate: string): string =>
+  `${monthYear.format(parseISO(startDate))} - ${isPresent(endDate) ? 'Present' : monthYear.format(parseISO(endDate))}`;
 
-  const years = differenceInYears(end, start);
-  const months = differenceInMonths(end, start) % 12;
-
-  if (years === 0) {
-    return `${months} ${months === 1 ? 'month' : 'months'}`;
-  }
-
-  if (months === 0) {
-    return `${years} ${years === 1 ? 'year' : 'years'}`;
-  }
-
-  return `${years} ${years === 1 ? 'year' : 'years'} ${months} ${months === 1 ? 'month' : 'months'}`;
-};
-
-/**
- * Format date range for display
- */
-export const formatDateRange = (startDate: string, endDate: string): string => {
-  const start = parseISO(startDate);
-  const end = endDate.toLowerCase() === 'present' ? 'Present' : format(parseISO(endDate), 'MMM yyyy');
-
-  return `${format(start, 'MMM yyyy')} - ${end}`;
-};
-
-/**
- * Get current year
- */
-export const getCurrentYear = (): number => {
-  return new Date().getFullYear();
-};
+export const getCurrentYear = (): number => new Date().getFullYear();

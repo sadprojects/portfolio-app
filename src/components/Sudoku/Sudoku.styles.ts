@@ -156,27 +156,22 @@ export const CellButton = styled.button<{
     $isSameNumber,
     $isNumberSelected,
   }) => {
-    const isDark = theme.colors.foreground === '#FFFFFF';
-    
-    if ($isError) return isDark ? 'rgba(239, 68, 68, 0.25)' : 'rgba(239, 68, 68, 0.15)';
+    const isDark = theme.colors.foreground === '#e8e8e8';
+
+    if ($isError)
+      return isDark ? 'rgba(239, 68, 68, 0.25)' : 'rgba(239, 68, 68, 0.15)';
     if ($isSelected)
-      return isDark
-        ? 'rgba(59, 130, 246, 0.3)'
-        : 'rgba(0, 0, 0, 0.1)';
+      return isDark ? 'rgba(59, 130, 246, 0.3)' : 'rgba(0, 0, 0, 0.1)';
     if ($isSameNumber || $isNumberSelected)
-      return isDark
-        ? 'rgba(59, 130, 246, 0.18)'
-        : 'rgba(0, 0, 0, 0.06)';
+      return isDark ? 'rgba(59, 130, 246, 0.18)' : 'rgba(0, 0, 0, 0.06)';
     if ($isHighlighted)
-      return isDark
-        ? 'rgba(255, 255, 255, 0.06)'
-        : 'rgba(0, 0, 0, 0.03)';
+      return isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.03)';
     return theme.colors.background;
   }};
 
   color: ${({ theme, $isInitial, $isError }) => {
-    const isDark = theme.colors.foreground === '#FFFFFF';
-    
+    const isDark = theme.colors.foreground === '#e8e8e8';
+
     if ($isError) return isDark ? '#ef4444' : '#dc2626';
     if ($isInitial) return theme.colors.foreground;
     return isDark ? '#60a5fa' : '#2563eb';
@@ -190,20 +185,15 @@ export const CellButton = styled.button<{
       $isSameNumber,
       $isNumberSelected,
     }) => {
-      const isDark = theme.colors.foreground === '#FFFFFF';
-      
-      if ($isError) return isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.2)';
+      const isDark = theme.colors.foreground === '#e8e8e8';
+
+      if ($isError)
+        return isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.2)';
       if ($isSelected)
-        return isDark
-          ? 'rgba(59, 130, 246, 0.4)'
-          : 'rgba(0, 0, 0, 0.12)';
+        return isDark ? 'rgba(59, 130, 246, 0.4)' : 'rgba(0, 0, 0, 0.12)';
       if ($isSameNumber || $isNumberSelected)
-        return isDark
-          ? 'rgba(59, 130, 246, 0.25)'
-          : 'rgba(0, 0, 0, 0.08)';
-      return isDark
-        ? 'rgba(255, 255, 255, 0.09)'
-        : 'rgba(0, 0, 0, 0.04)';
+        return isDark ? 'rgba(59, 130, 246, 0.25)' : 'rgba(0, 0, 0, 0.08)';
+      return isDark ? 'rgba(255, 255, 255, 0.09)' : 'rgba(0, 0, 0, 0.04)';
     }};
   }
 
@@ -434,7 +424,7 @@ export const WinOverlay = styled(motion.div)`
   justify-content: center;
   gap: 1rem;
   background: ${({ theme }) =>
-    theme.colors.foreground === '#FFFFFF'
+    theme.colors.foreground === '#e8e8e8'
       ? 'rgba(0, 0, 0, 0.92)'
       : 'rgba(255, 255, 255, 0.97)'};
   backdrop-filter: blur(8px);

@@ -1,69 +1,49 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
-import Skills from '@pages/Skills';
-import { render, screen } from '@testing-library/react';
+import { contentData } from '@data/content';
+import { fireEvent, render, screen } from '@testing-library/react';
+import Skills from './Skills';
 
-describe('Skills', () => {
-  it('renders without crashing', () => {
-    render(
-      <ThemeProvider>
-        <Skills />
-      </ThemeProvider>
-    );
-    expect(screen.getByText('Skills & Expertise')).toBeDefined();
+const renderPage = () =>
+  render(
+    <ThemeProvider>
+      <Skills />
+    </ThemeProvider>,
+  );
+
+describe('Skills & Credentials', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
   });
 
-  it('displays the correct subtitle', () => {
-    render(
-      <ThemeProvider>
-        <Skills />
-      </ThemeProvider>
+  it('shows every enabled skill with its proficiency by default', () => {
+    renderPage();
+    const enabled = contentData.skills.professional.filter(
+      (s) => s.enabled !== false,
     );
-    expect(screen.getByText('My technical and professional capabilities')).toBeDefined();
+    enabled.forEach((skill) => {
+      expect(
+        screen.getByLabelText(`${skill.name}, ${skill.level}%`),
+      ).toBeInTheDocument();
+    });
   });
 
-  it('renders technical skills section', () => {
-    render(
-      <ThemeProvider>
-        <Skills />
-      </ThemeProvider>
+  it('filters the grid by category', () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('tab', { name: 'Frontend' }));
+    expect(screen.getByRole('tab', { name: 'Frontend' })).toHaveAttribute(
+      'aria-selected',
+      'true',
     );
-
-    expect(screen.getByText('Technical Skills')).toBeDefined();
-    expect(screen.getByText('Javascript')).toBeDefined();
-    expect(screen.getByText('ReactJS')).toBeDefined();
+    expect(screen.getByLabelText(/^React,/)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/^MongoDB,/)).toBeNull();
   });
 
-  it('renders languages section', () => {
-    render(
-      <ThemeProvider>
-        <Skills />
-      </ThemeProvider>
-    );
-
-    expect(screen.getByText('Languages')).toBeDefined();
-    expect(screen.getByText('English')).toBeDefined();
-    expect(screen.getByText('Romanian')).toBeDefined();
-  });
-
-  it('renders development tools section', () => {
-    render(
-      <ThemeProvider>
-        <Skills />
-      </ThemeProvider>
-    );
-
-    expect(screen.getByText('Development Tools')).toBeDefined();
-    expect(screen.getByText('Git')).toBeDefined();
-  });
-
-  it('renders soft skills section', () => {
-    render(
-      <ThemeProvider>
-        <Skills />
-      </ThemeProvider>
-    );
-
-    expect(screen.getByText('Soft Skills')).toBeDefined();
-    expect(screen.getByText('Team player')).toBeDefined();
+  it('lists certifications as credential cards linking to the certificate', () => {
+    renderPage();
+    contentData.certifications.forEach((cert) => {
+      expect(
+        screen.getByRole('link', { name: `${cert.title}, view certificate` }),
+      ).toHaveAttribute('href', cert.url);
+    });
   });
 });

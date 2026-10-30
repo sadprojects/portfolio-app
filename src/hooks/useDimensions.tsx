@@ -1,4 +1,4 @@
-import { BREAKPOINTS } from '@constants/breakpoints';
+import { BREAKPOINTS } from '../constants';
 import { debounce } from '@utils/helpers';
 import { useEffect, useState } from 'react';
 
@@ -22,7 +22,7 @@ const useDimensions = (): [boolean, number, number] => {
     return () => window.removeEventListener('resize', debouncedResize);
   }, []);
 
-  const isMobile = dimensions.width <= BREAKPOINTS.sm;
+  const isMobile = dimensions.width <= BREAKPOINTS.mobile;
 
   return [isMobile, dimensions.width, dimensions.height];
 };

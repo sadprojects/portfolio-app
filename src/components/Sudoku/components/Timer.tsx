@@ -1,5 +1,5 @@
 import { Clock } from 'lucide-react';
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { formatTime } from '../sudokuUtils';
 import { TimerDisplay } from '../Sudoku.styles';
@@ -9,7 +9,7 @@ export interface TimerProps {
   isComplete: boolean;
 }
 
-export const Timer = memo(({ startTime, isComplete }: TimerProps) => {
+export const Timer = ({ startTime, isComplete }: TimerProps) => {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -33,6 +33,4 @@ export const Timer = memo(({ startTime, isComplete }: TimerProps) => {
       {formatTime(elapsed)}
     </TimerDisplay>
   );
-});
-
-Timer.displayName = 'Timer';
+};

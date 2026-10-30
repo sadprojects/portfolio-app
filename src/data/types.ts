@@ -1,5 +1,6 @@
 export interface Certification {
   title: string;
+  issuer?: string;
   url: string;
   date: string;
   enabled?: boolean;
@@ -62,15 +63,6 @@ export interface Photography {
   enabled?: boolean;
 }
 
-export interface SpeedSkating {
-  title: string;
-  description: string[];
-  image: {
-    path: string;
-    alt: string;
-  };
-}
-
 export interface Project {
   title: string;
   city: string;
@@ -87,8 +79,10 @@ export interface Project {
 
 export interface Skill {
   name: string;
+  /** Self-assessed proficiency, 0-100. */
   level: number;
-  priority: number;
+  /** Groups skills in the filter bar, e.g. 'Frontend'. */
+  category: string;
   enabled?: boolean;
 }
 
@@ -96,7 +90,6 @@ export interface Skills {
   professional: Skill[];
   languages: string[];
   developmentTools: string[];
-  personal: string[];
 }
 
 export interface SocialMediaLink {
@@ -125,6 +118,8 @@ export interface Experience {
   startDate: string;
   endDate: string;
   responsibilities: string[];
+  /** Mark a role that followed another one at the same company as a promotion. */
+  promotion?: boolean;
   enabled?: boolean;
 }
 
@@ -133,15 +128,31 @@ export interface Codewars {
   enabled: boolean;
 }
 
+/** Full-bleed parallax photo shown right before a section. */
+export interface SectionBanner {
+  image: string;
+  caption?: string;
+  alt?: string;
+  /** Which side of the grid the photo sits on. */
+  align?: 'left' | 'right';
+}
+
+/** Short centred line shown before a section starts. */
+export interface SectionIntro {
+  label: string;
+  text: string;
+}
+
 export interface SectionConfig {
   enabled: boolean;
   order: number;
   useSkeleton?: boolean;
+  intro?: SectionIntro;
+  banners?: SectionBanner[];
 }
 
 export interface SectionsConfig {
   projects: SectionConfig;
-  certifications: SectionConfig;
   skills: SectionConfig;
   experience: SectionConfig;
   hobbies: SectionConfig;
@@ -155,10 +166,14 @@ export interface ContentData {
   education: Education[];
   games: Game[];
   photography: Photography[];
-  speedSkating: SpeedSkating;
   introduction: string[];
   footer: string;
-  homepage: { title: string };
+  homepage: {
+    /** Headline on the hero. */
+    title: string;
+    /** Handwritten note under the portrait. */
+    portraitCaption?: string;
+  };
   greetings: Greetings;
   projects: Project[];
   skills: Skills;

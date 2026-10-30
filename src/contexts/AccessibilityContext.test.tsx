@@ -13,47 +13,6 @@ describe('AccessibilityContext', () => {
     localStorage.clear();
   });
 
-  it('should provide default scrollSnapEnabled as true', () => {
-    const { result } = renderHook(() => useAccessibility(), { wrapper });
-    expect(result.current.scrollSnapEnabled).toBe(true);
-  });
-
-  it('should toggle scrollSnapEnabled', () => {
-    const { result } = renderHook(() => useAccessibility(), { wrapper });
-
-    expect(result.current.scrollSnapEnabled).toBe(true);
-
-    act(() => {
-      result.current.toggleScrollSnap();
-    });
-
-    expect(result.current.scrollSnapEnabled).toBe(false);
-
-    act(() => {
-      result.current.toggleScrollSnap();
-    });
-
-    expect(result.current.scrollSnapEnabled).toBe(true);
-  });
-
-  it('should persist scrollSnapEnabled to localStorage', () => {
-    const { result } = renderHook(() => useAccessibility(), { wrapper });
-
-    act(() => {
-      result.current.toggleScrollSnap();
-    });
-
-    expect(localStorage.getItem('scrollSnapEnabled')).toBe('false');
-  });
-
-  it('should load scrollSnapEnabled from localStorage on init', () => {
-    localStorage.setItem('scrollSnapEnabled', 'false');
-
-    const { result } = renderHook(() => useAccessibility(), { wrapper });
-
-    expect(result.current.scrollSnapEnabled).toBe(false);
-  });
-
   it('should throw error when useAccessibility is used outside provider', () => {
     expect(() => {
       renderHook(() => useAccessibility());
@@ -87,6 +46,8 @@ describe('AccessibilityContext', () => {
   });
 
   it('should persist snowfallEnabled to localStorage', () => {
+    // Default depends on the season, so pin the starting value.
+    localStorage.setItem('snowfallEnabled', 'true');
     const { result } = renderHook(() => useAccessibility(), { wrapper });
 
     act(() => {
@@ -104,20 +65,8 @@ describe('AccessibilityContext', () => {
     expect(result.current.snowfallEnabled).toBe(false);
   });
 
-  it('should show toast when toggling scrollSnap', () => {
-    const { result } = renderHook(() => useAccessibility(), { wrapper });
-
-    expect(result.current.toast.isVisible).toBe(false);
-
-    act(() => {
-      result.current.toggleScrollSnap();
-    });
-
-    expect(result.current.toast.isVisible).toBe(true);
-    expect(result.current.toast.message).toBe('Scroll snap disabled');
-  });
-
   it('should show toast when toggling snowfall', () => {
+    localStorage.setItem('snowfallEnabled', 'true');
     const { result } = renderHook(() => useAccessibility(), { wrapper });
 
     expect(result.current.toast.isVisible).toBe(false);

@@ -24,9 +24,6 @@ declare module 'styled-components' {
       codeForeground?: string;
     };
     shadows: {
-      small: string;
-      medium: string;
-      large: string;
       sm: string;
       md: string;
       lg: string;

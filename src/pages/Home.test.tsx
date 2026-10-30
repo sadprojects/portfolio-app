@@ -8,11 +8,9 @@ const renderWithProviders = (ui: React.ReactElement) => {
   return render(
     <MemoryRouter>
       <AccessibilityProvider>
-        <ThemeProvider>
-          {ui}
-        </ThemeProvider>
+        <ThemeProvider>{ui}</ThemeProvider>
       </AccessibilityProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 };
 
@@ -119,13 +117,19 @@ describe('Home Page - Interactions', () => {
     // Wait for component to render
     await vi.advanceTimersByTimeAsync(100);
 
-    const tocButtons = container.querySelectorAll('button[aria-label^="Go to"]');
+    const tocButtons = container.querySelectorAll(
+      'button[aria-label^="Go to"]',
+    );
     expect(tocButtons.length).toBeGreaterThan(0);
 
-    const projectsButton = container.querySelector('button[aria-label="Go to Projects"]');
+    const projectsButton = container.querySelector(
+      'button[aria-label="Go to Projects"]',
+    );
     if (projectsButton) {
       // Mock scrollIntoView for the projects section
-      const projectsSection = container.querySelector('[data-section="projects"]');
+      const projectsSection = container.querySelector(
+        '[data-section="projects"]',
+      );
       const mockScrollIntoView = vi.fn();
 
       if (projectsSection) {
@@ -152,7 +156,9 @@ describe('Home Page - Interactions', () => {
     const viewWorkButton = getByText('View My Work');
 
     // Mock scrollIntoView for first section
-    const firstSection = container.querySelector('[data-section]:not([data-section="home"])');
+    const firstSection = container.querySelector(
+      '[data-section]:not([data-section="home"])',
+    );
     const mockScrollIntoView = vi.fn();
 
     if (firstSection) {
@@ -174,7 +180,8 @@ describe('Home Page - Interactions', () => {
     // Mock fetch for PDF download
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      blob: () => Promise.resolve(new Blob(['fake pdf'], { type: 'application/pdf' })),
+      blob: () =>
+        Promise.resolve(new Blob(['fake pdf'], { type: 'application/pdf' })),
     } as Response);
 
     // Mock URL.createObjectURL
@@ -190,13 +197,16 @@ describe('Home Page - Interactions', () => {
     fireEvent.click(downloadButton);
 
     // Should show loading state immediately
-    expect(queryByText('Downloading...') || queryByText('Download CV')).toBeDefined();
+    expect(
+      queryByText('Downloading...') || queryByText('Download CV'),
+    ).toBeDefined();
   }, 10000);
 
   it('should handle scroll events on container', async () => {
     const { container } = renderWithProviders(<Home />);
 
-    const pageContainer = container.querySelector('[data-section]')?.parentElement;
+    const pageContainer =
+      container.querySelector('[data-section]')?.parentElement;
     if (pageContainer) {
       fireEvent.scroll(pageContainer);
       // Should not crash
@@ -209,37 +219,10 @@ describe('Home Page - Interactions', () => {
 
     await vi.advanceTimersByTimeAsync(100);
 
-    expect(container.querySelectorAll('button[aria-label^="Go to"]').length).toBeGreaterThan(0);
+    expect(
+      container.querySelectorAll('button[aria-label^="Go to"]').length,
+    ).toBeGreaterThan(0);
   }, 10000);
-
-  it('should handle scroll snapping logic', () => {
-    const { container } = renderWithProviders(<Home />);
-
-    const pageContainer = container.querySelector('[data-section]')?.parentElement;
-    if (pageContainer) {
-      fireEvent.scroll(pageContainer);
-
-      // Should not crash
-      expect(container).toBeDefined();
-    }
-  });
-
-  it('should disable scroll snap on mobile', () => {
-    Object.defineProperty(window, 'innerWidth', {
-      writable: true,
-      configurable: true,
-      value: 500,
-    });
-
-    const { container } = renderWithProviders(<Home />);
-
-    const pageContainer = container.querySelector('[data-section]')?.parentElement;
-    if (pageContainer) {
-      fireEvent.scroll(pageContainer);
-      // Should not crash on mobile
-      expect(pageContainer).toBeDefined();
-    }
-  });
 
   it('should cleanup on unmount', () => {
     const { unmount } = renderWithProviders(<Home />);
@@ -247,4 +230,3 @@ describe('Home Page - Interactions', () => {
     expect(() => unmount()).not.toThrow();
   });
 });
-

@@ -1,6 +1,5 @@
 import { Eraser, RefreshCw, RotateCcw, Undo2 } from 'lucide-react';
 import {
-  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -35,7 +34,7 @@ import {
 import { formatTime, getHighScores, isNewBest } from './sudokuUtils';
 import type { CellPosition, SudokuDifficulty } from './types';
 
-export const Sudoku = memo(() => {
+export const Sudoku = () => {
   const [state, dispatch] = useReducer(
     gameReducer,
     'medium',
@@ -391,10 +390,7 @@ export const Sudoku = memo(() => {
     <GameContainer ref={containerRef}>
       <BoardSection>
         <StatusBar>
-          <Timer
-            startTime={state.startTime}
-            isComplete={state.isComplete}
-          />
+          <Timer startTime={state.startTime} isComplete={state.isComplete} />
           <ErrorBadge
             $hasErrors={state.errors.size > 0}
             role="status"
@@ -407,10 +403,7 @@ export const Sudoku = memo(() => {
         </StatusBar>
 
         <GridWrapper>
-          <Grid
-            role="grid"
-            aria-label="Sudoku puzzle grid"
-          >
+          <Grid role="grid" aria-label="Sudoku puzzle grid">
             {renderGrid}
           </Grid>
 
@@ -433,10 +426,7 @@ export const Sudoku = memo(() => {
       <ControlsSection>
         <Section>
           <SectionLabel id="difficulty-label">Difficulty</SectionLabel>
-          <DifficultyTabs
-            role="tablist"
-            aria-labelledby="difficulty-label"
-          >
+          <DifficultyTabs role="tablist" aria-labelledby="difficulty-label">
             {(
               [
                 'beginner',
@@ -465,10 +455,7 @@ export const Sudoku = memo(() => {
           <SectionLabel id="numbers-label">
             Numbers {highlightedNumber && `(${highlightedNumber} highlighted)`}
           </SectionLabel>
-          <NumberPad
-            role="group"
-            aria-labelledby="numbers-label"
-          >
+          <NumberPad role="group" aria-labelledby="numbers-label">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
               <NumberButton
                 key={num}
@@ -490,10 +477,7 @@ export const Sudoku = memo(() => {
             disabled={state.history.length === 0 || state.isComplete}
             aria-label="Undo last action (Ctrl+Z)"
           >
-            <Undo2
-              size={16}
-              aria-hidden="true"
-            />
+            <Undo2 size={16} aria-hidden="true" />
             Undo
           </ActionButton>
           <ActionButton
@@ -501,20 +485,14 @@ export const Sudoku = memo(() => {
             disabled={!state.selectedCell || state.isComplete}
             aria-label="Erase selected cell"
           >
-            <Eraser
-              size={16}
-              aria-hidden="true"
-            />
+            <Eraser size={16} aria-hidden="true" />
             Erase
           </ActionButton>
           <ActionButton
             onClick={handleReset}
             aria-label="Reset puzzle to initial state"
           >
-            <RotateCcw
-              size={16}
-              aria-hidden="true"
-            />
+            <RotateCcw size={16} aria-hidden="true" />
             Reset
           </ActionButton>
         </ActionRow>
@@ -524,20 +502,14 @@ export const Sudoku = memo(() => {
           onClick={() => handleNewGame(state.difficulty)}
           aria-label={`Start new ${state.difficulty} game`}
         >
-          <RefreshCw
-            size={16}
-            aria-hidden="true"
-          />
+          <RefreshCw size={16} aria-hidden="true" />
           New Game
         </ActionButton>
 
         {bestTime && (
           <Section>
             <SectionLabel>Best Time</SectionLabel>
-            <HighScoreItem
-              $rank={1}
-              role="status"
-            >
+            <HighScoreItem $rank={1} role="status">
               <span>🏆</span>
               <span>{formatTime(bestTime.time)}</span>
             </HighScoreItem>
@@ -546,8 +518,6 @@ export const Sudoku = memo(() => {
       </ControlsSection>
     </GameContainer>
   );
-});
-
-Sudoku.displayName = 'Sudoku';
+};
 
 export default Sudoku;

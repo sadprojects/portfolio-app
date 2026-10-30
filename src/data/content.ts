@@ -2,11 +2,59 @@ import type { ContentData } from './types';
 
 export const contentData: ContentData = {
   sections: {
-    projects: { enabled: true, order: 2, useSkeleton: true },
-    certifications: { enabled: true, order: 4, useSkeleton: true },
-    skills: { enabled: true, order: 3, useSkeleton: true },
-    experience: { enabled: true, order: 1, useSkeleton: true },
-    hobbies: { enabled: true, order: 5, useSkeleton: true },
+    projects: {
+      enabled: true,
+      order: 2,
+      useSkeleton: true,
+      intro: {
+        label: 'Side projects',
+        text: 'Things I built to learn something, mostly after hours and mostly still running.',
+      },
+    },
+    skills: {
+      enabled: true,
+      order: 3,
+      useSkeleton: true,
+      intro: {
+        label: 'Craft',
+        text: 'Front-end first, full-stack when it matters, and opinionated about the details users feel.',
+      },
+    },
+    experience: {
+      enabled: true,
+      order: 1,
+      useSkeleton: true,
+      intro: {
+        label: 'Where I work',
+        text: 'Eight years of shipping for the web, from WordPress tickets to the trading tools a team now builds with me.',
+      },
+    },
+    hobbies: {
+      enabled: true,
+      order: 5,
+      useSkeleton: true,
+      intro: {
+        label: 'Off the clock',
+        text: 'A camera, a controller, and the occasional long drive somewhere old.',
+      },
+      banners: [
+        {
+          image: 'castle.jpg',
+          caption: 'Weekends are for the camera.',
+          alt: 'Aerial view of Tsarevets fortress in Veliko Tarnovo',
+        },
+        {
+          image: 'nike.jpg',
+          caption: 'The best frames are a hike away.',
+          alt: 'Person standing on a rock over a cliff',
+        },
+        {
+          image: 'boat.jpg',
+          caption: 'Slow mornings, quiet shores.',
+          alt: 'Green sailing boat on the beach',
+        },
+      ],
+    },
     contact: { enabled: true, order: 6, useSkeleton: true },
   },
   certifications: [
@@ -14,18 +62,21 @@ export const contentData: ContentData = {
       title:
         'Published Research: Neural Network Based System for Disease Prediction',
       url: 'https://www.researchgate.net/publication/357430190_Neural_Network_Based_System_for_Disease_Prediction',
+      issuer: 'ResearchGate',
       date: 'Dec 2021',
       enabled: true,
     },
     {
       title: 'Microsoft Certified - Azure Fundamentals',
       url: 'https://learn.microsoft.com/api/credentials/share/en-gb/SilviuDinu-1202/D2162FE9FCA167E1?sharingId=79B7C1ADC9510DE6',
+      issuer: 'Microsoft',
       date: '18 Sep 2023',
       enabled: true,
     },
     {
       title: 'MongoDB - SI Associate Certification',
       url: 'https://learn.mongodb.com/c/yHhzIyEdQC6KznCAMnlgsg',
+      issuer: 'MongoDB University',
       date: '16 Jun 2023',
       enabled: true,
     },
@@ -34,7 +85,7 @@ export const contentData: ContentData = {
     email: 'silviualexd@gmail.com',
     phone: '+40730799252',
     name: 'Silviu Dinu',
-    position: 'Senior Software Engineer',
+    position: 'Lead Software Engineer',
     location: 'Bucharest, Romania',
     birthDate: '1996-09-18',
     firstJobDate: '2018-07-01',
@@ -68,11 +119,11 @@ export const contentData: ContentData = {
     },
   ],
   games: [
-    { title: 'Witcher 3: Wild Hunt', icon: 'witcher3.svg', enabled: true },
+    { title: 'Witcher 3: Wild Hunt', icon: 'witcher3.jpg', enabled: true },
     { title: 'Elden Ring', icon: 'elden_ring.jpg', enabled: true },
-    { title: 'Red Dead Redemption 2', icon: 'rdr2.svg', enabled: true },
-    { title: 'The Last Of Us', icon: 'tlou.svg', enabled: true },
-    { title: 'Serious Sam', icon: 'serious_sam.svg', enabled: true },
+    { title: 'Red Dead Redemption 2', icon: 'rdr2.jpg', enabled: true },
+    { title: 'The Last Of Us', icon: 'tlou.jpg', enabled: true },
+    { title: 'Serious Sam', icon: 'serious_sam.jpg', enabled: true },
   ],
   photography: [
     {
@@ -157,22 +208,15 @@ export const contentData: ContentData = {
       enabled: true,
     },
   ],
-  speedSkating: {
-    title: 'Speed Skating',
-    description: [
-      "Speed skating was my passion throughout my youth - a sport that might not be mainstream, but it's intense, competitive, and incredibly rewarding. Whether gliding on ice during winter or rolling through summer tracks, it's an all-season thrill that pushes you to your limits.",
-      'Over seven years of racing, I collected awards, forged lifelong friendships, and built the kind of discipline you can only get from pushing yourself on the track. It shaped who I am today.',
-    ],
-    image: {
-      path: 'tg_mures.jpg',
-      alt: 'A kid skating',
-    },
-  },
   introduction: [
-    '{{age}}-year-old Senior Software Engineer based in Bucharest, Romania. Building exceptional digital experiences with modern web technologies.',
+    "{{age}} years old, based in Bucharest. I've spent {{years}}+ years building for the web, from WordPress support tickets to the trading tools at London Stock Exchange Group, where I now lead a team and still write code every day.",
+    'Off the clock I shoot photos and lose evenings to open-world games.',
   ],
   footer: 'Built with ❤️ by Silviu Dinu',
-  homepage: { title: 'Hello there!' },
+  homepage: {
+    title: 'I make software people actually enjoy using.',
+    portraitCaption: "that's me",
+  },
   greetings: {
     timeBasedGreetings: [
       { type: 'morning', message: 'Good morning!' },
@@ -192,7 +236,7 @@ export const contentData: ContentData = {
   },
   projects: [
     {
-      title: '🎮 Sudoku Solver & Game',
+      title: 'Sudoku Solver & Game',
       city: 'Bucharest',
       description:
         'An interactive Sudoku game with multiple difficulty levels, built using a backtracking algorithm. Features include puzzle generation, real-time validation, timer, and local storage for high scores. Click to play!',
@@ -307,23 +351,34 @@ export const contentData: ContentData = {
   ],
   skills: {
     professional: [
-      { name: 'Javascript', level: 95, priority: 1, enabled: true },
-      { name: 'Angular', level: 86, priority: 1, enabled: true },
-      { name: 'AngularJS', level: 75, priority: 1, enabled: true },
-      { name: 'ReactJS', level: 95, priority: 1, enabled: true },
-      { name: 'VueJS', level: 65, priority: 2, enabled: true },
-      { name: 'NodeJS / Express', level: 80, priority: 1, enabled: true },
-      { name: 'Socket.io', level: 68, priority: 2, enabled: true },
-      { name: 'HTML / CSS', level: 90, priority: 2, enabled: true },
-      { name: 'MongoDB', level: 72, priority: 2, enabled: true },
-      { name: 'REST APIs', level: 82, priority: 2, enabled: true },
+      { name: 'JavaScript', level: 95, category: 'Frontend', enabled: true },
+      { name: 'TypeScript', level: 90, category: 'Frontend', enabled: true },
+      { name: 'React', level: 95, category: 'Frontend', enabled: true },
+      { name: 'Angular', level: 86, category: 'Frontend', enabled: true },
+      { name: 'AngularJS', level: 75, category: 'Frontend', enabled: true },
+      { name: 'Vue.js', level: 65, category: 'Frontend', enabled: true },
+      { name: 'HTML & CSS', level: 90, category: 'Frontend', enabled: true },
       {
-        name: 'Python / PyTorch for ML',
-        level: 72,
-        priority: 2,
+        name: 'Node.js & Express',
+        level: 80,
+        category: 'Backend & data',
         enabled: true,
       },
-      { name: 'PHP', level: 57, priority: 2, enabled: true },
+      {
+        name: 'REST APIs',
+        level: 82,
+        category: 'Backend & data',
+        enabled: true,
+      },
+      {
+        name: 'WebSockets & Socket.io',
+        level: 70,
+        category: 'Backend & data',
+        enabled: true,
+      },
+      { name: 'MongoDB', level: 72, category: 'Backend & data', enabled: true },
+      { name: 'PHP', level: 57, category: 'Backend & data', enabled: true },
+      { name: 'Python & PyTorch', level: 72, category: 'Other', enabled: true },
     ],
     languages: ['English', 'Romanian', 'Japanese (N5)'],
     developmentTools: [
@@ -334,16 +389,6 @@ export const contentData: ContentData = {
       'AWS',
       'Jenkins',
       'SonarQube',
-    ],
-    personal: [
-      'Reliable and professional',
-      'Efficient communicator',
-      'Organized',
-      'Punctual',
-      'Team player',
-      'Fast learner',
-      'Motivated',
-      'Curious',
     ],
   },
   social: [
@@ -414,11 +459,25 @@ export const contentData: ContentData = {
   },
   experience: [
     {
+      position: 'Lead Software Engineer',
+      company: 'London Stock Exchange Group',
+      city: 'Bucharest',
+      startDate: '2026-10-01',
+      endDate: 'Present',
+      promotion: true,
+      responsibilities: [
+        'Leading a team of engineers building the trading and analytics tools our users rely on every day, owning technical direction, code quality and delivery',
+        'Mentoring engineers, running design reviews and keeping the team shipping, while staying hands-on in the codebase',
+        'Working with tools like: React, TypeScript, Websockets, SharedWorkers, CI/CD',
+      ],
+      enabled: true,
+    },
+    {
       position: 'Senior Software Engineer',
       company: 'London Stock Exchange Group',
       city: 'Bucharest',
       startDate: '2024-02-01',
-      endDate: 'Present',
+      endDate: '2026-09-30',
       responsibilities: [
         'In my role as a Senior Software Engineer, I focus on developing cutting-edge software solutions that simplify financial operations and elevate the user experience. My contributions are central to equipping our users with dependable and effective financial tools',
         'Working with tools like: React, Websockets, SharedWorkers, CI/CD',

@@ -1,51 +1,35 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
-import { render } from '@testing-library/react';
+import { contentData } from '@data/content';
+import { render, screen } from '@testing-library/react';
 import Projects from './Projects';
 
-describe('Projects Page', () => {
-  it('renders projects page without crashing', () => {
-    const { container } = render(
-      <ThemeProvider>
-        <Projects />
-      </ThemeProvider>
-    );
-    expect(container.firstChild).toBeDefined();
+const renderPage = () =>
+  render(
+    <ThemeProvider>
+      <Projects />
+    </ThemeProvider>,
+  );
+
+describe('Projects', () => {
+  it('renders one block per enabled project with a link to its code', () => {
+    renderPage();
+    const enabled = contentData.projects.filter((p) => p.enabled !== false);
+    expect(screen.getAllByRole('article')).toHaveLength(enabled.length);
+    enabled.forEach((project) => {
+      expect(
+        screen.getByRole('link', { name: `View ${project.title} source code` }),
+      ).toHaveAttribute('href', project.repo);
+    });
   });
 
-  it('displays projects grid', () => {
-    const { container } = render(
-      <ThemeProvider>
-        <Projects />
-      </ThemeProvider>
-    );
-    expect(container.firstChild).toBeDefined();
-  });
-
-  it('renders with proper structure', () => {
-    const { container } = render(
-      <ThemeProvider>
-        <Projects />
-      </ThemeProvider>
-    );
-    expect(container.querySelector('div')).toBeDefined();
-  });
-
-  it('initializes without errors', () => {
-    expect(() => {
-      render(
-        <ThemeProvider>
-          <Projects />
-        </ThemeProvider>
-      );
-    }).not.toThrow();
-  });
-
-  it('mounts successfully', () => {
-    const { unmount } = render(
-      <ThemeProvider>
-        <Projects />
-      </ThemeProvider>
-    );
-    expect(unmount).toBeDefined();
+  it('shows a video for projects that have one and the Sudoku game inline', async () => {
+    const { container } = renderPage();
+    const withVideo = contentData.projects.filter(
+      (p) => p.video && !p.video.includes('youtu'),
+    ).length;
+    expect(container.querySelectorAll('video')).toHaveLength(withVideo);
+    expect(
+      await screen.findByLabelText('Sudoku puzzle grid'),
+    ).toBeInTheDocument();
   });
 });

@@ -85,7 +85,7 @@ const AppContent = () => {
     }
   }, [snowfallEnabled]);
 
-  const isDarkMode = theme.colors.background === '#000000';
+  const isDarkMode = theme.colors.background === '#0a0a0a';
   const snowColor = isDarkMode
     ? 'rgba(255, 255, 255, 0.9)'
     : 'rgba(100, 149, 237, 0.8)';
@@ -110,77 +110,33 @@ const AppContent = () => {
       <MainContent>
         <Suspense fallback={<Loader />}>
           <Routes>
-            <Route
-              path="/"
-              element={<Home />}
-            />
-            <Route
-              path="/home"
-              element={
-                <Navigate
-                  to="/"
-                  replace
-                />
-              }
-            />
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Navigate to="/" replace />} />
             <Route
               path="/projects"
-              element={
-                <Navigate
-                  to="/#projects"
-                  replace
-                />
-              }
+              element={<Navigate to="/#projects" replace />}
             />
             <Route
               path="/certifications"
-              element={
-                <Navigate
-                  to="/#certifications"
-                  replace
-                />
-              }
+              element={<Navigate to="/#skills" replace />}
             />
             <Route
               path="/skills"
-              element={
-                <Navigate
-                  to="/#skills"
-                  replace
-                />
-              }
+              element={<Navigate to="/#skills" replace />}
             />
             <Route
               path="/experience"
-              element={
-                <Navigate
-                  to="/#experience"
-                  replace
-                />
-              }
+              element={<Navigate to="/#experience" replace />}
             />
             <Route
               path="/hobbies"
-              element={
-                <Navigate
-                  to="/#hobbies"
-                  replace
-                />
-              }
+              element={<Navigate to="/#hobbies" replace />}
             />
             <Route
               path="/contact"
-              element={
-                <Navigate
-                  to="/#contact"
-                  replace
-                />
-              }
+              element={<Navigate to="/#contact" replace />}
             />
-            <Route
-              path="*"
-              element={<NotFound />}
-            />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </MainContent>

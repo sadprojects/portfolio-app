@@ -17,8 +17,6 @@ interface ToastState {
 }
 
 interface AccessibilityContextType {
-  scrollSnapEnabled: boolean;
-  toggleScrollSnap: () => void;
   snowfallEnabled: boolean;
   toggleSnowfall: () => void;
   toast: ToastState;
@@ -52,12 +50,6 @@ interface AccessibilityProviderProps {
 export const AccessibilityProvider: FC<AccessibilityProviderProps> = ({
   children,
 }) => {
-  const [scrollSnapEnabled, setScrollSnapEnabled] = useState<boolean>(() => {
-    const stored = localStorage.getItem('scrollSnapEnabled');
-    // Default to true (snap enabled) if not set
-    return stored === null ? true : stored === 'true';
-  });
-
   const [snowfallEnabled, setSnowfallEnabled] = useState<boolean>(() => {
     const stored = localStorage.getItem('snowfallEnabled');
     // Default to enabled during winter (Dec, Jan, Feb), disabled otherwise
@@ -68,10 +60,6 @@ export const AccessibilityProvider: FC<AccessibilityProviderProps> = ({
     message: '',
     isVisible: false,
   });
-
-  useEffect(() => {
-    localStorage.setItem('scrollSnapEnabled', String(scrollSnapEnabled));
-  }, [scrollSnapEnabled]);
 
   useEffect(() => {
     localStorage.setItem('snowfallEnabled', String(snowfallEnabled));
@@ -92,17 +80,6 @@ export const AccessibilityProvider: FC<AccessibilityProviderProps> = ({
     setToast((prev) => ({ ...prev, isVisible: false }));
   }, []);
 
-  const toggleScrollSnap = useCallback(() => {
-    setScrollSnapEnabled((prev) => {
-      const newValue = !prev;
-      showToast(
-        newValue ? 'Scroll snap enabled' : 'Scroll snap disabled',
-        newValue ? 'enabled' : 'disabled',
-      );
-      return newValue;
-    });
-  }, [showToast]);
-
   const toggleSnowfall = useCallback(() => {
     setSnowfallEnabled((prev) => {
       const newValue = !prev;
@@ -117,8 +94,6 @@ export const AccessibilityProvider: FC<AccessibilityProviderProps> = ({
   return (
     <AccessibilityContext.Provider
       value={{
-        scrollSnapEnabled,
-        toggleScrollSnap,
         snowfallEnabled,
         toggleSnowfall,
         toast,
