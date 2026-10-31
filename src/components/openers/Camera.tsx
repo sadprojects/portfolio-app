@@ -21,14 +21,16 @@ const SCREEN_CENTRE = {
   y: SCREEN.top + SCREEN.height / 2,
 };
 const ZOOM = 1.8;
-const READ_VIEWPORTS = 1.2;
-const ZOOM_VIEWPORTS = 1.2;
-const VIEWPORTS_PER_PHOTO = 0.75;
+const READ_VIEWPORTS = 1.5;
+const ZOOM_VIEWPORTS = 1.3;
+/* The first and the last photo each hold this long before and after the strip moves. */
+const HOLD_VIEWPORTS = 0.5;
+const VIEWPORTS_PER_PHOTO = 0.8;
 const INTRO_FADE_OUT_START = 0.8;
 
 const CameraTrack = styled.div<{ $photos: number }>`
   height: calc(
-    ${(READ_VIEWPORTS + ZOOM_VIEWPORTS + 1) * 100}vh +
+    ${(READ_VIEWPORTS + ZOOM_VIEWPORTS + 2 * HOLD_VIEWPORTS + 1) * 100}vh +
       ${({ $photos }) => ($photos - 1) * VIEWPORTS_PER_PHOTO * 100}vh
   );
 `;
@@ -170,9 +172,14 @@ export const Camera = ({ intro, photos }: CameraProps) => {
   const progress = useSpring(scrollYProgress, OPENER_SPRING);
 
   const runway =
-    READ_VIEWPORTS + ZOOM_VIEWPORTS + (photos.length - 1) * VIEWPORTS_PER_PHOTO;
+    READ_VIEWPORTS +
+    ZOOM_VIEWPORTS +
+    2 * HOLD_VIEWPORTS +
+    (photos.length - 1) * VIEWPORTS_PER_PHOTO;
   const zoomStart = READ_VIEWPORTS / runway;
   const zoomEnd = (READ_VIEWPORTS + ZOOM_VIEWPORTS) / runway;
+  const playbackStart = zoomEnd + HOLD_VIEWPORTS / runway;
+  const playbackEnd = 1 - HOLD_VIEWPORTS / runway;
 
   const scale = useTransform(progress, [zoomStart, zoomEnd], [1, ZOOM]);
   const startupOpacity = useTransform(
@@ -180,8 +187,9 @@ export const Camera = ({ intro, photos }: CameraProps) => {
     [zoomEnd * INTRO_FADE_OUT_START, zoomEnd],
     [1, 0],
   );
-  const index = useTransform(progress, (value) =>
-    playbackIndex(value, zoomEnd, photos.length),
+  const playback = useTransform(progress, [playbackStart, playbackEnd], [0, 1]);
+  const index = useTransform(playback, (value) =>
+    playbackIndex(value, 0, photos.length),
   );
   const stripX = useTransform(index, (current) => `${-current * 100}%`);
   const currentPhoto = (current: number) => photos[Math.round(current)];

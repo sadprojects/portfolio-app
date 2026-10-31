@@ -1,7 +1,7 @@
 import { Statement } from '@components/motion/Statement';
 import { contentData } from '@data/content';
 import type { SectionId, SectionIntro } from '@data/types';
-import { OPENER_FADE_IN, OPENER_SPRING } from '@styles/motion';
+import { OPENER_LINE, OPENER_SETTLES, OPENER_SPRING } from '@styles/motion';
 import {
   easeInOut,
   motion,
@@ -37,10 +37,10 @@ export interface DeskApp {
   body: ReactNode;
 }
 
-/* Scroll runways in viewports: the laptop zooms in over the first (and 0.7 before it pins); each section settles past its end, so nothing sits under the dock or the fold; the dock and the document take 1.65; the laptop shrinks away over 0.75, then closes its lid, recedes and rises out of the viewport over 1.5, and the camera follows from below. */
-const ARRIVE_VH = 120;
-const DESK_VH = 165;
-const SETTLE_VH = 30;
+/* Scroll runways in viewports: the laptop zooms in and its line is read over the first (and 0.7 before it pins); each section settles past its end, so nothing sits under the dock or the fold; the dock and the document take 2; the laptop shrinks away over 0.75, then closes its lid, recedes and rises out of the viewport over 1.5, and the camera follows from below. */
+const ARRIVE_VH = 170;
+const DESK_VH = 200;
+const SETTLE_VH = 33;
 const LEAVE_VH = 75;
 const CLOSE_VH = 150;
 const START_SCALE = 2.2;
@@ -50,16 +50,16 @@ const LID_CLOSED_DEGREES = -84;
 const DOCUMENT_ICON_SCALE = 0.06;
 const FIRST_PAGE_ZOOM = 1.8;
 
-/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document grows out of it over the section on screen, its first page zooms into place, then it clears. */
-const DOCK_SHOWS = [0, 0.1, 0.78, 0.85];
-const ICON_CLICK = [0.1, 0.15, 0.2];
-const ICON_OPENS = [0.15, 0.2];
-const LABEL_SHOWS = [0.1, 0.15, 0.3, 0.34];
-const DOCUMENT_OPENS = [0.2, 0.8];
-const DOCUMENT_APPEARS = [0.2, 0.26];
-const SCREEN_SECTION_FADES = [0.5, 0.8];
-const FIRST_PAGE_SETTLES = [0.2, 0.9];
-const FIRST_PAGE_FADES = [0.9, 1];
+/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document grows out of it over the section on screen, its first page zooms into place and holds to be read, then it clears, and the page stays blank for a beat before the section follows. */
+const DOCK_SHOWS = [0, 0.08, 0.72, 0.78];
+const ICON_CLICK = [0.08, 0.12, 0.16];
+const ICON_OPENS = [0.12, 0.16];
+const LABEL_SHOWS = [0.08, 0.12, 0.26, 0.3];
+const DOCUMENT_OPENS = [0.16, 0.62];
+const DOCUMENT_APPEARS = [0.16, 0.22];
+const SCREEN_SECTION_FADES = [0.4, 0.62];
+const FIRST_PAGE_SETTLES = [0.16, 0.62];
+const FIRST_PAGE_FADES = [0.8, 0.88];
 /* Beats of the closing runway: the display goes dark and the backdrop sets in, the lid folds down onto the keyboard, and the laptop rises away before the fold is done. */
 const SCREEN_GOES_DARK = [0, 0.15];
 const LID_FOLDS = [0.15, 0.6];
@@ -244,7 +244,7 @@ const Document = styled(ResumeFrame)`
   will-change: transform, opacity;
 `;
 
-/* Behind the pin and as wide as the screen; its first line enters at the screen's bottom edge once the laptop has settled. */
+/* Behind the pin and as wide as the screen; its first line enters at the screen's bottom edge once the laptop has settled and its line has cleared. */
 const SectionOnScreen = styled(motion.div)`
   position: relative;
   isolation: isolate;
@@ -304,7 +304,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const leave = useSpring(departure, OPENER_SPRING);
   const close = useSpring(closing, OPENER_SPRING);
 
-  const zoomIn = useTransform(arrive, [0, 1], [START_SCALE, 1]);
+  const zoomIn = useTransform(arrive, OPENER_SETTLES, [START_SCALE, 1]);
   const zoomOut = useTransform(leave, [0, 1], [1, END_SCALE]);
   const recede = useTransform(close, [0, 1], [1, CLOSED_SCALE / END_SCALE]);
   const laptopScale = useTransform(
@@ -312,11 +312,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
     ([entering, leaving, receding]: number[]) => entering * leaving * receding,
   );
   const laptopY = useTransform(close, LAPTOP_RISES, ['0vh', RISEN_OUT]);
-  const lineOpacity = useTransform(
-    arrive,
-    [...OPENER_FADE_IN, 0.85, 1],
-    [0, 1, 1, 0],
-  );
+  const lineOpacity = useTransform(arrive, OPENER_LINE, [0, 1, 1, 0]);
 
   const dockY = useTransform(desk, DOCK_SHOWS.slice(0, 2), ['140%', '0%']);
   const dockOpacity = useTransform(desk, DOCK_SHOWS, [0, 1, 1, 0]);

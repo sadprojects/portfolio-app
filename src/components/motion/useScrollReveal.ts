@@ -15,11 +15,11 @@ const progressTowardPageEnd = (scrollY: number) => {
 export const useScrollReveal = (ref: RefObject<HTMLElement | null>) => {
   const { scrollYProgress: enterByPosition } = useScroll({
     target: ref,
-    offset: ['start 89%', 'start 51%'],
+    offset: ['start 92%', 'start 62%'],
   });
   const { scrollYProgress: exitByPosition } = useScroll({
     target: ref,
-    offset: ['end 39%', 'end 1%'],
+    offset: ['end 28%', 'end 1%'],
   });
   const { scrollY } = useScroll();
 
