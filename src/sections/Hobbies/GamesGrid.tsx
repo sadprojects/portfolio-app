@@ -7,7 +7,7 @@ import styled from 'styled-components';
 const GridOfGames = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
-  gap: clamp(1rem, 3vw, 2rem);
+  gap: clamp(1.5rem, 4vw, 3rem);
 `;
 
 const GameCard = styled(motion.div)`

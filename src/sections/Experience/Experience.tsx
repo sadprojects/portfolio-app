@@ -15,7 +15,7 @@ const Tenure = styled.article`
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   gap: 1.5rem clamp(2rem, 5vw, 5rem);
-  padding: clamp(2.5rem, 5vw, 4rem) 0;
+  padding: clamp(3rem, 6vw, 5.25rem) 0;
   border-top: 1px solid ${({ theme }) => theme.colors.border};
 
   @media (max-width: 768px) {
@@ -63,7 +63,7 @@ const Meta = styled.p`
 const RoleList = styled.ol`
   display: flex;
   flex-direction: column;
-  gap: 2.25rem;
+  gap: 2.5rem;
   margin: 0;
   padding: 0;
   list-style: none;

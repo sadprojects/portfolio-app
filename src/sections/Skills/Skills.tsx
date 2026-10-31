@@ -26,7 +26,7 @@ const FilterBar = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   padding: 0.35rem;
   width: fit-content;
   border: 1px solid ${({ theme }) => theme.colors.border};
@@ -69,7 +69,7 @@ const ActivePill = styled(motion.span)`
 const SkillGrid = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
-  gap: 1rem;
+  gap: 2rem;
 `;
 
 const Tile = styled(motion.div)`
@@ -131,7 +131,7 @@ const LevelBar = styled.span<{ $level: number }>`
 `;
 
 const SubHeading = styled.h3`
-  margin: 3.5rem 0 1.25rem;
+  margin: 5rem 0 2rem;
   font-family: ${({ theme }) => theme.typography.fonts.display};
   font-weight: 400;
   font-size: clamp(1.6rem, 3vw, 2.25rem);
@@ -148,7 +148,7 @@ const CredentialRow = styled.a`
   align-items: center;
   gap: 0.75rem 1.5rem;
   margin: 0 -1.25rem;
-  padding: 1.75rem 1.25rem;
+  padding: 2.25rem 1.25rem;
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 0.75rem;
   color: inherit;
@@ -224,7 +224,7 @@ const CredentialAction = styled.span`
 const AtAGlance = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  margin-top: 3rem;
+  margin-top: 5rem;
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   background: ${({ theme }) => `${theme.colors.card}e6`};
@@ -233,7 +233,7 @@ const AtAGlance = styled.div`
 `;
 
 const GlanceCell = styled.div`
-  padding: 1.5rem;
+  padding: 2rem;
 
   & + & {
     border-left: 1px solid ${({ theme }) => theme.colors.border};

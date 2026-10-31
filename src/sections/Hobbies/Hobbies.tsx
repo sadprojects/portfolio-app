@@ -22,7 +22,7 @@ const Tabs = styled.div`
   display: flex;
   justify-content: center;
   gap: 0.35rem;
-  margin: -1.5rem auto 3rem;
+  margin: 0 auto 7rem;
   padding: 0.35rem;
   width: fit-content;
   border: 1px solid ${({ theme }) => theme.colors.border};

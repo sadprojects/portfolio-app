@@ -21,7 +21,7 @@ const ProjectRow = styled(Grid).attrs({ as: 'article' })`
   padding: 0;
 
   & + & {
-    margin-top: clamp(5rem, 12vw, 14rem);
+    margin-top: clamp(6rem, 17vw, 19rem);
   }
 `;
 

@@ -8,7 +8,7 @@ import styled from 'styled-components';
 const GridOfPhotos = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
-  gap: clamp(1rem, 2vw, 1.5rem);
+  gap: clamp(2rem, 6vw, 5.5rem) clamp(1.5rem, 4vw, 3.5rem);
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(3, 1fr);
