@@ -7,6 +7,9 @@ import {
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 
+import baseArtwork from '@/assets/laptop-base.svg';
+import lidArtwork from '@/assets/laptop-lid.svg';
+
 import { Cutout, Startup } from './Cutout';
 import { ARTWORK, HINGE, SCREEN, SCREEN_CENTRE } from './laptopArtwork';
 import { Zoom } from './Zoom';
@@ -102,13 +105,13 @@ export const LaptopFrame = ({
           {screenOff && <ScreenOff style={{ opacity: screenOff }} />}
         </Screen>
         <img
-          src="/media/images/laptop-lid.svg"
+          src={lidArtwork}
           alt=""
           width={ARTWORK.width}
           height={ARTWORK.height}
         />
       </Lid>
-      <img src="/media/images/laptop-base.svg" alt="" aria-hidden="true" />
+      <img src={baseArtwork} alt="" aria-hidden="true" />
     </Shell>
   );
 };

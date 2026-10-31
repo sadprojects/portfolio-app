@@ -1,6 +1,6 @@
 import type { Rect } from './Cutout';
 
-/* /media/images/laptop-lid.svg and laptop-base.svg are the public-domain MoonBook by Dmitry Chestnykh, split at its hinge; the screen (cut out of the lid) and the hinge are in % of the artwork. */
+/* src/assets/laptop-lid.svg and laptop-base.svg are the public-domain MoonBook by Dmitry Chestnykh, split at its hinge; the screen (cut out of the lid) and the hinge are in % of the artwork. */
 export const ARTWORK = { width: 707, height: 399 };
 export const SCREEN: Rect = {
   left: 14.84,

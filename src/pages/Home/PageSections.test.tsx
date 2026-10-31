@@ -10,7 +10,7 @@ vi.mock('framer-motion', async (importOriginal) => ({
   useReducedMotion: () => motion.reduce,
 }));
 
-const LAPTOP = 'img[src^="/media/images/laptop-"]';
+const LAPTOP = 'img[src*="laptop-"]';
 const CAMERA = 'img[src="/media/images/camera.webp"]';
 
 const renderSections = () =>

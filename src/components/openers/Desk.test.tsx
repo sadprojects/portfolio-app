@@ -25,9 +25,7 @@ const renderDesk = () =>
 describe('Desk', () => {
   it('hosts both sections behind one laptop, in order, with the CV in its dock', () => {
     const { container } = renderDesk();
-    const laptop = container.querySelector(
-      'img[src="/media/images/laptop-lid.svg"]',
-    )!;
+    const laptop = container.querySelector('img[src$="laptop-lid.svg"]')!;
     const track = laptop.closest('section')!;
     expect(
       [...track.querySelectorAll('[data-section]')].map((element) =>

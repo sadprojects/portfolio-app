@@ -67,11 +67,11 @@
     <linearGradient inkscape:collect="always" xlink:href="#linearGradient3939" id="linearGradient3937" x1="18.142" y1="464.07156" x2="725.14203" y2="464.07156" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1,0,0,2.3954965,0,-648.19278)"/>
     <linearGradient inkscape:collect="always" xlink:href="#linearGradient3967" id="linearGradient3965" x1="350.38416" y1="439.86459" x2="350.38416" y2="450.90128" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1.477217,0,0,0.89908475,-185.86164,44.389042)"/>
     <linearGradient inkscape:collect="always" xlink:href="#linearGradient3231" id="linearGradient3975" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1.3270874,0,0,1.0058,-214.40773,2.1515)" x1="525.28" y1="97.768" x2="656.6" y2="423.04"/>
-      <clipPath id="screenHole" clipPathUnits="userSpaceOnUse"><path clip-rule="evenodd" d="M 18.142,83.649 h 707.42 v 398.84 h -707.42 z M 123.12,111.49 h 494.98 v 310.02 h -494.98 z"/></clipPath>
   </defs>
-  <g id="layer1" clip-path="url(#screenHole)" transform="translate(-18.142 -83.649)">
-    <rect id="rect2453" style="fill:#d0d0d2;stroke:#b3b7b7;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel" rx="19.999001" ry="20.788254" height="363.471" width="542.42999" y="84.649002" x="101.03"/>
-    <rect id="rect3225" style="fill:#000000;stroke:#000000;stroke-width:1.00880003;stroke-linecap:round;stroke-linejoin:bevel" rx="17" ry="17" height="368.16855" width="535.76007" y="88.265999" x="103.91"/>
+  <g id="layer1" transform="translate(-18.142 -83.649)">
+    <path id="shell" style="fill:#d0d0d2;fill-rule:evenodd" d="M 121.029,84.649 h 502.432 a 19.999,20.788 0 0 1 19.999,20.788 v 321.895 a 19.999,20.788 0 0 1 -19.999,20.788 h -502.432 a 19.999,20.788 0 0 1 -19.999,-20.788 v -321.895 a 19.999,20.788 0 0 1 19.999,-20.788 z M 123.12,111.49 h 494.98 v 310.02 h -494.98 z"/>
+    <rect id="shellEdge" style="fill:none;stroke:#b3b7b7;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel" rx="19.999001" ry="20.788254" height="363.471" width="542.42999" y="84.649002" x="101.03"/>
+    <path id="bezel" style="fill:#000000;fill-rule:evenodd" d="M 120.910,88.266 h 501.760 a 17,17 0 0 1 17,17 v 334.169 a 17,17 0 0 1 -17,17 h -501.760 a 17,17 0 0 1 -17,-17 v -334.169 a 17,17 0 0 1 17,-17 z M 123.12,111.49 h 494.98 v 310.02 h -494.98 z"/>
     <path id="path3241" style="opacity:.16418;fill:url(#radialGradient3257)" d="m372.25 100.72a3.4688 3.2954 0 1 1 -6.94 0 3.4688 3.2954 0 1 1 6.94 0z" transform="matrix(1.2563 0 0 1.2563 -94.56 -25.955)"/>
     <rect x="104.9724" y="88.802849" width="533.5575" height="349.34769" ry="16.130957" rx="16.930111" style="opacity:0.27916667000000001;fill:none;stroke:#ffffff;stroke-width:1.00000002;stroke-linecap:round;stroke-linejoin:bevel;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" id="rect3955"/>
     <rect style="fill:url(#linearGradient3965);fill-opacity:1;stroke:none" id="rect3957" width="443.16507" height="7.192678" x="147.89493" y="439.86459"/>
