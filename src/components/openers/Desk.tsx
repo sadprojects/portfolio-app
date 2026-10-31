@@ -38,12 +38,12 @@ export interface DeskApp {
   body: ReactNode;
 }
 
-/* Scroll runways in viewports: the laptop zooms in and its line is read over the first (and 0.7 before it pins); each section settles past its end, so nothing sits under the dock or the fold; the dock and the document take 2; the laptop shrinks away over 0.75, then closes its lid, recedes and rises out of the viewport over 1.5, and the camera follows from below. */
+/* Scroll runways in viewports: the laptop zooms in and its line is read over the first (and 0.7 before it pins); each section settles past its end, so nothing sits under the dock or the fold; the dock and the document take 2; the laptop shrinks away over 0.75, then closes its lid and rises out of the viewport over 1.4, and the camera follows from below. */
 const ARRIVE_VH = 170;
 const DESK_VH = 200;
 const SETTLE_VH = 33;
 const LEAVE_VH = 75;
-const CLOSE_VH = 150;
+const CLOSE_VH = 140;
 const START_SCALE = 2.2;
 const END_SCALE = 0.55;
 const LID_CLOSED_DEGREES = -80;
@@ -52,7 +52,7 @@ const FIRST_PAGE_ZOOM = 1.8;
 
 /* Beats of the arrival: the laptop settles over the first part, and its line fades in, holds to be read, and fades out, leaving the screen clear before the section enters. */
 const LAPTOP_SETTLES = [0, 0.55];
-const LINE_SHOWS = [0.04, 0.3, 0.74, 0.86];
+const LINE_SHOWS = [0.04, 0.3, 0.78, 0.91];
 /* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document grows out of it over the section on screen, its first page zooms into place and holds to be read, then it clears, and the page stays blank for a beat before the section follows. */
 const DOCK_SHOWS = [0, 0.08, 0.72, 0.78];
 const ICON_CLICK = [0.08, 0.12, 0.16];
@@ -62,11 +62,11 @@ const DOCUMENT_OPENS = [0.16, 0.62];
 const DOCUMENT_APPEARS = [0.16, 0.22];
 const SCREEN_SECTION_FADES = [0.4, 0.62];
 const FIRST_PAGE_SETTLES = [0.16, 0.62];
-const FIRST_PAGE_FADES = [0.8, 0.88];
+const FIRST_PAGE_FADES = [0.82, 0.93];
 /* Beats of the closing runway: the display goes dark, the lid folds down onto the keyboard, and the laptop rises out of the viewport before the fold is done; the camera, pinned underneath from then on, rises into its place from below. Nothing scales during the fold, so the lid's layer is never re-rasterised mid-turn. */
 const SCREEN_GOES_DARK = [0, 0.15];
 const LID_FOLDS = [0.15, 0.6];
-const LAPTOP_RISES = [0.4, 0.85];
+const LAPTOP_RISES = [0.4, 0.8];
 const RISEN_OUT = '-100vh';
 
 /* The dock's apps, as tinted tiles; the CV sits in the middle, where the document grows from. */
