@@ -12,7 +12,7 @@ import styled from 'styled-components';
 const DEFAULT_START_SCALE = 2.2;
 
 const ZoomTrack = styled.div`
-  height: 200vh;
+  height: 216vh;
 `;
 
 const ZoomStage = styled.div`

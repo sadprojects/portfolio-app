@@ -15,7 +15,7 @@ const PHONE = '(max-width: 768px)';
 const DESK: [SectionId, SectionId] = ['projects', 'skills'];
 
 const SectionBody = styled.section`
-  padding: clamp(1rem, 3vw, 4rem) 0 clamp(4rem, 8vw, 10rem);
+  padding: clamp(1rem, 3vw, 4rem) 0 clamp(5rem, 11vw, 13rem);
   scroll-margin-top: 4rem;
 `;
 

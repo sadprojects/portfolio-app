@@ -1,27 +1,46 @@
+import { motion, type MotionValue } from 'framer-motion';
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 
 import { Cutout, Startup, type Rect } from './Cutout';
-import { ARTWORK, SCREEN, SCREEN_CENTRE } from './laptopArtwork';
+import { ARTWORK, HINGE, SCREEN, SCREEN_CENTRE } from './laptopArtwork';
 import { Zoom } from './Zoom';
 
 const OPENER_WIDTH = 'min(94vw, 80rem)';
 
-/* The artwork minus its screen, so whatever is behind shows through. */
-const screenCutout = ({ left, top, width, height }: Rect) =>
-  `polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, ${left}% ${top}%, ${left + width}% ${top}%, ${left + width}% ${top + height}%, ${left}% ${top + height}%, ${left}% ${top}%)`;
+/* The lid minus its screen, so whatever is behind shows through. */
+const lidCutout = ({ left, top, width, height }: Rect) =>
+  `polygon(evenodd, 0 0, 100% 0, 100% ${HINGE}%, 0 ${HINGE}%, 0 0, ${left}% ${top}%, ${left + width}% ${top}%, ${left + width}% ${top + height}%, ${left}% ${top + height}%, ${left}% ${top}%)`;
 
 const Shell = styled.div`
   position: relative;
   aspect-ratio: ${ARTWORK.width} / ${ARTWORK.height};
+  perspective: 1600px;
 
   img {
-    position: relative;
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
-    clip-path: ${screenCutout(SCREEN)};
   }
+`;
+
+/* Folds back around the hinge when the laptop closes. */
+const Lid = styled(motion.div)`
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% ${HINGE}%;
+  backface-visibility: hidden;
+  will-change: transform;
+
+  img {
+    clip-path: ${lidCutout(SCREEN)};
+  }
+`;
+
+const Base = styled.img`
+  clip-path: inset(${HINGE}% 0 0 0);
 `;
 
 const Screen = styled(Cutout)`
@@ -38,22 +57,45 @@ const Screen = styled(Cutout)`
   }
 `;
 
+/* The display going dark as the lid comes down. */
+const ScreenOff = styled(motion.div)`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #141416, #060607);
+`;
+
 export const ScreenInset = styled.div`
   padding: 0 4%;
 `;
 
+interface LaptopFrameProps {
+  children: ReactNode;
+  /** Degrees the lid has folded back; open when absent. */
+  lidAngle?: MotionValue<number>;
+  /** How far the display has gone dark; lit when absent. */
+  screenOff?: MotionValue<number>;
+}
+
 /** The laptop artwork; children sit on its screen. */
-export const LaptopFrame = ({ children }: { children: ReactNode }) => (
+export const LaptopFrame = ({
+  children,
+  lidAngle,
+  screenOff,
+}: LaptopFrameProps) => (
   <Shell>
-    <Screen $rect={SCREEN} $tone="background">
-      {children}
-    </Screen>
-    <img
-      src="/media/images/laptop.svg"
-      alt=""
-      width={ARTWORK.width}
-      height={ARTWORK.height}
-    />
+    <Lid style={{ rotateX: lidAngle }}>
+      <Screen $rect={SCREEN} $tone="background">
+        {children}
+        {screenOff && <ScreenOff style={{ opacity: screenOff }} />}
+      </Screen>
+      <img
+        src="/media/images/laptop.svg"
+        alt=""
+        width={ARTWORK.width}
+        height={ARTWORK.height}
+      />
+    </Lid>
+    <Base src="/media/images/laptop.svg" alt="" aria-hidden="true" />
   </Shell>
 );
 

@@ -27,11 +27,11 @@ export const useScrollReveal = (
 ): ScrollReveal => {
   const { scrollYProgress: enterByPosition } = useScroll({
     target: ref,
-    offset: ['start 88%', 'start 52%'],
+    offset: ['start 89%', 'start 51%'],
   });
   const { scrollYProgress: exitByPosition } = useScroll({
     target: ref,
-    offset: ['end 38%', 'end 2%'],
+    offset: ['end 39%', 'end 1%'],
   });
   const { scrollY } = useScroll();
 

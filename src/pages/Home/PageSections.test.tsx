@@ -50,9 +50,10 @@ describe('section openers', () => {
 
   it('host projects and skills on one laptop on wide screens', () => {
     const { container } = renderSections();
-    const laptops = container.querySelectorAll(LAPTOP);
-    expect(laptops).toHaveLength(1);
+    // The artwork is drawn twice, as a lid and a base, inside one desk.
+    const laptops = [...container.querySelectorAll<HTMLImageElement>(LAPTOP)];
     const desk = laptops[0].closest('section')!;
+    laptops.forEach((laptop) => expect(desk).toContainElement(laptop));
     expect(desk).toContainElement(
       container.querySelector('[data-section="projects"]'),
     );
