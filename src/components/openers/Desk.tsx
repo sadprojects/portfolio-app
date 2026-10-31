@@ -37,7 +37,7 @@ export interface DeskApp {
   body: ReactNode;
 }
 
-/* Scroll runways in viewports: the laptop zooms in over the first (and 0.3 before it pins), the dock and the document take the next 1.4, the document's section settles 0.25 past its end, and the laptop shrinks away over 0.6. */
+/* Scroll runways in viewports: the laptop zooms in over the first (and 0.3 before it pins); each section settles 0.25 past its end, so nothing sits under the dock or the fold; the dock and the document take 1.4; the laptop shrinks away over 0.6. */
 const ARRIVE_VH = 100;
 const DESK_VH = 140;
 const SETTLE_VH = 25;
@@ -250,7 +250,7 @@ const SectionOnScreen = styled(motion.div)`
 /* Fades in as the document's first page clears, above whatever section waits below the laptop; settles a little past its end (its page still painted below it), then holds still and shrinks with the laptop as it leaves. */
 const SectionInDocument = styled(SectionOnScreen)`
   z-index: 1;
-  padding: ${DESK_VH}vh 0 ${SETTLE_VH}vh;
+  padding: ${DESK_VH + SETTLE_VH}vh 0 ${SETTLE_VH}vh;
   margin-bottom: ${LEAVE_VH}vh;
   background: ${({ theme }) => theme.colors.card};
   transform-origin: 50% calc(100% - 100vh + var(--screen-centre));
@@ -278,10 +278,10 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
     target: track,
     offset: ['start 70%', `start ${-ARRIVE_VH}%`],
   });
-  // The stretch over which the section on screen, holding still, would otherwise scroll out of view.
+  // Starts once the section on screen has settled; the stretch over which it, holding still, would otherwise scroll on.
   const { scrollYProgress: deskRunway } = useScroll({
     target: screenSection,
-    offset: ['end end', `end ${100 - DESK_VH}%`],
+    offset: [`end ${100 - SETTLE_VH}%`, `end ${100 - SETTLE_VH - DESK_VH}%`],
   });
   const { scrollYProgress: departure } = useScroll({
     target: track,
