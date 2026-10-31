@@ -1,4 +1,10 @@
-import { motion, type MotionValue } from 'framer-motion';
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  type MotionStyle,
+  type MotionValue,
+} from 'framer-motion';
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 
@@ -15,7 +21,7 @@ const lidCutout = ({ left, top, width, height }: Rect) =>
 const Shell = styled.div`
   position: relative;
   aspect-ratio: ${ARTWORK.width} / ${ARTWORK.height};
-  perspective: 1600px;
+  perspective: 6000px;
 
   img {
     position: absolute;
@@ -26,7 +32,7 @@ const Shell = styled.div`
   }
 `;
 
-/* Folds back around the hinge when the laptop closes. */
+/* Folds down around the hinge, towards the viewer, when the laptop closes. */
 const Lid = styled(motion.div)`
   position: absolute;
   inset: 0;
@@ -81,23 +87,31 @@ export const LaptopFrame = ({
   children,
   lidAngle,
   screenOff,
-}: LaptopFrameProps) => (
-  <Shell>
-    <Lid style={{ rotateX: lidAngle }}>
-      <Screen $rect={SCREEN} $tone="background">
-        {children}
-        {screenOff && <ScreenOff style={{ opacity: screenOff }} />}
-      </Screen>
-      <img
-        src="/media/images/laptop.svg"
-        alt=""
-        width={ARTWORK.width}
-        height={ARTWORK.height}
-      />
-    </Lid>
-    <Base src="/media/images/laptop.svg" alt="" aria-hidden="true" />
-  </Shell>
-);
+}: LaptopFrameProps) => {
+  // The screen's mask lives in the lid's plane, so it is drawn in as the display goes dark, before the lid folds.
+  const lit = useMotionValue(0);
+  const mask = useTransform(
+    screenOff ?? lit,
+    (dark) => `${200 * (1 - dark)}vmax`,
+  );
+  return (
+    <Shell>
+      <Lid style={{ rotateX: lidAngle, '--mask': mask } as MotionStyle}>
+        <Screen $rect={SCREEN} $tone="background">
+          {children}
+          {screenOff && <ScreenOff style={{ opacity: screenOff }} />}
+        </Screen>
+        <img
+          src="/media/images/laptop.svg"
+          alt=""
+          width={ARTWORK.width}
+          height={ARTWORK.height}
+        />
+      </Lid>
+      <Base src="/media/images/laptop.svg" alt="" aria-hidden="true" />
+    </Shell>
+  );
+};
 
 /** Opener alone: the laptop zooms out to show the line on its screen; the section follows below. */
 export const Laptop = ({ children }: { children: ReactNode }) => (

@@ -11,5 +11,5 @@ export const SCREEN: Rect = {
 export const SCREEN_CENTRE = `${SCREEN.left + SCREEN.width / 2}% ${SCREEN.top + SCREEN.height / 2}%`;
 /* Where the lid meets the base: everything below is the base. */
 export const HINGE = 97.2;
-/* Pinned, the screen spans up to 91% of the viewport's width (clear of the section dots) or 94% of its height; the keyboard sits below the fold. */
-export const PINNED_WIDTH = 'min(130vw, 214vh)';
+/* Pinned, the screen spans up to 90% of the viewport's width or 88% of its height, with the whole lid in view; the keyboard sits below the fold. */
+export const PINNED_WIDTH = 'min(128vw, 200vh)';
