@@ -2,8 +2,22 @@ import { Statement } from '@components/motion/Statement';
 import { contentData } from '@data/content';
 import type { SectionId, SectionIntro } from '@data/types';
 import { OPENER_FADE_IN, OPENER_SPRING } from '@styles/motion';
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
-import { FileText, Folder, Globe, Settings, Terminal } from 'lucide-react';
+import {
+  easeInOut,
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
+import {
+  Compass,
+  FileText,
+  Folder,
+  Image,
+  Music,
+  Settings,
+  Terminal,
+} from 'lucide-react';
 import {
   useRef,
   type CSSProperties,
@@ -12,7 +26,8 @@ import {
 } from 'react';
 import styled from 'styled-components';
 
-import { LaptopFrame, ScreenInset, ScreenStartup } from './Laptop';
+import { Startup } from './Cutout';
+import { LaptopFrame, ScreenInset } from './Laptop';
 import { ARTWORK, PINNED_WIDTH, SCREEN, SCREEN_CENTRE } from './laptopArtwork';
 import { ResumeFrame } from './Resume';
 
@@ -22,22 +37,67 @@ export interface DeskApp {
   body: ReactNode;
 }
 
-/* Scroll runways in viewports: the laptop zooms in over the first (and 0.3 before it pins), the dock and the document take the next, and the laptop shrinks away over 0.6 of one. */
+/* Scroll runways in viewports: the laptop zooms in over the first (and 0.3 before it pins), the dock and the document take the next 1.4, the document's section settles 0.25 past its end, and the laptop shrinks away over 0.6. */
 const ARRIVE_VH = 100;
-const DESK_VH = 100;
+const DESK_VH = 140;
+const SETTLE_VH = 25;
 const LEAVE_VH = 60;
 const START_SCALE = 2.2;
 const END_SCALE = 0.6;
 const DOCUMENT_ICON_SCALE = 0.06;
+const FIRST_PAGE_ZOOM = 1.8;
 
-/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document opens over the section on screen, its first page is read, then it clears. */
-const DOCK_SHOWS = [0, 0.15, 0.7, 0.8];
-const ICON_CLICK = [0.15, 0.22, 0.3];
-const LABEL_SHOWS = [0.15, 0.22, 0.3, 0.36];
-const DOCUMENT_OPENS = [0.3, 0.75];
-const DOCUMENT_APPEARS = [0.3, 0.38];
-const SCREEN_SECTION_FADES = [0.5, 0.75];
-const FIRST_PAGE_FADES = [0.85, 1];
+/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document grows out of it over the section on screen, its first page zooms into place, then it clears. */
+const DOCK_SHOWS = [0, 0.1, 0.78, 0.85];
+const ICON_CLICK = [0.1, 0.15, 0.2];
+const ICON_OPENS = [0.15, 0.2];
+const LABEL_SHOWS = [0.1, 0.15, 0.3, 0.34];
+const DOCUMENT_OPENS = [0.2, 0.8];
+const DOCUMENT_APPEARS = [0.2, 0.26];
+const SCREEN_SECTION_FADES = [0.5, 0.8];
+const FIRST_PAGE_SETTLES = [0.2, 0.9];
+const FIRST_PAGE_FADES = [0.9, 1];
+
+/* The dock's apps, as tinted tiles; the CV sits in the middle, where the document grows from. */
+const DOCK_APPS = [
+  {
+    name: 'files',
+    Icon: Folder,
+    tint: 'linear-gradient(160deg, #4cc2ff, #1a6cf0)',
+    running: true,
+  },
+  {
+    name: 'browser',
+    Icon: Compass,
+    tint: 'linear-gradient(160deg, #39b6ff, #1364d6)',
+  },
+  {
+    name: 'photos',
+    Icon: Image,
+    tint: 'conic-gradient(from 200deg, #ff7a59, #ffd166, #7bd389, #4cc9f0, #c77dff, #ff7a59)',
+  },
+  {
+    name: 'cv',
+    Icon: FileText,
+    tint: 'linear-gradient(160deg, #ff7b72, #d93a4a)',
+  },
+  {
+    name: 'music',
+    Icon: Music,
+    tint: 'linear-gradient(160deg, #ff6b7a, #ff2d55)',
+  },
+  {
+    name: 'terminal',
+    Icon: Terminal,
+    tint: 'linear-gradient(160deg, #3a3a3f, #141416)',
+  },
+  {
+    name: 'settings',
+    Icon: Settings,
+    tint: 'linear-gradient(160deg, #a0a0a8, #5e5e66)',
+  },
+];
+const DOCUMENT_APP = 'cv';
 
 const viewportHeight = () => document.documentElement.clientHeight;
 
@@ -82,31 +142,47 @@ const Dock = styled(motion.div)`
   left: 50%;
   bottom: 2.5%;
   display: flex;
-  gap: 0.45em;
-  height: 9%;
-  padding: 0.45em;
+  gap: 0.5em;
+  height: 9.5%;
+  padding: 0.5em;
   translate: -50% 0;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 1.2em;
-  background: ${({ theme }) => `${theme.colors.card}cc`};
-  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.3em;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0.6em 1.6em rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(16px);
   font-size: clamp(0.4rem, 0.7vw, 0.7rem);
 `;
 
-const DockIcon = styled(motion.span)`
+const DockIcon = styled(motion.span)<{ $tint: string; $running?: boolean }>`
   position: relative;
   display: grid;
   place-items: center;
   height: 100%;
   aspect-ratio: 1;
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 24%;
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.foreground};
+  background: ${({ $tint }) => $tint};
+  box-shadow: 0 0.15em 0.4em rgba(0, 0, 0, 0.35);
+  color: #fff;
 
   svg {
-    width: 50%;
-    height: 50%;
+    width: 52%;
+    height: 52%;
+    filter: drop-shadow(0 0.1em 0.2em rgba(0, 0, 0, 0.3));
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -0.65em;
+    left: 50%;
+    width: 0.35em;
+    height: 0.35em;
+    border-radius: 50%;
+    translate: -50% 0;
+    background: ${({ theme }) => theme.colors.foreground};
+    opacity: ${({ $running }) => ($running ? 0.8 : 0)};
   }
 `;
 
@@ -123,6 +199,17 @@ const DocumentIcon = styled(DockIcon)`
     font-weight: 700;
     letter-spacing: 0.1em;
   }
+`;
+
+const RunningDot = styled(motion.i)`
+  position: absolute;
+  bottom: -0.65em;
+  left: 50%;
+  width: 0.35em;
+  height: 0.35em;
+  border-radius: 50%;
+  translate: -50% 0;
+  background: ${({ theme }) => theme.colors.foreground};
 `;
 
 const DockLabel = styled(motion.span)`
@@ -146,7 +233,7 @@ const Document = styled(ResumeFrame)`
   position: absolute;
   inset: 0;
   aspect-ratio: auto;
-  transform-origin: 50% 95%;
+  transform-origin: 50% 93%;
   will-change: transform, opacity;
 `;
 
@@ -160,10 +247,10 @@ const SectionOnScreen = styled(motion.div)`
   will-change: transform, opacity;
 `;
 
-/* Fades in as the document's first page clears, above whatever section waits below the laptop; holds still and shrinks with the laptop as it leaves. */
+/* Fades in as the document's first page clears, above whatever section waits below the laptop; settles a little past its end (its page still painted below it), then holds still and shrinks with the laptop as it leaves. */
 const SectionInDocument = styled(SectionOnScreen)`
   z-index: 1;
-  padding-top: ${DESK_VH}vh;
+  padding: ${DESK_VH}vh 0 ${SETTLE_VH}vh;
   margin-bottom: ${LEAVE_VH}vh;
   background: ${({ theme }) => theme.colors.card};
   transform-origin: 50% calc(100% - 100vh + var(--screen-centre));
@@ -194,7 +281,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   // The stretch over which the section on screen, holding still, would otherwise scroll out of view.
   const { scrollYProgress: deskRunway } = useScroll({
     target: screenSection,
-    offset: ['end end', 'end start'],
+    offset: ['end end', `end ${100 - DESK_VH}%`],
   });
   const { scrollYProgress: departure } = useScroll({
     target: track,
@@ -218,13 +305,20 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
 
   const dockY = useTransform(desk, DOCK_SHOWS.slice(0, 2), ['140%', '0%']);
   const dockOpacity = useTransform(desk, DOCK_SHOWS, [0, 1, 1, 0]);
-  const iconScale = useTransform(desk, ICON_CLICK, [1, 1.3, 1]);
+  const iconScale = useTransform(desk, ICON_CLICK, [1, 1.35, 1]);
+  const iconRunning = useTransform(desk, ICON_OPENS, [0, 0.8]);
   const labelOpacity = useTransform(desk, LABEL_SHOWS, [0, 1, 1, 0]);
-  const documentScale = useTransform(desk, DOCUMENT_OPENS, [
-    DOCUMENT_ICON_SCALE,
+  const documentScale = useTransform(
+    desk,
+    DOCUMENT_OPENS,
+    [DOCUMENT_ICON_SCALE, 1],
+    { ease: easeInOut },
+  );
+  const documentOpacity = useTransform(desk, DOCUMENT_APPEARS, [0, 1]);
+  const firstPageScale = useTransform(desk, FIRST_PAGE_SETTLES, [
+    FIRST_PAGE_ZOOM,
     1,
   ]);
-  const documentOpacity = useTransform(desk, DOCUMENT_APPEARS, [0, 1]);
   const firstPageOpacity = useTransform(desk, FIRST_PAGE_FADES, [1, 0]);
 
   // The section on screen holds its last screen while the document opens over it, then goes.
@@ -260,32 +354,34 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
           }}
         >
           <LaptopFrame>
-            <ScreenStartup style={{ opacity: lineOpacity }}>
+            <Startup style={{ opacity: lineOpacity }}>
               <Statement {...onScreen.intro} exitOnScroll={false} />
-            </ScreenStartup>
+            </Startup>
             <Dock style={{ y: dockY, opacity: dockOpacity }} aria-hidden="true">
-              <DockIcon>
-                <Folder />
-              </DockIcon>
-              <DockIcon>
-                <Globe />
-              </DockIcon>
-              <DocumentIcon style={{ scale: iconScale }}>
-                <FileText />
-                <small>PDF</small>
-                <DockLabel style={{ opacity: labelOpacity }}>
-                  {contentData.contact.cv}
-                </DockLabel>
-              </DocumentIcon>
-              <DockIcon>
-                <Terminal />
-              </DockIcon>
-              <DockIcon>
-                <Settings />
-              </DockIcon>
+              {DOCK_APPS.map(({ name, Icon, tint, running }) =>
+                name === DOCUMENT_APP ? (
+                  <DocumentIcon
+                    key={name}
+                    $tint={tint}
+                    style={{ scale: iconScale }}
+                  >
+                    <Icon />
+                    <small>PDF</small>
+                    <RunningDot style={{ opacity: iconRunning }} />
+                    <DockLabel style={{ opacity: labelOpacity }}>
+                      {contentData.contact.cv}
+                    </DockLabel>
+                  </DocumentIcon>
+                ) : (
+                  <DockIcon key={name} $tint={tint} $running={running}>
+                    <Icon />
+                  </DockIcon>
+                ),
+              )}
             </Dock>
             <Document
               firstPageOpacity={firstPageOpacity}
+              firstPageScale={firstPageScale}
               intro={inDock.intro}
               style={{ scale: documentScale, opacity: documentOpacity }}
             />

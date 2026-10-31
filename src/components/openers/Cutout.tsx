@@ -22,11 +22,27 @@ export const Cutout = styled.div<{ $rect: Rect; $tone: Tone }>`
   box-shadow: 0 0 0 200vmax var(--tone);
 `;
 
-/* Fills the cutout while the frame arrives, then fades to let what is behind through. */
+/* Fills the cutout with the section's line while the frame arrives, then fades to let what is behind through. Sized for a statement on a small screen. */
 export const Startup = styled(motion.div)`
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
+  overflow: hidden;
   background: var(--tone);
+
+  && section {
+    padding-top: clamp(1rem, 2vw, 2.5rem);
+    padding-bottom: clamp(1rem, 2vw, 2.5rem);
+  }
+
+  @media (max-width: 768px) {
+    && p {
+      font-size: 1rem;
+    }
+
+    && p:first-of-type {
+      font-size: 0.55rem;
+    }
+  }
 `;

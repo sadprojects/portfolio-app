@@ -1,3 +1,4 @@
+import { Statement } from '@components/motion/Statement';
 import { contentData } from '@data/content';
 import type { SectionIntro } from '@data/types';
 import { motion, type MotionStyle, type MotionValue } from 'framer-motion';
@@ -17,6 +18,7 @@ const PAGE: Rect = {
 };
 const DOCK_SCALE = 0.06;
 const OPENER_WIDTH = 'min(92vw, 64rem)';
+const TRAFFIC_LIGHTS = ['#ff5f57', '#febc2e', '#28c840'];
 
 const Viewer = styled(motion.div)`
   position: relative;
@@ -52,43 +54,22 @@ const WindowControls = styled.span`
   translate: 0 -50%;
 
   span {
-    width: 0.8em;
-    height: 0.8em;
+    width: 0.85em;
+    height: 0.85em;
     border-radius: 50%;
-    background: ${({ theme }) => theme.colors.border};
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
   }
 `;
 
-/* Narrow enough to stay inside the viewport at full zoom in the phone opener. */
-const Highlight = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+const FirstPage = styled(motion.div)`
   width: 100%;
-  max-width: 34rem;
-  padding: 0 6%;
-`;
-
-const HighlightLabel = styled.p`
-  margin: 0;
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.secondary};
-`;
-
-const HighlightText = styled.p`
-  margin: 0;
-  font-family: ${({ theme }) => theme.typography.fonts.display};
-  font-size: clamp(1.2rem, 1.7vw, 1.7rem);
-  line-height: 1.25;
-  letter-spacing: -0.01em;
 `;
 
 interface ResumeFrameProps {
   /** Opacity of the first page, which carries the section's line and fades to let the section through. */
   firstPageOpacity: MotionValue<number>;
+  /** Zoom of that line as the document opens; settled when absent. */
+  firstPageScale?: MotionValue<number>;
   intro: SectionIntro;
   className?: string;
   style?: MotionStyle;
@@ -97,6 +78,7 @@ interface ResumeFrameProps {
 /** The CV as a viewer window: a title bar with the file name over a page that shows what is behind it. */
 export const ResumeFrame = ({
   firstPageOpacity,
+  firstPageScale,
   intro,
   className,
   style,
@@ -104,17 +86,16 @@ export const ResumeFrame = ({
   <Viewer className={className} style={style}>
     <Cutout $rect={PAGE} $tone="card">
       <Startup style={{ opacity: firstPageOpacity }}>
-        <Highlight>
-          <HighlightLabel>{intro.label}</HighlightLabel>
-          <HighlightText>{intro.text}</HighlightText>
-        </Highlight>
+        <FirstPage style={{ scale: firstPageScale }}>
+          <Statement {...intro} exitOnScroll={false} />
+        </FirstPage>
       </Startup>
     </Cutout>
     <TitleBar aria-hidden="true">
       <WindowControls>
-        <span />
-        <span />
-        <span />
+        {TRAFFIC_LIGHTS.map((colour) => (
+          <span key={colour} style={{ background: colour }} />
+        ))}
       </WindowControls>
       {contentData.contact.cv}
     </TitleBar>

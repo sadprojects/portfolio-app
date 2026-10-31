@@ -38,23 +38,6 @@ const Screen = styled(Cutout)`
   }
 `;
 
-export const ScreenStartup = styled(Startup)`
-  && > section {
-    padding-top: clamp(1rem, 2vw, 2.5rem);
-    padding-bottom: clamp(1rem, 2vw, 2.5rem);
-  }
-
-  @media (max-width: 768px) {
-    && p {
-      font-size: 1rem;
-    }
-
-    && p:first-of-type {
-      font-size: 0.55rem;
-    }
-  }
-`;
-
 export const ScreenInset = styled.div`
   padding: 0 4%;
 `;
@@ -77,11 +60,9 @@ export const LaptopFrame = ({ children }: { children: ReactNode }) => (
 /** Opener alone: the laptop zooms out to show the line on its screen; the section follows below. */
 export const Laptop = ({ children }: { children: ReactNode }) => (
   <Zoom origin={SCREEN_CENTRE} width={OPENER_WIDTH}>
-    {(startupOpacity) => (
+    {(lineOpacity) => (
       <LaptopFrame>
-        <ScreenStartup style={{ opacity: startupOpacity }}>
-          {children}
-        </ScreenStartup>
+        <Startup style={{ opacity: lineOpacity }}>{children}</Startup>
       </LaptopFrame>
     )}
   </Zoom>

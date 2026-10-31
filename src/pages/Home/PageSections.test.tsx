@@ -37,9 +37,11 @@ describe('section openers', () => {
     [experience, projects, skills, hobbies].forEach((section) => {
       expect(screen.getAllByText(section.intro!.text)).toHaveLength(1);
     });
-    // Projects: inside the laptop. Skills: on the resume sheet. Hobbies: on the camera's screen.
+    // Projects: inside the laptop. Skills: in the CV's viewer. Hobbies: on the camera's screen.
     expect(container.querySelector(LAPTOP)).toBeInTheDocument();
-    expect(screen.getByText(skills.intro!.label)).toBeInTheDocument();
+    expect(screen.getAllByText(contentData.contact.cv).length).toBeGreaterThan(
+      0,
+    );
     expect(container.querySelector(CAMERA)).toBeInTheDocument();
     expect(
       screen.getByText(`1/${hobbies.banners!.length}`),
