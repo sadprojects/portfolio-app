@@ -1,15 +1,12 @@
 import type { SudokuDifficulty } from './types';
 
-/** Duration in ms for long press to trigger number highlight mode */
-export const LONG_PRESS_DURATION = 400;
+export const GRID_SIZE = 9;
+export const BOX_SIZE = 3;
+export const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-/** Easter egg: press b, then 25111996, then b again to auto-solve */
 export const SECRET_CODE = 'b25111996b';
+export const SECRET_CODE_TIMEOUT_MS = 10_000;
 
-/** Timeout in ms for secret code entry reset */
-export const SECRET_CODE_TIMEOUT = 10000;
-
-/** Available difficulty levels */
 export const DIFFICULTIES: SudokuDifficulty[] = [
   'beginner',
   'easy',
@@ -18,5 +15,12 @@ export const DIFFICULTIES: SudokuDifficulty[] = [
   'expert',
 ];
 
-/** Default difficulty for new games */
 export const DEFAULT_DIFFICULTY: SudokuDifficulty = 'medium';
+
+export const CELLS_REMOVED_BY_DIFFICULTY: Record<SudokuDifficulty, number> = {
+  beginner: 25,
+  easy: 35,
+  medium: 45,
+  hard: 52,
+  expert: 58,
+};

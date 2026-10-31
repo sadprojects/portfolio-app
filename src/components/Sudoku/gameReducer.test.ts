@@ -1,22 +1,19 @@
-import { vi } from 'vitest';
+import { vi } from 'vite-plus/test';
+
 import { gameReducer, createInitialState } from './gameReducer';
 import type { GameAction } from './gameReducer';
 import type { SudokuGameState } from './types';
 
-// Mock sudokuUtils module
-vi.mock('./sudokuUtils', () => ({
+vi.mock('./puzzle', async () => ({
+  ...(await vi.importActual<typeof import('./puzzle')>('./puzzle')),
   generatePuzzle: vi.fn(() => ({
-    puzzle: Array(9)
-      .fill(null)
-      .map(() => Array(9).fill(0)),
-    solution: Array(9)
-      .fill(null)
-      .map(() => Array(9).fill(1)),
+    puzzle: Array.from({ length: 9 }, () => Array(9).fill(0)),
+    solution: Array.from({ length: 9 }, () => Array(9).fill(1)),
   })),
   findErrors: vi.fn(() => new Set<string>()),
   isGridComplete: vi.fn(() => false),
-  saveHighScore: vi.fn(),
 }));
+vi.mock('./scores', () => ({ saveHighScore: vi.fn() }));
 
 describe('gameReducer', () => {
   let initialState: SudokuGameState;

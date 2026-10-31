@@ -2,67 +2,61 @@
   "name": "portfolio-app",
   "version": "0.0.0",
   "description": "A modern portfolio website by Silviu Dinu",
+  "homepage": "https://github.com/SilviuDinu/portfolio-app#readme",
+  "bugs": {
+    "url": "https://github.com/SilviuDinu/portfolio-app/issues"
+  },
+  "license": "ISC",
+  "author": "Silviu Dinu",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SilviuDinu/portfolio-app.git"
+  },
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vp dev",
     "prebuild": "node scripts/generate-version.js",
-    "build": "tsc && vite build",
+    "build": "tsc && vp build",
     "postdeploy": "node scripts/post-deploy.js",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage",
-    "lint": "eslint .",
-    "lint:strict": "eslint . --max-warnings 0",
-    "format": "prettier --write \"src/**/*.{ts,tsx,json}\""
+    "preview": "vp preview",
+    "test": "vp test",
+    "test:watch": "vp test watch",
+    "test:ui": "vp test --ui",
+    "test:coverage": "vp test --coverage",
+    "lint": "vp lint",
+    "lint:strict": "vp lint --max-warnings 0",
+    "format": "vp fmt"
   },
   "dependencies": {
     "framer-motion": "^11.11.9",
     "lenis": "^1.3.27",
     "lucide-react": "^0.454.0",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
-    "react-router-dom": "^6.26.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "react-snowfall": "^2.4.0",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.8.6",
-    "@types/react": "^19.2.1",
-    "@types/react-dom": "^19.2.1",
-    "@types/styled-components": "^5.1.34",
-    "@typescript-eslint/eslint-plugin": "^8.11.0",
-    "@typescript-eslint/parser": "^8.11.0",
-    "@vitejs/plugin-react": "^4.3.3",
-    "@vitest/coverage-v8": "^2.1.9",
-    "@vitest/ui": "^2.1.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "@vitest/coverage-v8": "5.0.5",
+    "@vitest/ui": "5.0.5",
     "babel-plugin-react-compiler": "^1.0.0",
     "babel-plugin-styled-components": "^2.1.4",
-    "eslint": "^9.13.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.13",
-    "globals": "^16.5.0",
     "jsdom": "^25.0.1",
-    "prettier": "^3.3.3",
-    "typescript": "^5.6.3",
-    "typescript-eslint": "^8.48.0",
-    "vite": "^5.4.10",
+    "typescript": "^6.0.3",
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.4.0",
     "vite-plugin-svgr": "^4.3.0",
-    "vitest": "^2.1.4"
+    "vite-plus": "1.4.0",
+    "vitest": "5.0.5"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SilviuDinu/portfolio-app.git"
-  },
-  "author": "Silviu Dinu",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/SilviuDinu/portfolio-app/issues"
-  },
-  "homepage": "https://github.com/SilviuDinu/portfolio-app#readme"
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.4.0",
+    "vitest": "5.0.5"
+  }
 }

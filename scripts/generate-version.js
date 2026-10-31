@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -9,22 +9,16 @@ const __dirname = dirname(__filename);
 
 const versionPath = join(__dirname, '../src/version.json');
 
-// Read existing version.json or create new one
-let currentVersion = '0.0.2';
-if (existsSync(versionPath)) {
+// Keep the current version (or start one); the build time is epoch ms, so timezone-agnostic.
+const readVersion = () => {
   try {
-    const existing = JSON.parse(readFileSync(versionPath, 'utf-8'));
-    currentVersion = existing.version;
-  } catch (error) {
+    return JSON.parse(readFileSync(versionPath, 'utf-8')).version;
+  } catch {
     console.warn('Could not read existing version.json, using default version');
+    return '0.0.2';
   }
-}
-
-// Set the version and build timestamp (epoch ms for timezone-agnostic storage)
-const versionInfo = {
-  version: currentVersion,
-  buildTime: Date.now(),
 };
+const versionInfo = { version: readVersion(), buildTime: Date.now() };
 
 // Write to src/version.json
 writeFileSync(versionPath, JSON.stringify(versionInfo, null, 2) + '\n');

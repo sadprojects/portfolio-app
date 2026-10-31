@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { fireEvent, render, screen } from '@testing-library/react';
+
 import { VersionModal } from './VersionModal';
 
 // Mock the version.json

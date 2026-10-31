@@ -1,39 +1,45 @@
 import { motion, useReducedMotion, useTransform } from 'framer-motion';
 import { useRef, type ReactNode } from 'react';
 import styled from 'styled-components';
+
 import { useScrollReveal } from './useScrollReveal';
 
-const Box = styled(motion.div)`
+const DEFAULT_TRAVEL_PX = 80;
+
+const ScrubFrame = styled(motion.div)`
   will-change: transform, opacity;
 `;
 
 interface ScrubProps {
   children: ReactNode;
   className?: string;
-  /** Travel in px: rises this far on entry, leaves the same distance upward on exit. */
   distance?: number;
 }
 
-/** Wraps any block so it fades and slides with scroll position in both directions. */
-export const Scrub = ({ children, className, distance = 80 }: ScrubProps) => {
+export const Scrub = ({
+  children,
+  className,
+  distance = DEFAULT_TRAVEL_PX,
+}: ScrubProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const { enter, exit } = useScrollReveal(ref);
   const y = useTransform(
     [enter, exit],
-    ([e, x]: number[]) => (1 - e) * distance - x * distance,
+    ([entered, exited]: number[]) =>
+      (1 - entered) * distance - exited * distance,
   );
-  const opacity = useTransform([enter, exit], ([e, x]: number[]) =>
-    Math.min(e, 1 - x),
+  const opacity = useTransform([enter, exit], ([entered, exited]: number[]) =>
+    Math.min(entered, 1 - exited),
   );
 
   return (
-    <Box
+    <ScrubFrame
       ref={ref}
       className={className}
       style={reduceMotion ? undefined : { y, opacity }}
     >
       {children}
-    </Box>
+    </ScrubFrame>
   );
 };

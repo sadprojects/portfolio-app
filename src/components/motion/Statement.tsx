@@ -1,8 +1,9 @@
 import { Grid, col } from '@styles/grid';
 import styled from 'styled-components';
+
 import { RevealText } from './RevealText';
 
-const Wrap = styled(Grid).attrs({ as: 'section' })`
+const StatementGrid = styled(Grid).attrs({ as: 'section' })`
   padding: clamp(5rem, 11vw, 13rem) 16px;
   row-gap: 1.25rem;
 
@@ -12,7 +13,7 @@ const Wrap = styled(Grid).attrs({ as: 'section' })`
   }
 `;
 
-const Label = styled(RevealText)`
+const StatementLabel = styled(RevealText)`
   ${col('4 / 10', '3 / 11')}
   margin: 0;
   text-align: center;
@@ -23,7 +24,7 @@ const Label = styled(RevealText)`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-const Text = styled(RevealText)`
+const StatementLine = styled(RevealText)`
   ${col('3 / 11', '2 / 12')}
   margin: 0;
   text-align: center;
@@ -37,12 +38,28 @@ const Text = styled(RevealText)`
 interface StatementProps {
   label: string;
   text: string;
+  exitOnScroll?: boolean;
+  animate?: boolean;
 }
 
-/** A short centred manifesto line that introduces the section after it. */
-export const Statement = ({ label, text }: StatementProps) => (
-  <Wrap>
-    <Label text={label} tag="p" />
-    <Text text={text} tag="p" delay={0.15} />
-  </Wrap>
+export const Statement = ({
+  label,
+  text,
+  exitOnScroll,
+  animate,
+}: StatementProps) => (
+  <StatementGrid>
+    <StatementLabel
+      text={label}
+      tag="p"
+      exitOnScroll={exitOnScroll}
+      animate={animate}
+    />
+    <StatementLine
+      text={text}
+      tag="p"
+      exitOnScroll={exitOnScroll}
+      animate={animate}
+    />
+  </StatementGrid>
 );

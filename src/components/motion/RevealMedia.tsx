@@ -1,3 +1,4 @@
+import { easeOutCubic } from '@utils/math';
 import {
   motion,
   useReducedMotion,
@@ -6,9 +7,17 @@ import {
 } from 'framer-motion';
 import { useRef, type ReactNode } from 'react';
 import styled from 'styled-components';
+
 import { useScrollReveal } from './useScrollReveal';
 
-const Frame = styled(motion.div)<{ $ratio?: string }>`
+const DEFAULT_PARALLAX_PX = 60;
+const ZOOM_FROM = 1.35;
+const ZOOM_ON_EXIT = 0.1;
+const ENTER_LIFT_PX = 60;
+const EXIT_LIFT_PX = 80;
+const EXIT_MIN_OPACITY = 0.4;
+
+const MediaFrame = styled(motion.div)<{ $ratio?: string }>`
   position: relative;
   overflow: hidden;
   border-radius: 2px;
@@ -16,8 +25,7 @@ const Frame = styled(motion.div)<{ $ratio?: string }>`
   background: ${({ theme }) => theme.colors.accent};
 `;
 
-/* Oversized so the parallax drift never exposes the frame behind the media. */
-const Inner = styled(motion.div)`
+const DriftingMedia = styled(motion.div)`
   position: absolute;
   left: 0;
   top: -10%;
@@ -37,19 +45,14 @@ const Inner = styled(motion.div)`
 interface RevealMediaProps {
   children: ReactNode;
   ratio?: string;
-  /** Vertical drift in px across the viewport; 0 disables parallax. */
   parallax?: number;
   className?: string;
 }
 
-/**
- * Media wipes up out of a mask while settling from a zoom as it scrolls in, drifts while
- * on screen, then collapses back into the mask as it leaves. All scrubbed by scroll position.
- */
 export const RevealMedia = ({
   children,
   ratio,
-  parallax = 60,
+  parallax = DEFAULT_PARALLAX_PX,
   className,
 }: RevealMediaProps) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -60,31 +63,37 @@ export const RevealMedia = ({
     offset: ['start end', 'end start'],
   });
   const drift = reduceMotion ? 0 : parallax;
-  const y = useTransform(scrollYProgress, [0, 1], [drift, -drift]);
-  const out = (t: number) => 1 - (1 - t) ** 3;
+
+  const mediaY = useTransform(scrollYProgress, [0, 1], [drift, -drift]);
   const clipPath = useTransform(
     [enter, exit],
-    ([e, x]: number[]) =>
-      `inset(${(1 - out(e)) * 100}% 0% ${out(x) * 100}% 0%)`,
+    ([entered, exited]: number[]) =>
+      `inset(${(1 - easeOutCubic(entered)) * 100}% 0% ${easeOutCubic(exited) * 100}% 0%)`,
   );
   const scale = useTransform(
     [enter, exit],
-    ([e, x]: number[]) => 1.35 - 0.35 * out(e) + 0.1 * x,
+    ([entered, exited]: number[]) =>
+      ZOOM_FROM -
+      (ZOOM_FROM - 1) * easeOutCubic(entered) +
+      ZOOM_ON_EXIT * exited,
   );
-  const opacity = useTransform(exit, [0, 1], [1, 0.4]);
+  const opacity = useTransform(exit, [0, 1], [1, EXIT_MIN_OPACITY]);
   const frameY = useTransform(
     [enter, exit],
-    ([e, x]: number[]) => (1 - out(e)) * 60 - x * 80,
+    ([entered, exited]: number[]) =>
+      (1 - easeOutCubic(entered)) * ENTER_LIFT_PX - exited * EXIT_LIFT_PX,
   );
 
   return (
-    <Frame
+    <MediaFrame
       ref={ref}
       className={className}
       $ratio={ratio}
       style={reduceMotion ? undefined : { clipPath, opacity, y: frameY }}
     >
-      <Inner style={reduceMotion ? undefined : { y, scale }}>{children}</Inner>
-    </Frame>
+      <DriftingMedia style={reduceMotion ? undefined : { y: mediaY, scale }}>
+        {children}
+      </DriftingMedia>
+    </MediaFrame>
   );
 };

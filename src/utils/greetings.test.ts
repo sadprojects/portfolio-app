@@ -1,10 +1,10 @@
 import { contentData } from '@data/content';
+
 import {
   fetchWeatherData,
-  getCompleteGreeting,
   getIntroduction,
   getTimeOfDay,
-  resetGreetingType,
+  nextGreeting,
 } from './greetings';
 
 // Mock the content data
@@ -80,190 +80,69 @@ describe('getIntroduction', () => {
   });
 });
 
-describe('getCompleteGreeting', () => {
-  beforeEach(() => {
-    resetGreetingType();
+describe('nextGreeting', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
-  it('should return casual greeting on first call', async () => {
-    const greeting = await getCompleteGreeting();
-
-    // First greeting should include a casual greeting and an introduction
-    const hasCasual = contentData.greetings.casualGreetings.some((casual) =>
-      greeting.includes(casual),
+  it('opens with a casual greeting and an introduction', () => {
+    const first = nextGreeting(null);
+    expect(first.kind).toBe('casual');
+    expect(first.text).toMatch(
+      /^(Hey there!|Hello!|Hi!) (I'm Silviu\.|Welcome to my site\.)$/,
     );
-    const hasIntro = contentData.greetings.introductions.some((intro) =>
-      greeting.includes(intro),
-    );
-
-    expect(hasCasual).toBe(true);
-    expect(hasIntro).toBe(true);
   });
 
-  describe('with time-based greetings', () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-      resetGreetingType();
+  it('alternates casual lines with the time of day', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-01-01T08:00:00'));
+    expect(nextGreeting('casual')).toEqual({
+      text: 'Good morning!',
+      kind: 'timeBased',
     });
+    expect(nextGreeting('timeBased').kind).toBe('casual');
+    expect(nextGreeting('weather').kind).toBe('casual');
+  });
 
-    afterEach(() => {
-      vi.useRealTimers();
+  it('lets the weather speak 30% of the time after a casual line', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
+    expect(nextGreeting('casual', { temp: 20, condition: 'rain' })).toEqual({
+      text: 'Rainy day!',
+      kind: 'weather',
     });
-
-    it('should alternate to time-based greeting on second call', async () => {
-      vi.setSystemTime(new Date('2025-01-01T10:00:00'));
-
-      // First call - casual
-      await getCompleteGreeting();
-
-      // Second call - should be time-based (morning)
-      const greeting = await getCompleteGreeting();
-      expect(greeting).toBe('Good morning!');
-    });
-  });
-
-  it('should alternate back to casual on third call', async () => {
-    // First call - casual
-    await getCompleteGreeting();
-
-    // Second call - time-based
-    await getCompleteGreeting();
-
-    // Third call - should be casual again
-    const greeting = await getCompleteGreeting();
-
-    const hasCasual = contentData.greetings.casualGreetings.some((casual) =>
-      greeting.includes(casual),
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    expect(nextGreeting('casual', { temp: 20, condition: 'rain' }).kind).toBe(
+      'timeBased',
     );
-    expect(hasCasual).toBe(true);
   });
 
-  it('should handle weather greeting when weather data is provided', async () => {
-    // Reset to start fresh
-    resetGreetingType();
-
-    // First call - casual
-    await getCompleteGreeting();
-
-    // Mock Math.random to always return 0.8 (> 0.7, so weather will be used)
-    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.8);
-
-    // Second call with weather data - should potentially be weather-based
-    const weatherData = { temp: 25, condition: 'clear' };
-    const greeting = await getCompleteGreeting(weatherData);
-
-    // It should be either weather or time-based
-    expect(greeting).toBeDefined();
-
-    randomSpy.mockRestore();
-  });
-
-  it('should return cold weather greeting for very low temp', async () => {
-    resetGreetingType();
-    await getCompleteGreeting();
-
-    vi.spyOn(Math, 'random').mockReturnValue(0.8);
-
-    const weatherData = { temp: 0, condition: 'clear' };
-    const greeting = await getCompleteGreeting(weatherData);
-
-    // Should be cold greeting
-    expect(greeting).toBe('Brrr, cold!');
-  });
-
-  it('should return hot weather greeting for very high temp', async () => {
-    resetGreetingType();
-    await getCompleteGreeting();
-
-    vi.spyOn(Math, 'random').mockReturnValue(0.8);
-
-    const weatherData = { temp: 35, condition: 'clear' };
-    const greeting = await getCompleteGreeting(weatherData);
-
-    expect(greeting).toBe('Hot day!');
-  });
-
-  it('should return rainy greeting for rain condition', async () => {
-    resetGreetingType();
-    await getCompleteGreeting();
-
-    vi.spyOn(Math, 'random').mockReturnValue(0.8);
-
-    const weatherData = { temp: 20, condition: 'rain' };
-    const greeting = await getCompleteGreeting(weatherData);
-
-    expect(greeting).toBe('Rainy day!');
-  });
-
-  it('should return snowy greeting for snow condition', async () => {
-    resetGreetingType();
-    await getCompleteGreeting();
-
-    vi.spyOn(Math, 'random').mockReturnValue(0.8);
-
-    const weatherData = { temp: 20, condition: 'snow' };
-    const greeting = await getCompleteGreeting(weatherData);
-
-    expect(greeting).toBe('Snowy day!');
-  });
-
-  it('should return cloudy greeting for clouds condition', async () => {
-    resetGreetingType();
-    await getCompleteGreeting();
-
-    vi.spyOn(Math, 'random').mockReturnValue(0.8);
-
-    const weatherData = { temp: 20, condition: 'clouds' };
-    const greeting = await getCompleteGreeting(weatherData);
-
-    expect(greeting).toBe('Cloudy day!');
-  });
-
-  it('should return sunny greeting for unknown condition', async () => {
-    resetGreetingType();
-    await getCompleteGreeting();
-
-    vi.spyOn(Math, 'random').mockReturnValue(0.8);
-
-    const weatherData = { temp: 20, condition: 'unknown' };
-    const greeting = await getCompleteGreeting(weatherData);
-
-    expect(greeting).toBe('Beautiful day!');
-  });
-
-  it('should handle thunderstorm condition', async () => {
-    resetGreetingType();
-    await getCompleteGreeting();
-
-    vi.spyOn(Math, 'random').mockReturnValue(0.8);
-
-    const weatherData = { temp: 20, condition: 'thunderstorm' };
-    const greeting = await getCompleteGreeting(weatherData);
-
-    expect(greeting).toBe('Rainy day!'); // Thunderstorm maps to rainy
-  });
-});
-
-describe('resetGreetingType', () => {
-  it('should reset greeting type so first call is casual again', async () => {
-    // Make some calls
-    await getCompleteGreeting();
-    await getCompleteGreeting();
-
-    // Reset
-    resetGreetingType();
-
-    // Next call should be casual
-    const greeting = await getCompleteGreeting();
-
-    const hasCasual = contentData.greetings.casualGreetings.some((casual) =>
-      greeting.includes(casual),
-    );
-    expect(hasCasual).toBe(true);
+  it.each([
+    [{ temp: 2, condition: 'clear' }, 'Brrr, cold!'],
+    [{ temp: 35, condition: 'clear' }, 'Hot day!'],
+    [{ temp: 20, condition: 'snow' }, 'Snowy day!'],
+    [{ temp: 20, condition: 'clouds' }, 'Cloudy day!'],
+    [{ temp: 20, condition: 'clear' }, 'Beautiful day!'],
+  ] as const)('picks the right line for %o', (weather, text) => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
+    expect(nextGreeting('casual', weather).text).toBe(text);
   });
 });
 
 describe('fetchWeatherData', () => {
+  it('returns null without asking when location permission is not granted', async () => {
+    Object.defineProperty(navigator, 'permissions', {
+      configurable: true,
+      value: { query: vi.fn().mockResolvedValue({ state: 'denied' }) },
+    });
+    expect(await fetchWeatherData()).toBeNull();
+    expect(navigator.geolocation.getCurrentPosition).not.toHaveBeenCalled();
+    Object.defineProperty(navigator, 'permissions', {
+      configurable: true,
+      value: undefined,
+    });
+  });
+
   const mockGeolocationPosition = {
     coords: {
       latitude: 51.5074,

@@ -1,8 +1,9 @@
-import type { SectionConfig } from '@utils/sectionBuilder';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-const Wrapper = styled.nav`
+import type { Section } from './sections';
+
+const TocNav = styled.nav`
   position: fixed;
   right: 2rem;
   top: 50%;
@@ -22,26 +23,24 @@ const Wrapper = styled.nav`
   }
 `;
 
-const List = styled.div<{ $expanded: boolean }>`
+const TocList = styled.div<{ $expanded: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.5rem;
   border: 1px solid
-    ${({ theme, $expanded }) =>
-      $expanded ? theme.colors.border : 'transparent'};
+    ${({ theme, $expanded }) => ($expanded ? theme.colors.border : 'transparent')};
   border-radius: 1rem;
-  background: ${({ theme, $expanded }) =>
-    $expanded ? `${theme.colors.card}f2` : 'transparent'};
+  background: ${({ theme, $expanded }) => ($expanded ? `${theme.colors.card}f2` : 'transparent')};
   backdrop-filter: ${({ $expanded }) => ($expanded ? 'blur(16px)' : 'none')};
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
-const Item = styled.button<{ $active: boolean; $expanded: boolean }>`
+const TocItem = styled.button<{ $active: boolean; $expanded: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.45rem 0.5rem;
+  padding: 0.6rem;
   border: 0;
   border-radius: 0.6rem;
   background: none;
@@ -75,12 +74,11 @@ const Item = styled.button<{ $active: boolean; $expanded: boolean }>`
 `;
 
 interface TableOfContentsProps {
-  sections: SectionConfig[];
+  sections: Section[];
   activeSection: string;
   onNavigate: (sectionId: string) => void;
 }
 
-/** Right-edge section dots (desktop only). Hover shows labels; drag the active dot to scrub the page. */
 export const TableOfContents = ({
   sections,
   activeSection,
@@ -88,47 +86,48 @@ export const TableOfContents = ({
 }: TableOfContentsProps) => {
   const [expanded, setExpanded] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const lastY = useRef(0);
+  const lastPointerY = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
 
   const startDrag = (event: React.MouseEvent) => {
-    lastY.current = event.clientY;
+    lastPointerY.current = event.clientY;
     setDragging(true);
     event.preventDefault();
   };
 
-  const onMove = useCallback((event: MouseEvent) => {
-    const height = listRef.current?.offsetHeight || 1;
+  const scrubPage = useCallback((event: MouseEvent) => {
+    const listHeight = listRef.current?.offsetHeight || 1;
     const scrollable =
       document.documentElement.scrollHeight - window.innerHeight;
-    window.scrollBy(0, ((event.clientY - lastY.current) * scrollable) / height);
-    lastY.current = event.clientY;
+    const pointerDelta = event.clientY - lastPointerY.current;
+    window.scrollBy(0, (pointerDelta * scrollable) / listHeight);
+    lastPointerY.current = event.clientY;
   }, []);
 
   useEffect(() => {
     if (!dragging) return;
-    const stop = () => setDragging(false);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', stop);
+    const stopDrag = () => setDragging(false);
+    window.addEventListener('mousemove', scrubPage);
+    window.addEventListener('mouseup', stopDrag);
     return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', stop);
+      window.removeEventListener('mousemove', scrubPage);
+      window.removeEventListener('mouseup', stopDrag);
     };
-  }, [dragging, onMove]);
+  }, [dragging, scrubPage]);
 
   return (
-    <Wrapper
+    <TocNav
       aria-label="Sections"
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => !dragging && setExpanded(false)}
       onFocus={() => setExpanded(true)}
       onBlur={() => setExpanded(false)}
     >
-      <List ref={listRef} $expanded={expanded}>
+      <TocList ref={listRef} $expanded={expanded}>
         {sections.map((section) => {
           const active = activeSection === section.id;
           return (
-            <Item
+            <TocItem
               key={section.id}
               $active={active}
               $expanded={expanded}
@@ -138,10 +137,10 @@ export const TableOfContents = ({
               aria-current={active ? 'true' : undefined}
             >
               <span>{section.label}</span>
-            </Item>
+            </TocItem>
           );
         })}
-      </List>
-    </Wrapper>
+      </TocList>
+    </TocNav>
   );
 };

@@ -1,23 +1,37 @@
-import { VersionModal } from '@components/VersionModal/VersionModal';
 import { RevealText } from '@components/motion/RevealText';
 import { Scrub } from '@components/motion/Scrub';
+import { LineButton } from '@components/ui/LineButton';
+import { VersionModal } from '@components/VersionModal/VersionModal';
 import { contentData } from '@data/content';
-import { LineButton } from '@pages/Home/HeroSection';
+import { useDoubleClick } from '@hooks/useDoubleClick';
 import { Grid, col } from '@styles/grid';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
-const Wrap = styled.footer`
+const SOCIAL_LABELS: Record<string, string> = {
+  github: 'GitHub',
+  linkedin: 'LinkedIn',
+  twitter: 'X',
+  facebook: 'Facebook',
+};
+
+const FooterScreen = styled.footer`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
   margin-top: auto;
   padding: clamp(6rem, 12vw, 14rem) 0 2rem;
   scroll-margin-top: 4rem;
 `;
 
-const Inner = styled(Grid)`
+const ContactGrid = styled(Grid)`
+  flex: 1;
+  align-content: center;
   row-gap: 2.5rem;
 `;
 
-const Label = styled.p`
+const ContactLabel = styled.p`
   ${col('2 / 12', '1 / -1')}
   margin: 0;
   font-size: 0.75rem;
@@ -27,7 +41,7 @@ const Label = styled.p`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-const Email = styled.a`
+const EmailLink = styled.a`
   ${col('2 / 12', '1 / -1')}
   justify-self: start;
   color: inherit;
@@ -44,7 +58,7 @@ const Email = styled.a`
   }
 `;
 
-const Links = styled.nav`
+const ElsewhereLinks = styled.nav`
   ${col('2 / 12', '1 / -1')}
 
   > div {
@@ -54,20 +68,20 @@ const Links = styled.nav`
   }
 `;
 
-const Bottom = styled.div`
+const LegalRow = styled.div`
   ${col('2 / 12', '1 / -1')}
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.75rem 2rem;
-  margin-top: 2rem;
+  margin-top: 4rem;
   padding-top: 1.25rem;
   border-top: 1px solid ${({ theme }) => theme.colors.border};
   font-size: 0.8rem;
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-const NameLink = styled.span`
+const VersionTrigger = styled.span`
   cursor: pointer;
   user-select: none;
 
@@ -76,42 +90,21 @@ const NameLink = styled.span`
   }
 `;
 
-const labels: Record<string, string> = {
-  github: 'GitHub',
-  linkedin: 'LinkedIn',
-  twitter: 'X',
-  facebook: 'Facebook',
-};
-
 export const Footer = () => {
   const { social, footer, contact } = contentData;
   const currentYear = new Date().getFullYear();
-  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
-  const clickCountRef = useRef(0);
-  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleNameClick = () => {
-    clickCountRef.current += 1;
-    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
-    if (clickCountRef.current === 2) {
-      setIsVersionModalOpen(true);
-      clickCountRef.current = 0;
-      return;
-    }
-    clickTimerRef.current = setTimeout(() => {
-      clickCountRef.current = 0;
-    }, 400);
-  };
+  const [versionModalOpen, setVersionModalOpen] = useState(false);
+  const onNameClick = useDoubleClick(() => setVersionModalOpen(true));
 
   return (
     <>
-      <Wrap data-section="contact" aria-label="Contact">
-        <Inner>
-          <Label>Say hi</Label>
-          <Email href={`mailto:${contact.email}`}>
+      <FooterScreen data-section="contact" aria-label="Contact">
+        <ContactGrid>
+          <ContactLabel>Say hi</ContactLabel>
+          <EmailLink href={`mailto:${contact.email}`}>
             <RevealText tag="span" text={contact.email} />
-          </Email>
-          <Links aria-label="Elsewhere">
+          </EmailLink>
+          <ElsewhereLinks aria-label="Elsewhere">
             <Scrub>
               {contact.calendly && (
                 <LineButton
@@ -123,44 +116,44 @@ export const Footer = () => {
                   Book a call
                 </LineButton>
               )}
-              {social
-                .filter((link) => link.enabled !== false)
-                .map(({ name, url }) => (
-                  <LineButton
-                    key={name}
-                    as="a"
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={name}
-                  >
-                    {labels[name] ?? name}
-                  </LineButton>
-                ))}
+              {social.map(({ name, url }) => (
+                <LineButton
+                  key={name}
+                  as="a"
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={name}
+                >
+                  {SOCIAL_LABELS[name] ?? name}
+                </LineButton>
+              ))}
               <span>{contact.location}</span>
             </Scrub>
-          </Links>
-          <Bottom>
+          </ElsewhereLinks>
+        </ContactGrid>
+        <Grid>
+          <LegalRow>
             <span>
               © {currentYear}{' '}
-              <NameLink
-                onClick={handleNameClick}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  handleNameClick();
+              <VersionTrigger
+                onClick={onNameClick}
+                onTouchEnd={(event) => {
+                  event.preventDefault();
+                  onNameClick();
                 }}
               >
                 {footer}
-              </NameLink>
+              </VersionTrigger>
             </span>
             <span>{contact.position}</span>
-          </Bottom>
-        </Inner>
-      </Wrap>
+          </LegalRow>
+        </Grid>
+      </FooterScreen>
 
       <VersionModal
-        isOpen={isVersionModalOpen}
-        onClose={() => setIsVersionModalOpen(false)}
+        isOpen={versionModalOpen}
+        onClose={() => setVersionModalOpen(false)}
       />
     </>
   );

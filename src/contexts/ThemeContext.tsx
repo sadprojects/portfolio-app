@@ -29,9 +29,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('theme', mode);
-    const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(mode);
   }, [mode]);
 
   const toggleTheme = () => {
@@ -47,9 +44,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
-      <StyledThemeProvider theme={currentTheme}>
-        {children}
-      </StyledThemeProvider>
+      <StyledThemeProvider theme={currentTheme}>{children}</StyledThemeProvider>
     </ThemeContext.Provider>
   );
 };

@@ -3,21 +3,19 @@ export interface Certification {
   issuer?: string;
   url: string;
   date: string;
-  enabled?: boolean;
 }
 
 export interface Contact {
   email: string;
-  phone: string;
   name: string;
   position: string;
   location: string;
   birthDate: string;
   firstJobDate: string;
-  linkedin: string;
-  linkedinMessaging: string;
   calendly?: string;
   profileImage?: string;
+  /** File name under /media/cv. */
+  cv: string;
 }
 
 export interface Education {
@@ -25,14 +23,11 @@ export interface Education {
   company: string;
   city: string;
   period: string;
-  responsibilities?: string[];
-  enabled?: boolean;
 }
 
 export interface Game {
   title: string;
   icon: string;
-  enabled?: boolean;
 }
 
 export interface Greetings {
@@ -42,25 +37,17 @@ export interface Greetings {
   }>;
   casualGreetings: string[];
   introductions: string[];
-  weatherGreetings: {
-    sunny: string[];
-    rainy: string[];
-    cloudy: string[];
-    snowy: string[];
-    cold: string[]; // Below 5°C
-    hot: string[]; // Above 30°C
-  };
+  /** cold is below 5°C, hot above 30°C; the rest follow the sky. */
+  weatherGreetings: Record<
+    'sunny' | 'rainy' | 'cloudy' | 'snowy' | 'cold' | 'hot',
+    string[]
+  >;
 }
 
 export interface Photography {
   path: string;
-  width: number;
-  height: number;
   url: string;
   alt: string;
-  type: string;
-  altUrl?: string;
-  enabled?: boolean;
 }
 
 export interface Project {
@@ -73,17 +60,13 @@ export interface Project {
   repo: string;
   video?: string;
   publication?: string;
-  easterEgg?: 'sudoku'; // Expandable for future easter eggs
-  enabled?: boolean;
+  easterEgg?: 'sudoku';
 }
 
 export interface Skill {
   name: string;
-  /** Self-assessed proficiency, 0-100. */
-  level: number;
   /** Groups skills in the filter bar, e.g. 'Frontend'. */
   category: string;
-  enabled?: boolean;
 }
 
 export interface Skills {
@@ -95,20 +78,6 @@ export interface Skills {
 export interface SocialMediaLink {
   name: string;
   url: string;
-  icon: string;
-  enabled?: boolean;
-}
-
-export interface TechnologyItem {
-  key: string;
-  name: string;
-  icon: string;
-  enabled?: boolean;
-}
-
-export interface Technologies {
-  description: string;
-  items: TechnologyItem[];
 }
 
 export interface Experience {
@@ -118,23 +87,30 @@ export interface Experience {
   startDate: string;
   endDate: string;
   responsibilities: string[];
-  /** Mark a role that followed another one at the same company as a promotion. */
-  promotion?: boolean;
-  enabled?: boolean;
 }
 
-export interface Codewars {
-  username: string;
-  enabled: boolean;
+/** What the camera prints in the corner of a photo in playback; fill in what you know, the rest is left out. */
+export interface PhotoExif {
+  camera?: string;
+  /** e.g. 'ƒ/2.8' */
+  aperture?: string;
+  /** e.g. '1/250 s' */
+  shutter?: string;
+  iso?: number;
+  /** e.g. '35 mm' */
+  focal?: string;
+  /** e.g. 'Dec 2020' */
+  date?: string;
+  /** e.g. 'Bușteni, Romania' */
+  location?: string;
 }
 
-/** Full-bleed parallax photo shown right before a section. */
+/** A photo the camera opener plays back, with its handwritten note. */
 export interface SectionBanner {
   image: string;
   caption?: string;
   alt?: string;
-  /** Which side of the grid the photo sits on. */
-  align?: 'left' | 'right';
+  exif?: PhotoExif;
 }
 
 /** Short centred line shown before a section starts. */
@@ -143,24 +119,28 @@ export interface SectionIntro {
   text: string;
 }
 
-export interface SectionConfig {
-  enabled: boolean;
-  order: number;
-  useSkeleton?: boolean;
+export type SectionId =
+  | 'home'
+  | 'experience'
+  | 'projects'
+  | 'skills'
+  | 'hobbies'
+  | 'contact';
+
+/** The words for one section; its order, icon and opener live in pages/Home/sections.tsx. */
+export interface SectionCopy {
+  /** Name in the navigation. */
+  label: string;
+  /** Heading at the top of the section body, when it has one. */
+  title?: string;
+  /** Short centred line shown as the section opens. */
   intro?: SectionIntro;
+  /** Photos the camera opener plays back. */
   banners?: SectionBanner[];
 }
 
-export interface SectionsConfig {
-  projects: SectionConfig;
-  skills: SectionConfig;
-  experience: SectionConfig;
-  hobbies: SectionConfig;
-  contact: SectionConfig;
-}
-
 export interface ContentData {
-  sections: SectionsConfig;
+  sections: Record<SectionId, SectionCopy>;
   certifications: Certification[];
   contact: Contact;
   education: Education[];
@@ -178,7 +158,6 @@ export interface ContentData {
   projects: Project[];
   skills: Skills;
   social: SocialMediaLink[];
-  technologies: Technologies;
   experience: Experience[];
-  codewars: Codewars;
+  codewars: { username: string };
 }

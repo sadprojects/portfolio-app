@@ -1,28 +1,37 @@
-import Blinker from '@components/Blinker/Blinker';
-import { RevealMedia } from '@components/motion/RevealMedia';
 import { RevealText } from '@components/motion/RevealText';
+import { LineButton } from '@components/ui/LineButton';
+import { useIntro } from '@contexts/IntroContext';
 import { contentData } from '@data/content';
+import { useGreeting } from '@hooks/useGreeting';
+import { useTypewriter } from '@hooks/useTypewriter';
+import { useWeather } from '@hooks/useWeather';
+import { VisuallyHidden } from '@styles/a11y';
 import { EASE, Grid, col } from '@styles/grid';
 import {
-  fetchWeatherData,
-  getCompleteGreeting,
-  resetGreetingType,
-} from '@utils/greetings';
-import { motion, useScroll, useTransform } from 'framer-motion';
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'framer-motion';
 import { ArrowDown, Download } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import { useRef } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 
-/* ---------- hero statement ---------- */
+const COPY_LIFT_PX = -260;
+const COPY_FADE_RANGE = [0.05, 0.55];
+const ACTIONS_DELAY_SECONDS = 0.6;
+
 const Hero = styled(Grid)`
+  position: relative;
   min-height: calc(100vh - 4rem);
+  min-height: calc(100svh - 4rem);
   align-items: center;
   row-gap: 2.5rem;
   padding-top: 3rem;
-  padding-bottom: clamp(3rem, 6vw, 6rem);
+  padding-bottom: clamp(5rem, 8vw, 8rem);
 `;
 
-const Copy = styled(motion.div)`
+const HeroCopy = styled(motion.div)`
   ${col('2 / 10', '1 / 12')}
   display: flex;
   flex-direction: column;
@@ -40,7 +49,30 @@ const Greeting = styled.p`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-const Title = styled(RevealText)`
+const blink = keyframes`
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+`;
+
+const Cursor = styled.span<{ $idle: boolean }>`
+  display: inline-block;
+  width: 2.75rem;
+  height: 0.1rem;
+  margin-left: 0.12em;
+  vertical-align: baseline;
+  background: currentColor;
+  ${({ $idle }) =>
+    $idle &&
+    css`
+      animation: ${blink} 1s step-end infinite;
+    `}
+
+  @media (max-width: 768px) {
+    width: 0.75rem;
+  }
+`;
+
+const Headline = styled(RevealText)`
   margin: 0;
   font-family: ${({ theme }) => theme.typography.fonts.display};
   font-weight: 400;
@@ -56,234 +88,118 @@ const Actions = styled(motion.div)`
   gap: 1.25rem 2.5rem;
 `;
 
-const ScrollHint = styled(motion.div)`
-  ${col('11 / 13', '11 / 13')}
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.secondary};
-
-  @media (max-width: 768px) {
-    display: none;
-  }
+const ring = keyframes`
+  from { transform: scale(1); opacity: 0.6; }
+  to { transform: scale(1.9); opacity: 0; }
 `;
 
-const HintLine = styled(motion.span)`
-  display: block;
-  width: 1px;
-  height: 2.5rem;
-  background: currentColor;
-  transform-origin: top;
-`;
-
-/* Immersive-style underlined text button: the line wipes out on hover and back in from the left. */
-export const LineButton = styled.button`
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0 0 0.55rem;
+const ScrollCue = styled(motion.button)`
+  position: absolute;
+  left: calc(50% - 1.5rem);
+  bottom: clamp(1.25rem, 3vw, 2.5rem);
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 50%;
   background: none;
-  border: 0;
-  color: inherit;
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  text-decoration: none;
+  color: ${({ theme }) => theme.colors.secondary};
   cursor: pointer;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
 
   &::after {
     content: '';
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background: currentColor;
-    transform-origin: right;
-    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    inset: -1px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    animation: ${ring} 2s ease-out infinite;
   }
 
-  &:hover::after,
-  &:focus-visible::after {
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: wait;
-  }
-
+  &:hover,
   &:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 4px;
+    color: ${({ theme }) => theme.colors.foreground};
+    border-color: ${({ theme }) => theme.colors.foreground};
+    outline: none;
   }
-`;
 
-/* ---------- about ---------- */
-
-const About = styled(Grid)`
-  align-items: center;
-  row-gap: 2rem;
-  margin-top: clamp(6rem, 12vw, 14rem);
-`;
-
-const Portrait = styled.figure`
-  ${col('2 / 6', '1 / 6', '1 / 9')}
-  margin: 0;
-`;
-
-const PortraitCaption = styled.figcaption`
-  margin-top: 0.75rem;
-  font-family: ${({ theme }) => theme.typography.fonts.hand};
-  font-weight: 600;
-  font-size: 1.35rem;
-  color: ${({ theme }) => theme.colors.secondary};
-`;
-
-const AboutText = styled.div`
-  ${col('7 / 12', '6 / 13')}
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const AboutParagraph = styled(RevealText)`
-  margin: 0;
-  font-family: ${({ theme }) => theme.typography.fonts.display};
-  font-size: clamp(1.35rem, 1.95vw, 2.3rem);
-  line-height: 1.3;
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      animation: none;
+    }
+  }
 `;
 
 interface HeroSectionProps {
-  age: number;
-  yearsOfExperience: number;
-  firstSectionId?: string;
-  isGeneratingPDF: boolean;
   onViewWork: () => void;
-  onDownloadCV: () => void;
+  onScrollDown: () => void;
 }
 
-const fillPlaceholders = (text: string, values: Record<string, number>) =>
-  text.replace(/\{\{(\w+)\}\}/g, (_, key: string) =>
-    String(values[key] ?? `{{${key}}}`),
-  );
-
-export const HeroSection = ({
-  age,
-  yearsOfExperience,
-  firstSectionId,
-  isGeneratingPDF,
-  onViewWork,
-  onDownloadCV,
-}: HeroSectionProps) => {
-  const { homepage, introduction, contact } = contentData;
-  const [currentGreeting, setCurrentGreeting] = useState('');
-  const [weatherData, setWeatherData] = useState<{
-    temp: number;
-    condition: string;
-  } | null>(null);
-  const [isLoadingGreeting, setIsLoadingGreeting] = useState(true);
-
-  useEffect(() => {
-    resetGreetingType();
-    getCompleteGreeting(null).then((greeting) => {
-      setCurrentGreeting(greeting);
-      setIsLoadingGreeting(false);
-    });
-  }, []);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(
-      () => fetchWeatherData().then(setWeatherData),
-      2000,
-    );
-    return () => clearTimeout(timeoutId);
-  }, []);
-
-  const handleCycleComplete = useCallback(async () => {
-    setCurrentGreeting(await getCompleteGreeting(weatherData));
-  }, [weatherData]);
+export const HeroSection = ({ onViewWork, onScrollDown }: HeroSectionProps) => {
+  const { homepage, contact } = contentData;
+  const { done: introDone } = useIntro();
+  const reduceMotion = useReducedMotion();
+  const weather = useWeather();
+  const greeting = useGreeting(introDone, weather);
+  const typed = useTypewriter(greeting, introDone && !reduceMotion);
+  const shownGreeting = reduceMotion ? greeting : typed;
 
   const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: heroProgress } = useScroll({
+  const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
   });
-  const copyY = useTransform(heroProgress, [0, 1], [0, -260]);
-  const copyOpacity = useTransform(heroProgress, [0.05, 0.55], [1, 0]);
-
-  const paragraphs = introduction.map((p) =>
-    fillPlaceholders(p, { age, years: yearsOfExperience }),
-  );
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, COPY_LIFT_PX]);
+  const copyOpacity = useTransform(scrollYProgress, COPY_FADE_RANGE, [1, 0]);
 
   return (
-    <>
-      <Hero ref={heroRef}>
-        <Copy style={{ y: copyY, opacity: copyOpacity }}>
-          <Greeting aria-live="polite">
-            <Blinker
-              text={currentGreeting || "Hi! I'm Silviu"}
-              cycleInterval={10000}
-              onCycleComplete={handleCycleComplete}
-              startDelay={isLoadingGreeting ? 0 : 2500}
-            />
-          </Greeting>
+    <Hero ref={heroRef}>
+      <HeroCopy style={{ y: copyY, opacity: copyOpacity }}>
+        <Greeting>
+          <VisuallyHidden aria-live="polite">{greeting}</VisuallyHidden>
+          <span aria-hidden="true">
+            {shownGreeting}
+            <Cursor $idle={shownGreeting === greeting} />
+          </span>
+        </Greeting>
 
-          <Title tag="h1" text={homepage.title} delay={0.2} />
+        <Headline tag="h1" text={homepage.title} />
 
-          <Actions
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9, ease: EASE }}
-          >
-            <LineButton onClick={onViewWork} disabled={!firstSectionId}>
-              View My Work
-              <ArrowDown size={14} />
-            </LineButton>
+        <Actions
+          initial={{ opacity: 0, y: 12 }}
+          animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+          transition={{
+            duration: 0.8,
+            delay: ACTIONS_DELAY_SECONDS,
+            ease: EASE,
+          }}
+        >
+          <LineButton onClick={onViewWork}>
+            View My Work
+            <ArrowDown size={14} />
+          </LineButton>
 
-            <LineButton onClick={onDownloadCV} disabled={isGeneratingPDF}>
-              <Download size={14} />
-              {isGeneratingPDF ? 'Downloading...' : 'Download CV'}
-            </LineButton>
-          </Actions>
-        </Copy>
+          <LineButton as="a" href={`/media/cv/${contact.cv}`} download>
+            <Download size={14} />
+            Download CV
+          </LineButton>
+        </Actions>
+      </HeroCopy>
 
-        <ScrollHint aria-hidden="true" style={{ opacity: copyOpacity }}>
-          Scroll
-          <HintLine
-            animate={{ scaleY: [0, 1, 1, 0], originY: [0, 0, 1, 1] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </ScrollHint>
-      </Hero>
-
-      <About>
-        {contact.profileImage && (
-          <Portrait>
-            <RevealMedia ratio="4 / 5" parallax={40}>
-              <img
-                src={`/media/images/${contact.profileImage}`}
-                alt={contact.name}
-              />
-            </RevealMedia>
-            {homepage.portraitCaption && (
-              <PortraitCaption>{homepage.portraitCaption}</PortraitCaption>
-            )}
-          </Portrait>
-        )}
-        <AboutText>
-          {paragraphs.map((text, i) => (
-            <AboutParagraph key={text} text={text} tag="p" delay={i * 0.15} />
-          ))}
-        </AboutText>
-      </About>
-    </>
+      <ScrollCue
+        type="button"
+        aria-label="Scroll down"
+        onClick={onScrollDown}
+        style={{ opacity: copyOpacity }}
+        animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
+        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <ArrowDown size={18} />
+      </ScrollCue>
+    </Hero>
   );
 };

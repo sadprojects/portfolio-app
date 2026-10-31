@@ -1,16 +1,13 @@
-import versionInfo from '@/version.json';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Calendar, Package, X } from 'lucide-react';
-
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 
-const Overlay = styled(motion.div)`
+import versionInfo from '@/version.json';
+
+const Backdrop = styled(motion.div)`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -19,7 +16,7 @@ const Overlay = styled(motion.div)`
   padding: 1rem;
 `;
 
-const Modal = styled(motion.div)`
+const Dialog = styled(motion.div)`
   background-color: ${({ theme }) => theme.colors.card};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
@@ -30,14 +27,14 @@ const Modal = styled(motion.div)`
   box-shadow: ${({ theme }) => theme.shadows.lg};
 `;
 
-const Header = styled.div`
+const DialogHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 `;
 
-const Title = styled.h2`
+const DialogTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.foreground};
@@ -62,19 +59,19 @@ const CloseButton = styled.button`
   }
 `;
 
-const Content = styled.div`
+const DialogBody = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 `;
 
-const InfoItem = styled.div`
+const InfoRow = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 1rem;
 `;
 
-const IconWrapper = styled.div`
+const InfoIcon = styled.div`
   color: ${({ theme }) => theme.colors.secondary};
   display: flex;
   align-items: center;
@@ -85,7 +82,7 @@ const IconWrapper = styled.div`
   border-radius: 0.5rem;
 `;
 
-const InfoContent = styled.div`
+const InfoText = styled.div`
   flex: 1;
 `;
 
@@ -109,75 +106,61 @@ interface VersionModalProps {
 }
 
 export const VersionModal = ({ isOpen, onClose }: VersionModalProps) => {
-  // Format the build time (epoch ms) to user's local timezone
-  const formatBuildDate = (epochMs: number | null | undefined): string => {
-    if (!epochMs) return 'Not available';
-    try {
-      const date = new Date(epochMs);
-      return date.toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch {
-      return 'Not available';
-    }
-  };
+  const { buildTime } = versionInfo as { version: string; buildTime?: number };
+  const builtAt = buildTime
+    ? new Date(buildTime).toLocaleString(undefined, {
+        dateStyle: 'long',
+        timeStyle: 'short',
+      })
+    : 'Not available';
 
-  const buildTime = (versionInfo as { version: string; buildTime?: number })
-    .buildTime;
-
-  const modalContent = (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <Overlay
+        <Backdrop
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
-          <Modal
+          <Dialog
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
-            <Header>
-              <Title>Version Info</Title>
+            <DialogHeader>
+              <DialogTitle>Version Info</DialogTitle>
               <CloseButton onClick={onClose} aria-label="Close modal">
                 <X size={20} />
               </CloseButton>
-            </Header>
+            </DialogHeader>
 
-            <Content>
-              <InfoItem>
-                <IconWrapper>
+            <DialogBody>
+              <InfoRow>
+                <InfoIcon>
                   <Package size={20} />
-                </IconWrapper>
-                <InfoContent>
+                </InfoIcon>
+                <InfoText>
                   <InfoLabel>Current Version</InfoLabel>
                   <InfoValue>v{versionInfo.version}</InfoValue>
-                </InfoContent>
-              </InfoItem>
+                </InfoText>
+              </InfoRow>
 
-              <InfoItem>
-                <IconWrapper>
+              <InfoRow>
+                <InfoIcon>
                   <Calendar size={20} />
-                </IconWrapper>
-                <InfoContent>
+                </InfoIcon>
+                <InfoText>
                   <InfoLabel>Last Built</InfoLabel>
-                  <InfoValue>{formatBuildDate(buildTime)}</InfoValue>
-                </InfoContent>
-              </InfoItem>
-            </Content>
-          </Modal>
-        </Overlay>
+                  <InfoValue>{builtAt}</InfoValue>
+                </InfoText>
+              </InfoRow>
+            </DialogBody>
+          </Dialog>
+        </Backdrop>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
-
-  // Render modal in a portal to ensure proper stacking
-  return createPortal(modalContent, document.body);
 };

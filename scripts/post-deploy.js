@@ -15,12 +15,6 @@ try {
   const versionData = JSON.parse(readFileSync(versionPath, 'utf-8'));
   const currentVersion = versionData.version;
 
-  // Parse version for incrementing later
-  const versionParts = currentVersion.split('.');
-  const major = parseInt(versionParts[0], 10);
-  const minor = parseInt(versionParts[1], 10);
-  const patch = parseInt(versionParts[2], 10);
-
   // First, create a tag for the CURRENT deployed version
   const deployedTagName = `v${currentVersion}`;
   try {
@@ -28,7 +22,7 @@ try {
       stdio: 'inherit',
     });
     console.log(`✓ Git tag created for deployed version: ${deployedTagName}`);
-  } catch (tagError) {
+  } catch {
     // Tag might already exist, that's okay
     console.warn(
       `⚠ Git tag creation skipped (may already exist): ${deployedTagName}`,
@@ -36,7 +30,7 @@ try {
   }
 
   // Now increment version for NEXT deployment
-  const nextVersion = `${major}.${minor}.${patch + 1}`;
+  const nextVersion = currentVersion.replace(/\d+$/, (patch) => +patch + 1);
 
   // Update version only, preserve buildTime from the build step
   versionData.version = nextVersion;

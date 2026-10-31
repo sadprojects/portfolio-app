@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { render, screen } from '@testing-library/react';
+
 import { MediaBlock } from './MediaBlock';
 
 describe('MediaBlock', () => {
@@ -19,7 +20,7 @@ describe('MediaBlock', () => {
       '/media/images/castle.jpg',
     );
     expect(
-      screen.getByLabelText('Weekends are for the camera.'),
+      screen.getByText('Weekends are for the camera.'),
     ).toBeInTheDocument();
   });
 });

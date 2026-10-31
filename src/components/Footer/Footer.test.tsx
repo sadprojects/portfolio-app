@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { act, fireEvent, render, screen } from '@testing-library/react';
+
 import { Footer } from './Footer';
 
 // Mock the content data

@@ -1,6 +1,7 @@
-import { render, screen, act } from '@testing-library/react';
 import { ThemeProvider } from '@contexts/ThemeContext';
-import { vi } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
+import { vi } from 'vite-plus/test';
+
 import { Timer } from './Timer';
 
 // Helper to render with theme
@@ -21,24 +22,14 @@ describe('Timer', () => {
   it('should render initial time as 00:00', () => {
     const now = Date.now();
     vi.setSystemTime(now);
-    renderWithTheme(
-      <Timer
-        startTime={now}
-        isComplete={false}
-      />,
-    );
+    renderWithTheme(<Timer startTime={now} isComplete={false} />);
     expect(screen.getByText('00:00')).toBeInTheDocument();
   });
 
   it('should update elapsed time after 5 seconds', () => {
     const now = Date.now();
     vi.setSystemTime(now);
-    renderWithTheme(
-      <Timer
-        startTime={now}
-        isComplete={false}
-      />,
-    );
+    renderWithTheme(<Timer startTime={now} isComplete={false} />);
 
     act(() => {
       vi.advanceTimersByTime(5000);
@@ -50,12 +41,7 @@ describe('Timer', () => {
   it('should format minutes and seconds correctly after 125 seconds', () => {
     const now = Date.now();
     vi.setSystemTime(now);
-    renderWithTheme(
-      <Timer
-        startTime={now}
-        isComplete={false}
-      />,
-    );
+    renderWithTheme(<Timer startTime={now} isComplete={false} />);
 
     act(() => {
       vi.advanceTimersByTime(125000);
@@ -67,12 +53,7 @@ describe('Timer', () => {
   it('should pad single digit seconds with zero', () => {
     const now = Date.now();
     vi.setSystemTime(now);
-    renderWithTheme(
-      <Timer
-        startTime={now}
-        isComplete={false}
-      />,
-    );
+    renderWithTheme(<Timer startTime={now} isComplete={false} />);
 
     act(() => {
       vi.advanceTimersByTime(65000);
@@ -85,10 +66,7 @@ describe('Timer', () => {
     const now = Date.now();
     vi.setSystemTime(now);
     const { rerender } = renderWithTheme(
-      <Timer
-        startTime={now}
-        isComplete={false}
-      />,
+      <Timer startTime={now} isComplete={false} />,
     );
 
     act(() => {
@@ -100,10 +78,7 @@ describe('Timer', () => {
     // Complete the timer
     rerender(
       <ThemeProvider>
-        <Timer
-          startTime={now}
-          isComplete={true}
-        />
+        <Timer startTime={now} isComplete={true} />
       </ThemeProvider>,
     );
 
@@ -119,10 +94,7 @@ describe('Timer', () => {
     const now = Date.now();
     vi.setSystemTime(now);
     const { container } = renderWithTheme(
-      <Timer
-        startTime={now}
-        isComplete={false}
-      />,
+      <Timer startTime={now} isComplete={false} />,
     );
     const svg = container.querySelector('svg');
     expect(svg).toBeInTheDocument();
@@ -132,10 +104,7 @@ describe('Timer', () => {
     const now = Date.now();
     vi.setSystemTime(now);
     const { rerender } = renderWithTheme(
-      <Timer
-        startTime={now}
-        isComplete={false}
-      />,
+      <Timer startTime={now} isComplete={false} />,
     );
 
     act(() => {
@@ -149,10 +118,7 @@ describe('Timer', () => {
     vi.setSystemTime(newStart);
     rerender(
       <ThemeProvider>
-        <Timer
-          startTime={newStart}
-          isComplete={false}
-        />
+        <Timer startTime={newStart} isComplete={false} />
       </ThemeProvider>,
     );
 

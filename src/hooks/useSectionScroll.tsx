@@ -1,53 +1,35 @@
-import { scrollToElement } from '@lib/smoothScroll';
+import type { ScrollTo } from '@hooks/useSmoothScroll';
 import { useEffect, useRef, useState } from 'react';
 
-interface UseSectionScrollOptions {
-  onSectionChange?: (sectionId: string) => void;
-}
+const HASH_SCROLL_DELAY_MS = 300;
+const HASH_CLEAR_DELAY_MS = 1000;
 
-/** Tracks which `[data-section]` is on screen, honours a URL hash on load, and scrolls to sections. */
-export const useSectionScroll = ({
-  onSectionChange,
-}: UseSectionScrollOptions = {}) => {
+const sectionElement = (id: string) =>
+  document.querySelector<HTMLElement>(`[data-section="${id}"]`);
+
+export const useSectionScroll = (scrollTo: ScrollTo) => {
   const [activeSection, setActiveSection] = useState('home');
   const containerRef = useRef<HTMLDivElement>(null);
-  const hasScrolledToHash = useRef(false);
 
   useEffect(() => {
-    if (hasScrolledToHash.current) return;
-    const hash = window.location.hash.slice(1);
-    if (!hash) return;
-
-    let attempts = 0;
-    const tryScroll = () => {
-      const element = document.querySelector<HTMLElement>(
-        `[data-section="${hash}"]`,
+    const target = sectionElement(window.location.hash.slice(1));
+    if (!target) return;
+    const timer = setTimeout(() => {
+      scrollTo(target);
+      setTimeout(
+        () => window.history.replaceState(null, '', window.location.pathname),
+        HASH_CLEAR_DELAY_MS,
       );
-      if (element) {
-        scrollToElement(element);
-        hasScrolledToHash.current = true;
-        setTimeout(
-          () => window.history.replaceState(null, '', window.location.pathname),
-          1000,
-        );
-      } else if (attempts < 20) {
-        attempts++;
-        setTimeout(tryScroll, 100);
-      }
-    };
-    const timeoutId = setTimeout(tryScroll, 300);
-    return () => clearTimeout(timeoutId);
-  }, []);
+    }, HASH_SCROLL_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [scrollTo]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const sectionId = entry.target.getAttribute('data-section');
-          if (entry.isIntersecting && sectionId) {
-            setActiveSection(sectionId);
-            onSectionChange?.(sectionId);
-          }
+          const id = entry.target.getAttribute('data-section');
+          if (entry.isIntersecting && id) setActiveSection(id);
         });
       },
       { rootMargin: '-50% 0px -50% 0px', threshold: 0 },
@@ -56,13 +38,11 @@ export const useSectionScroll = ({
       .querySelectorAll('[data-section]')
       .forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, [onSectionChange]);
+  }, []);
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.querySelector<HTMLElement>(
-      `[data-section="${sectionId}"]`,
-    );
-    if (element) scrollToElement(element);
+  const scrollToSection = (id: string) => {
+    const target = sectionElement(id);
+    if (target) scrollTo(target);
   };
 
   return { activeSection, containerRef, scrollToSection };

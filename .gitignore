@@ -6,3 +6,4 @@ public/.DS_Store
 dist/
 coverage/
 .nyc_output/
+.vitest/

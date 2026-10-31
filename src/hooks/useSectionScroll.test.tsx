@@ -1,22 +1,25 @@
 import { act, renderHook } from '@testing-library/react';
+
 import { useSectionScroll } from './useSectionScroll';
 
 type ObserverCallback = (entries: Partial<IntersectionObserverEntry>[]) => void;
 
 describe('useSectionScroll', () => {
-  let callback: ObserverCallback;
+  const observer = { callback: null as ObserverCallback | null };
   const observe = vi.fn();
   const disconnect = vi.fn();
+  const scrollTo = vi.fn();
 
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.clearAllMocks();
     document.body.innerHTML =
       '<div data-section="home"></div><div data-section="projects"></div>';
     window.history.replaceState(null, '', '/');
     vi.stubGlobal(
       'IntersectionObserver',
-      vi.fn((cb: ObserverCallback) => {
-        callback = cb;
+      vi.fn(function (cb: ObserverCallback) {
+        observer.callback = cb;
         return {
           observe,
           disconnect,
@@ -25,7 +28,6 @@ describe('useSectionScroll', () => {
         };
       }),
     );
-    Element.prototype.scrollIntoView = vi.fn();
   });
 
   afterEach(() => {
@@ -34,16 +36,15 @@ describe('useSectionScroll', () => {
   });
 
   it('starts on home and observes every section', () => {
-    const { result } = renderHook(() => useSectionScroll());
+    const { result } = renderHook(() => useSectionScroll(scrollTo));
     expect(result.current.activeSection).toBe('home');
     expect(observe).toHaveBeenCalledTimes(2);
   });
 
-  it('updates the active section and notifies when a section intersects', () => {
-    const onSectionChange = vi.fn();
-    const { result } = renderHook(() => useSectionScroll({ onSectionChange }));
+  it('updates the active section when a section intersects', () => {
+    const { result } = renderHook(() => useSectionScroll(scrollTo));
     act(() => {
-      callback([
+      observer.callback?.([
         {
           isIntersecting: true,
           target: document.querySelector('[data-section="projects"]')!,
@@ -51,24 +52,25 @@ describe('useSectionScroll', () => {
       ]);
     });
     expect(result.current.activeSection).toBe('projects');
-    expect(onSectionChange).toHaveBeenCalledWith('projects');
   });
 
   it('scrolls to a section by id and ignores unknown ids', () => {
-    const { result } = renderHook(() => useSectionScroll());
+    const { result } = renderHook(() => useSectionScroll(scrollTo));
     act(() => result.current.scrollToSection('projects'));
-    expect(Element.prototype.scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollTo).toHaveBeenCalledWith(
+      document.querySelector('[data-section="projects"]'),
+    );
     act(() => result.current.scrollToSection('nope'));
-    expect(Element.prototype.scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollTo).toHaveBeenCalledTimes(1);
   });
 
   it('scrolls to the hash target on mount and then clears the hash', () => {
     window.history.replaceState(null, '', '/#projects');
-    renderHook(() => useSectionScroll());
+    renderHook(() => useSectionScroll(scrollTo));
     act(() => {
       vi.advanceTimersByTime(400);
     });
-    expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
+    expect(scrollTo).toHaveBeenCalledTimes(1);
     act(() => {
       vi.advanceTimersByTime(1000);
     });
@@ -76,7 +78,7 @@ describe('useSectionScroll', () => {
   });
 
   it('disconnects the observer on unmount', () => {
-    const { unmount } = renderHook(() => useSectionScroll());
+    const { unmount } = renderHook(() => useSectionScroll(scrollTo));
     unmount();
     expect(disconnect).toHaveBeenCalled();
   });

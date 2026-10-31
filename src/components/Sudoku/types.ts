@@ -1,5 +1,10 @@
 export type SudokuGrid = number[][];
-export type SudokuDifficulty = 'beginner' | 'easy' | 'medium' | 'hard' | 'expert';
+export type SudokuDifficulty =
+  | 'beginner'
+  | 'easy'
+  | 'medium'
+  | 'hard'
+  | 'expert';
 
 export interface CellPosition {
   row: number;

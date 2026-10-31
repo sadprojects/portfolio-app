@@ -1,0 +1,568 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`content > matches the approved copy 1`] = `
+{
+  "certifications": [
+    {
+      "date": "Dec 2021",
+      "issuer": "ResearchGate",
+      "title": "Published Research: Neural Network Based System for Disease Prediction",
+      "url": "https://www.researchgate.net/publication/357430190_Neural_Network_Based_System_for_Disease_Prediction",
+    },
+    {
+      "date": "18 Sep 2023",
+      "issuer": "Microsoft",
+      "title": "Microsoft Certified - Azure Fundamentals",
+      "url": "https://learn.microsoft.com/api/credentials/share/en-gb/SilviuDinu-1202/D2162FE9FCA167E1?sharingId=79B7C1ADC9510DE6",
+    },
+    {
+      "date": "16 Jun 2023",
+      "issuer": "MongoDB University",
+      "title": "MongoDB - SI Associate Certification",
+      "url": "https://learn.mongodb.com/c/yHhzIyEdQC6KznCAMnlgsg",
+    },
+  ],
+  "codewars": {
+    "username": "SilviuDinu",
+  },
+  "contact": {
+    "birthDate": "1996-09-18",
+    "cv": "Silviu_Alexandru_Dinu_CV_EN.pdf",
+    "email": "silviualexd@gmail.com",
+    "firstJobDate": "2018-07-01",
+    "location": "Bucharest, Romania",
+    "name": "Silviu Dinu",
+    "position": "Lead Software Engineer",
+    "profileImage": "me.jpg",
+  },
+  "education": [
+    {
+      "city": "Bucharest",
+      "company": "Automatic Control and Computer Science, POLITEHNICA University",
+      "period": "2020 - 2022",
+      "position": "MSc, Advanced Signal Processing in Multimedia Applications",
+    },
+    {
+      "city": "Bucharest",
+      "company": "Automatic Control and Computer Science, POLITEHNICA University",
+      "period": "2016 - 2020",
+      "position": "BSc, Systems Engineering",
+    },
+    {
+      "city": "Ploiești",
+      "company": "Alexandru Ioan Cuza National College",
+      "period": "2012 - 2016",
+      "position": "High School",
+    },
+  ],
+  "experience": [
+    {
+      "city": "Bucharest",
+      "company": "London Stock Exchange Group",
+      "endDate": "Present",
+      "position": "Lead Software Engineer",
+      "responsibilities": [
+        "Lead a team of engineers building the trading and analytics tools our users rely on every day; own technical direction, code quality and delivery",
+        "Mentor engineers, run design reviews and keep the team shipping, while staying hands-on in the codebase",
+        "Put AI to work for the team rather than instead of it: coding agents in the daily loop, MCP servers wired into our internal tooling, and the same review bar for their output as for anyone else's",
+        "Stack: React, TypeScript, WebSockets, SharedWorkers, CI/CD, AI agents, MCP",
+      ],
+      "startDate": "2026-10-01",
+    },
+    {
+      "city": "Bucharest",
+      "company": "London Stock Exchange Group",
+      "endDate": "2026-09-30",
+      "position": "Senior Software Engineer",
+      "responsibilities": [
+        "Built the front end of trading and analytics tools traders use all day: live data over WebSockets, state shared across tabs with SharedWorkers, and the CI/CD that got it to production",
+        "Promoted to Lead Software Engineer in October 2026",
+        "Stack: React, TypeScript, WebSockets, SharedWorkers, CI/CD",
+      ],
+      "startDate": "2024-02-01",
+    },
+    {
+      "city": "Bucharest",
+      "company": "Cognizant",
+      "endDate": "2024-02-01",
+      "position": "Full Stack Developer",
+      "responsibilities": [
+        "Full-stack delivery on a client platform: React on AEM, Node.js services, MongoDB, Algolia search",
+        "Brought product ideas to the table, not just tickets",
+        "Stack: React, Node.js, MongoDB, AEM, Algolia",
+      ],
+      "startDate": "2022-10-01",
+    },
+    {
+      "city": "Bucharest",
+      "company": "EPAM Systems",
+      "endDate": "2022-10-01",
+      "position": "Full Stack Developer",
+      "responsibilities": [
+        "Shipped web and hybrid-mobile features end to end with Angular, Node.js, Ionic and Cordova",
+        "Stack: Angular, AngularJS, Node.js, TypeScript, Ionic, Cordova",
+      ],
+      "startDate": "2021-10-01",
+    },
+    {
+      "city": "Bucharest",
+      "company": "Deloitte Digital",
+      "endDate": "2021-10-01",
+      "position": "Consultant - Middle Frontend Developer",
+      "responsibilities": [
+        "Front-end consultant sitting with clients directly: Angular and React builds, and owning the conversations about scope and trade-offs",
+        "Stack: Angular, AngularJS, React, SCSS, Node.js, Jira",
+      ],
+      "startDate": "2020-02-01",
+    },
+    {
+      "city": "Bucharest",
+      "company": "Themeisle",
+      "endDate": "2020-02-01",
+      "position": "Junior Programmer - Technical Support Engineer",
+      "responsibilities": [
+        "Helped customers build and fix WordPress sites",
+        "Debugged and reported issues across PHP, CSS, JavaScript and MySQL",
+      ],
+      "startDate": "2018-07-01",
+    },
+  ],
+  "footer": "Built with ❤️ by Silviu Dinu",
+  "games": [
+    {
+      "icon": "witcher3.jpg",
+      "title": "Witcher 3: Wild Hunt",
+    },
+    {
+      "icon": "elden_ring.jpg",
+      "title": "Elden Ring",
+    },
+    {
+      "icon": "rdr2.jpg",
+      "title": "Red Dead Redemption 2",
+    },
+    {
+      "icon": "tlou.jpg",
+      "title": "The Last Of Us",
+    },
+    {
+      "icon": "serious_sam.jpg",
+      "title": "Serious Sam",
+    },
+  ],
+  "greetings": {
+    "casualGreetings": [
+      "Hi!",
+      "Hey!",
+      "Hello!",
+    ],
+    "introductions": [
+      "I'm Silviu",
+    ],
+    "timeBasedGreetings": [
+      {
+        "message": "Good morning!",
+        "type": "morning",
+      },
+      {
+        "message": "Good afternoon!",
+        "type": "afternoon",
+      },
+      {
+        "message": "Good evening!",
+        "type": "evening",
+      },
+    ],
+    "weatherGreetings": {
+      "cloudy": [
+        "Cloudy today!",
+        "Grey skies!",
+      ],
+      "cold": [
+        "Stay warm!",
+        "Brr! Cold!",
+        "Cold today!",
+      ],
+      "hot": [
+        "Hot day!",
+        "Stay cool!",
+        "Summer heat!",
+      ],
+      "rainy": [
+        "Rainy day!",
+        "Cozy weather!",
+        "Perfect for coding!",
+      ],
+      "snowy": [
+        "Winter vibes!",
+        "Stay warm!",
+        "Snowy day!",
+      ],
+      "sunny": [
+        "Lovely day!",
+        "Sunshine!",
+        "Beautiful!",
+      ],
+    },
+  },
+  "homepage": {
+    "portraitCaption": "that's me",
+    "title": "I make software people actually enjoy using.",
+  },
+  "introduction": [
+    "{{age}} years old, based in Bucharest. I've spent {{years}}+ years building for the web, from WordPress support tickets to the trading tools at London Stock Exchange Group, where I now lead a team and still write code every day.",
+    "Off the clock I shoot photos and lose evenings to open-world games.",
+  ],
+  "photography": [
+    {
+      "alt": "Mountains picture",
+      "path": "mountains.jpg",
+      "url": "https://unsplash.com/photos/FAekx3o6JSk",
+    },
+    {
+      "alt": "Tree picture",
+      "path": "tree.jpg",
+      "url": "https://unsplash.com/photos/qJIgaF44sTg",
+    },
+    {
+      "alt": "Lake house picture",
+      "path": "lake-house.jpg",
+      "url": "https://unsplash.com/photos/qWvKHnu9lyY",
+    },
+    {
+      "alt": "Chicken picture",
+      "path": "chicken.jpg",
+      "url": "https://unsplash.com/photos/E0UIsf77SkQ",
+    },
+    {
+      "alt": "Person standing on a rock over a cliff",
+      "path": "nike.jpg",
+      "url": "https://unsplash.com/photos/CuxlhYpBsfA",
+    },
+    {
+      "alt": "Jack Daniels glass with Nikon and Airpods",
+      "path": "jack.jpg",
+      "url": "https://unsplash.com/photos/U172-ZN0Jjg",
+    },
+    {
+      "alt": "Sunflower picture",
+      "path": "sunflower.jpg",
+      "url": "https://unsplash.com/photos/KvB0Cgz3SSs",
+    },
+    {
+      "alt": "Green sailing boat on the beach",
+      "path": "boat.jpg",
+      "url": "https://unsplash.com/photos/BBYbtPQU9LQ",
+    },
+    {
+      "alt": "Picture of DJI Air 2S drone",
+      "path": "drone.jpg",
+      "url": "https://unsplash.com/photos/2vajkRGV08E",
+    },
+  ],
+  "projects": [
+    {
+      "city": "Bucharest",
+      "description": "Sudoku, built into this site. Puzzles are generated and solved with backtracking; there are four difficulties, live validation, a timer and local best times. Click to play.",
+      "easterEgg": "sudoku",
+      "period": "Dec 2025",
+      "repo": "https://github.com/SilviuDinu/portfolio-app",
+      "title": "Sudoku Solver & Game",
+      "tools": [
+        "React",
+        "TypeScript",
+        "Backtracking Algorithm",
+        "LocalStorage",
+        "Styled Components",
+      ],
+    },
+    {
+      "city": "Bucharest",
+      "description": "The site you are on. Started as an Angular app in 2021, rebuilt in React with the scroll-driven layout in 2026.",
+      "period": "Aug 2021 - Present",
+      "repo": "https://github.com/SilviuDinu/portfolio-app",
+      "title": "This Website",
+      "tools": [
+        "React",
+        "TypeScript",
+        "Styled Components",
+        "Framer Motion",
+        "Vite+",
+      ],
+      "video": "portfolio-app",
+    },
+    {
+      "city": "Ploiești",
+      "description": "Search the weather anywhere in the world, or let it find you and show what matters where you are. React in front, Express behind.",
+      "period": "Jun 2021 - Jul 2021",
+      "repo": "https://github.com/SilviuDinu/react-weather-app",
+      "title": "React Weather App",
+      "tools": [
+        "React Hooks",
+        "React Router",
+        "Express",
+        "REST APIs",
+        "Typescript",
+        "MongoDB",
+      ],
+      "video": "react-weather-app",
+      "website": "https://forecast-report.com/",
+    },
+    {
+      "city": "Ploiești",
+      "description": "A real-time chat room: React on the front end, Socket.io on the back end, messages fan out to everyone connected.",
+      "period": "Apr 2021",
+      "repo": "https://github.com/SilviuDinu/web-sockets-chat",
+      "title": "WebSockets Chat",
+      "tools": [
+        "React Hooks",
+        "Node.JS",
+        "Websockets",
+        "Socket.io",
+        "Typescript",
+      ],
+      "video": "web-sockets-chat",
+    },
+    {
+      "city": "Ploiești",
+      "description": "A bit.ly clone: paste a long URL, get a short one. Vue on the front end, Express and MongoDB behind it.",
+      "period": "Oct 2020",
+      "repo": "https://github.com/SilviuDinu/url-shortener",
+      "title": "URL Shortener",
+      "tools": [
+        "VueJS",
+        "NodeJS",
+        "Express",
+        "MongoDB",
+        "REST APIs",
+      ],
+      "video": "url-shortener",
+    },
+    {
+      "city": "Ploiești",
+      "description": "A neural network that maps symptoms to the most likely disease, served from a Flask API. Published on ResearchGate.",
+      "period": "Apr 2021 - May 2021",
+      "publication": "https://www.researchgate.net/publication/357430190_Neural_Network_Based_System_for_Disease_Prediction",
+      "repo": "https://github.com/SilviuDinu/cercetare_sem2_BE",
+      "title": "Disease Predictor",
+      "tools": [
+        "Python",
+        "PyTorch",
+        "Machine Learning",
+        "Flask",
+        "REST APIs",
+        "Data Science",
+      ],
+      "video": "disease-predictor",
+    },
+    {
+      "city": "Bucharest",
+      "description": "A Raspberry Pi with a gas sensor and a Python script. Past a threshold, it emails me the readings.",
+      "period": "Nov 2018 – Dec 2018",
+      "repo": "https://github.com/SilviuDinu/smoke-detector",
+      "title": "Smoke Detector",
+      "tools": [
+        "Linux",
+        "Raspberry PI",
+        "Python",
+        "Electronics",
+        "SMTP",
+      ],
+      "video": "https://youtu.be/-RQZF3_onj4",
+    },
+  ],
+  "sections": {
+    "contact": {
+      "label": "Contact",
+    },
+    "experience": {
+      "intro": {
+        "label": "Where I work",
+        "text": "Eight years of shipping for the web, from WordPress tickets to the trading tools a team now builds with me.",
+      },
+      "label": "Experience",
+      "title": "Experience",
+    },
+    "hobbies": {
+      "banners": [
+        {
+          "alt": "Snow-dusted mountain peaks behind a spruce tree",
+          "caption": "Cold air, clear head.",
+          "exif": {
+            "camera": "Nikon D3500",
+            "date": "Dec 2020",
+            "location": "Bușteni, Romania",
+          },
+          "image": "mountains_md.jpg",
+        },
+        {
+          "alt": "Wooden lake house with a red roof at dusk",
+          "caption": "Still water, loud sky.",
+          "exif": {
+            "camera": "Nikon D3500",
+            "date": "Dec 2020",
+          },
+          "image": "lake-house_md.jpg",
+        },
+        {
+          "alt": "Aerial view of Tsarevets fortress in Veliko Tarnovo",
+          "caption": "Weekends are for the camera.",
+          "exif": {
+            "camera": "DJI Air 2S",
+            "location": "Veliko Tarnovo, Bulgaria",
+          },
+          "image": "castle_md.jpg",
+        },
+        {
+          "alt": "Person standing on a rock over a cliff",
+          "caption": "The best frames are a hike away.",
+          "exif": {
+            "camera": "Nikon D3500",
+            "date": "Aug 2021",
+            "location": "Brașov, Romania",
+          },
+          "image": "nike_md.jpg",
+        },
+        {
+          "alt": "Jack Daniels glass with a Nikon and AirPods",
+          "caption": "Kit on the table, week over.",
+          "exif": {
+            "camera": "Nikon D3500",
+            "date": "May 2021",
+          },
+          "image": "jack_md.jpg",
+        },
+        {
+          "alt": "Green sailing boat on the beach",
+          "caption": "Slow mornings, quiet shores.",
+          "exif": {
+            "camera": "Nikon D3500",
+            "date": "Jul 2022",
+          },
+          "image": "boat_md.jpg",
+        },
+      ],
+      "intro": {
+        "label": "Off the clock",
+        "text": "A camera, a controller, and the occasional long drive somewhere old.",
+      },
+      "label": "Hobbies",
+      "title": "My Hobbies",
+    },
+    "home": {
+      "label": "Home",
+    },
+    "projects": {
+      "intro": {
+        "label": "Side projects",
+        "text": "Things I built to learn something, mostly after hours and mostly still running.",
+      },
+      "label": "Projects",
+    },
+    "skills": {
+      "intro": {
+        "label": "Craft",
+        "text": "Front-end first, full-stack when it matters, and opinionated about the details users feel.",
+      },
+      "label": "Skills",
+      "title": "Skills & Credentials",
+    },
+  },
+  "skills": {
+    "developmentTools": [
+      "Git",
+      "Jira",
+      "Azure",
+      "MongoDB Compass",
+      "AWS",
+      "Jenkins",
+      "SonarQube",
+    ],
+    "languages": [
+      "English",
+      "Romanian",
+      "Japanese (N5)",
+    ],
+    "professional": [
+      {
+        "category": "Frontend",
+        "name": "JavaScript",
+      },
+      {
+        "category": "Frontend",
+        "name": "TypeScript",
+      },
+      {
+        "category": "Frontend",
+        "name": "React",
+      },
+      {
+        "category": "Frontend",
+        "name": "Angular",
+      },
+      {
+        "category": "Frontend",
+        "name": "AngularJS",
+      },
+      {
+        "category": "Frontend",
+        "name": "Vue.js",
+      },
+      {
+        "category": "Frontend",
+        "name": "HTML & CSS",
+      },
+      {
+        "category": "Backend & data",
+        "name": "Node.js & Express",
+      },
+      {
+        "category": "Backend & data",
+        "name": "REST APIs",
+      },
+      {
+        "category": "Backend & data",
+        "name": "WebSockets & Socket.io",
+      },
+      {
+        "category": "Backend & data",
+        "name": "MongoDB",
+      },
+      {
+        "category": "Backend & data",
+        "name": "PHP",
+      },
+      {
+        "category": "AI & data",
+        "name": "Python & PyTorch",
+      },
+      {
+        "category": "AI & data",
+        "name": "Neural networks",
+      },
+      {
+        "category": "AI & data",
+        "name": "AI agents & MCP",
+      },
+    ],
+  },
+  "social": [
+    {
+      "name": "github",
+      "url": "https://github.com/SilviuDinu",
+    },
+    {
+      "name": "facebook",
+      "url": "https://www.facebook.com/slv.alex96",
+    },
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/silviualexd",
+    },
+    {
+      "name": "linkedin",
+      "url": "https://www.linkedin.com/in/silviu-alexandru-dinu-138128151/",
+    },
+  ],
+}
+`;

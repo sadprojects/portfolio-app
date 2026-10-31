@@ -1,6 +1,13 @@
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
+const ERROR_RED = '#ef4444';
+const ERROR_RED_TEXT = '#dc2626';
+const FOCUS_BLUE = '#2563eb';
+const ENTRY_BLUE_DARK = '#60a5fa';
+const ENTRY_BLUE_LIGHT = '#2563eb';
+const BEST_TIME_GOLD = 'rgba(251, 191, 36, 0.12)';
+
 export const GameContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -72,7 +79,7 @@ export const TimerDisplay = styled.div`
   }
 `;
 
-export const GridWrapper = styled.div`
+export const BoardFrame = styled.div`
   position: relative;
   border-radius: 0.75rem;
   overflow: hidden;
@@ -91,7 +98,7 @@ export const GridWrapper = styled.div`
   }
 `;
 
-export const Grid = styled.div`
+export const BoardGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
@@ -99,7 +106,7 @@ export const Grid = styled.div`
   background: ${({ theme }) => theme.colors.foreground};
 `;
 
-export const Box = styled.div`
+export const BoardBox = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
@@ -156,7 +163,7 @@ export const CellButton = styled.button<{
     $isSameNumber,
     $isNumberSelected,
   }) => {
-    const isDark = theme.colors.foreground === '#e8e8e8';
+    const isDark = theme.mode === 'dark';
 
     if ($isError)
       return isDark ? 'rgba(239, 68, 68, 0.25)' : 'rgba(239, 68, 68, 0.15)';
@@ -170,11 +177,11 @@ export const CellButton = styled.button<{
   }};
 
   color: ${({ theme, $isInitial, $isError }) => {
-    const isDark = theme.colors.foreground === '#e8e8e8';
+    const isDark = theme.mode === 'dark';
 
-    if ($isError) return isDark ? '#ef4444' : '#dc2626';
+    if ($isError) return isDark ? ERROR_RED : ERROR_RED_TEXT;
     if ($isInitial) return theme.colors.foreground;
-    return isDark ? '#60a5fa' : '#2563eb';
+    return isDark ? ENTRY_BLUE_DARK : ENTRY_BLUE_LIGHT;
   }};
 
   &:hover {
@@ -185,7 +192,7 @@ export const CellButton = styled.button<{
       $isSameNumber,
       $isNumberSelected,
     }) => {
-      const isDark = theme.colors.foreground === '#e8e8e8';
+      const isDark = theme.mode === 'dark';
 
       if ($isError)
         return isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.2)';
@@ -222,11 +229,10 @@ export const NumberButton = styled.button<{ $isActive?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 1;
+  min-height: 2.75rem;
   font-size: clamp(1.25rem, 3.5vw, 1.5rem);
   font-weight: 700;
-  background: ${({ theme, $isActive }) =>
-    $isActive ? theme.colors.foreground : 'transparent'};
+  background: ${({ theme, $isActive }) => ($isActive ? theme.colors.foreground : 'transparent')};
   border: 2px solid ${({ theme }) => theme.colors.foreground};
   border-radius: 0.625rem;
   color: ${({ theme, $isActive }) =>
@@ -253,7 +259,7 @@ export const NumberButton = styled.button<{ $isActive?: boolean }>`
   }
 
   &:focus-visible {
-    outline: 2px solid #2563eb;
+    outline: 2px solid ${FOCUS_BLUE};
     outline-offset: 2px;
   }
 
@@ -289,14 +295,13 @@ export const ActionButton = styled.button<{ $variant?: 'primary' | 'danger' }>`
         ? 'rgba(239, 68, 68, 0.1)'
         : 'transparent'};
   border: 2px solid
-    ${({ theme, $variant }) =>
-      $variant === 'danger' ? '#ef4444' : theme.colors.foreground};
+    ${({ theme, $variant }) => ($variant === 'danger' ? ERROR_RED : theme.colors.foreground)};
   border-radius: 0.625rem;
   color: ${({ theme, $variant }) =>
     $variant === 'primary'
       ? theme.colors.background
       : $variant === 'danger'
-        ? '#ef4444'
+        ? ERROR_RED
         : theme.colors.foreground};
   cursor: pointer;
   transition: all 120ms ease;
@@ -317,7 +322,7 @@ export const ActionButton = styled.button<{ $variant?: 'primary' | 'danger' }>`
   }
 
   &:focus-visible {
-    outline: 2px solid #2563eb;
+    outline: 2px solid ${FOCUS_BLUE};
     outline-offset: 2px;
   }
 
@@ -350,8 +355,7 @@ export const DifficultyTab = styled.button<{ $isActive: boolean }>`
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  background: ${({ $isActive, theme }) =>
-    $isActive ? theme.colors.foreground : 'transparent'};
+  background: ${({ $isActive, theme }) => ($isActive ? theme.colors.foreground : 'transparent')};
   border: none;
   border-radius: 0.375rem;
   color: ${({ theme, $isActive }) =>
@@ -377,18 +381,18 @@ export const DifficultyTab = styled.button<{ $isActive: boolean }>`
   }
 
   &:focus-visible {
-    outline: 2px solid #2563eb;
+    outline: 2px solid ${FOCUS_BLUE};
     outline-offset: -2px;
   }
 `;
 
-export const Section = styled.div`
+export const ControlGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
 `;
 
-export const SectionLabel = styled.span`
+export const ControlLabel = styled.span`
   font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -406,7 +410,7 @@ export const HighScoreItem = styled.div<{ $rank: number }>`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.foreground};
   background: ${({ $rank, theme }) =>
-    $rank === 1 ? 'rgba(251, 191, 36, 0.12)' : theme.colors.accent};
+    $rank === 1 ? BEST_TIME_GOLD : theme.colors.accent};
   border-radius: 0.375rem;
   font-variant-numeric: tabular-nums;
 
@@ -424,7 +428,7 @@ export const WinOverlay = styled(motion.div)`
   justify-content: center;
   gap: 1rem;
   background: ${({ theme }) =>
-    theme.colors.foreground === '#e8e8e8'
+    theme.mode === 'dark'
       ? 'rgba(0, 0, 0, 0.92)'
       : 'rgba(255, 255, 255, 0.97)'};
   backdrop-filter: blur(8px);
@@ -477,24 +481,10 @@ export const ErrorBadge = styled.div<{ $hasErrors: boolean }>`
   gap: 0.375rem;
   padding: 0.5rem 0.875rem;
   border: 1.5px solid
-    ${({ $hasErrors, theme }) => ($hasErrors ? '#ef4444' : theme.colors.border)};
+    ${({ $hasErrors, theme }) => ($hasErrors ? ERROR_RED : theme.colors.border)};
   border-radius: 2rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: ${({ $hasErrors, theme }) =>
-    $hasErrors ? '#dc2626' : theme.colors.secondary};
-  background: ${({ $hasErrors }) =>
-    $hasErrors ? 'rgba(239, 68, 68, 0.08)' : 'transparent'};
-`;
-
-export const ScreenReaderOnly = styled.span`
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  color: ${({ $hasErrors, theme }) => ($hasErrors ? ERROR_RED_TEXT : theme.colors.secondary)};
+  background: ${({ $hasErrors }) => ($hasErrors ? 'rgba(239, 68, 68, 0.08)' : 'transparent')};
 `;

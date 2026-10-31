@@ -1,155 +1,78 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
-import { render, screen, waitFor } from '@testing-library/react';
-import { App } from './App';
+import { render, screen } from '@testing-library/react';
 
-// Mock react-router-dom
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    BrowserRouter: ({ children }: { children: React.ReactNode }) => (
-      <div>{children}</div>
-    ),
-    Routes: ({ children }: { children: React.ReactNode }) => (
-      <div>{children}</div>
-    ),
-    Route: ({ element }: { element: React.ReactNode }) => <div>{element}</div>,
-    Navigate: () => null,
-  };
-});
-
-// Mock lazy loaded components
-vi.mock('@pages/Home', () => ({
+vi.mock('@pages/Home/Home', () => ({
   default: () => <div data-testid="home-page">Home Page</div>,
 }));
-
-vi.mock('@pages/NotFound', () => ({
+vi.mock('@pages/NotFound/NotFound', () => ({
   default: () => <div data-testid="not-found-page">Not Found Page</div>,
 }));
-
-// Mock Snowfall
 vi.mock('react-snowfall', () => ({
   default: () => <div data-testid="snowfall">Snowfall</div>,
 }));
-
-// Mock Footer
 vi.mock('@components/Footer/Footer', () => ({
   Footer: () => <footer data-testid="footer">Footer</footer>,
 }));
 
-// Mock Toast
-vi.mock('@components/Toast/Toast', () => ({
-  Toast: () => <div data-testid="toast">Toast</div>,
-}));
-
-// Mock Loader
-vi.mock('@components/Loader/Loader', () => ({
-  Loader: () => <div data-testid="loader">Loading...</div>,
-}));
-
-// Mock ErrorBoundary
-vi.mock('@components/ErrorBoundary/ErrorBoundary', () => ({
-  default: ({ children }: { children: React.ReactNode }) => (
-    <div>{children}</div>
-  ),
-}));
-
-// Mock AccessibilityContext
-vi.mock('@contexts/AccessibilityContext', () => ({
-  AccessibilityProvider: ({ children }: { children: React.ReactNode }) => (
-    <div>{children}</div>
-  ),
-  useAccessibility: () => ({
-    snowfallEnabled: false,
-    toast: { message: '', isVisible: false, icon: null, variant: 'info' },
-    hideToast: vi.fn(),
-  }),
-}));
+/* Routing is decided once from the URL at import time, so each case loads the module afresh. */
+const renderAt = async (url: string) => {
+  window.history.replaceState(null, '', url);
+  vi.resetModules();
+  const { App } = await import('./App');
+  render(
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>,
+  );
+};
 
 describe('App', () => {
-  afterEach(() => {
-    vi.clearAllMocks();
+  afterEach(() => window.history.replaceState(null, '', '/'));
+
+  it('renders the home page and footer at the root', async () => {
+    await renderAt('/');
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
+    expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should render without crashing', async () => {
-    render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>,
-    );
-
-    // App should render successfully
-    await waitFor(() => {
-      expect(document.body).toBeDefined();
-    });
+  it('turns an old page URL into the matching anchor of the single page', async () => {
+    await renderAt('/certifications');
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/');
+    expect(window.location.hash).toBe('#skills');
   });
 
-  it('should render the footer', async () => {
-    render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('footer')).toBeDefined();
-    });
+  it('shows the 404 page for an unknown path', async () => {
+    await renderAt('/nope');
+    expect(await screen.findByTestId('not-found-page')).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/nope');
   });
 
-  it('should render the toast component', async () => {
-    render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('toast')).toBeDefined();
-    });
+  it('sends /home to the root without an anchor', async () => {
+    await renderAt('/home');
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/');
+    expect(window.location.hash).toBe('');
   });
 
-  it('should not show snowfall when disabled', async () => {
-    render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>,
-    );
+  it('lets it snow in either theme once the intro is out of the way', async () => {
+    localStorage.setItem('snowfallEnabled', 'true');
+    localStorage.setItem('theme', 'light');
+    vi.spyOn(window, 'matchMedia').mockReturnValue({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    } as unknown as MediaQueryList);
+    await renderAt('/');
+    expect(await screen.findByTestId('snowfall')).toBeInTheDocument();
+    vi.restoreAllMocks();
+    localStorage.clear();
+  });
 
-    // Snowfall should not be visible when disabled - check immediately since it's mocked
+  it('holds the snow back until the intro has lifted', async () => {
+    localStorage.setItem('snowfallEnabled', 'true');
+    await renderAt('/');
+    await screen.findByTestId('home-page');
     expect(screen.queryByTestId('snowfall')).toBeNull();
-  });
-});
-
-describe('App with snowfall enabled', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.doMock('@contexts/AccessibilityContext', () => ({
-      AccessibilityProvider: ({ children }: { children: React.ReactNode }) => (
-        <div>{children}</div>
-      ),
-      useAccessibility: () => ({
-        snowfallEnabled: true,
-        toast: { message: '', isVisible: false, icon: null, variant: 'info' },
-        hideToast: vi.fn(),
-      }),
-    }));
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-    vi.clearAllMocks();
-  });
-
-  it('should show snowfall after delay when enabled', async () => {
-    // This test would need the real implementation with snowfall enabled
-    // For now, we're just testing that the App renders
-    render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>,
-    );
-
-    // App should still render
-    expect(document.body).toBeDefined();
   });
 });
