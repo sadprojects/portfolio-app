@@ -115,7 +115,7 @@ export const contentData: ContentData = {
     location: 'Bucharest, Romania',
     birthDate: '1996-09-18',
     firstJobDate: '2018-07-01',
-    profileImage: 'me.jpg',
+    profileImage: 'me.webp',
     cv: 'Silviu_Alexandru_Dinu_CV_EN.pdf',
   },
   education: [

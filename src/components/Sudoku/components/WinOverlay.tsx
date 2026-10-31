@@ -12,7 +12,7 @@ import {
 } from '../Sudoku.styles';
 import type { SudokuDifficulty } from '../types';
 
-export interface WinOverlayProps {
+interface WinOverlayProps {
   isComplete: boolean;
   elapsedTime: number;
   isNewBestTime: boolean;

@@ -9,7 +9,7 @@ export interface Rect {
   height: number;
 }
 
-export type Tone = keyof DefaultTheme['colors'];
+type Tone = keyof DefaultTheme['colors'];
 
 /* The see-through part of an artwork; everything around it is masked in the frame's tone, as far as --mask reaches. */
 export const Cutout = styled.div<{ $rect: Rect; $tone: Tone }>`

@@ -6,7 +6,7 @@ import { TimerDisplay } from '../Sudoku.styles';
 
 const TICK_MS = 1000;
 
-export interface TimerProps {
+interface TimerProps {
   startTime: number;
   isComplete: boolean;
 }

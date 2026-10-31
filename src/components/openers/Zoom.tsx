@@ -1,4 +1,4 @@
-import { OPENER_LINE, OPENER_SETTLES, OPENER_SPRING } from '@styles/motion';
+import { OPENER_FADE_IN, OPENER_SPRING } from '@styles/motion';
 import {
   motion,
   useScroll,
@@ -12,7 +12,7 @@ import styled from 'styled-components';
 const DEFAULT_START_SCALE = 2.2;
 
 const ZoomTrack = styled.div`
-  height: 290vh;
+  height: 240vh;
 `;
 
 const ZoomStage = styled.div`
@@ -33,7 +33,7 @@ interface ZoomProps {
   origin?: string;
   start?: number;
   width: string;
-  /** The zoomed content, given the opacity its line fades in and out with. */
+  /** The zoomed content, given the opacity its line fades in with. */
   children: (lineOpacity: MotionValue<number>) => ReactNode;
 }
 
@@ -49,8 +49,8 @@ export const Zoom = ({
     offset: ['start 70%', 'end end'],
   });
   const progress = useSpring(scrollYProgress, OPENER_SPRING);
-  const scale = useTransform(progress, OPENER_SETTLES, [start, 1]);
-  const lineOpacity = useTransform(progress, OPENER_LINE, [0, 1, 1, 0]);
+  const scale = useTransform(progress, [0, 1], [start, 1]);
+  const lineOpacity = useTransform(progress, OPENER_FADE_IN, [0, 1]);
 
   return (
     <ZoomTrack ref={ref}>

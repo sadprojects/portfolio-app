@@ -25,7 +25,7 @@ const Caption = styled(RevealText)<{ $align: Side }>`
   line-height: 1.25;
 `;
 
-export interface MediaBlockProps {
+interface MediaBlockProps {
   image: string;
   caption?: string;
   alt?: string;

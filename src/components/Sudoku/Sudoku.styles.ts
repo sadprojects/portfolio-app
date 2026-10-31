@@ -18,7 +18,7 @@ export const GameContainer = styled.div`
 
 export const BoardSection = styled.div`
   display: flex;
-  flex: 3 1 18rem;
+  flex: 3 1 16rem;
   flex-direction: column;
   gap: 1rem;
   min-width: 0;

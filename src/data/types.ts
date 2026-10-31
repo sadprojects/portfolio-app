@@ -77,7 +77,7 @@ export interface Skills {
   developmentTools: string[];
 }
 
-export interface SocialMediaLink {
+interface SocialMediaLink {
   name: string;
   url: string;
 }

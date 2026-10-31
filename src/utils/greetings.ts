@@ -1,7 +1,7 @@
 import { contentData } from '@data/content';
 
 type TimeOfDay = 'morning' | 'afternoon' | 'evening';
-export type GreetingKind = 'casual' | 'timeBased' | 'weather';
+type GreetingKind = 'casual' | 'timeBased' | 'weather';
 
 export interface WeatherData {
   temp: number;

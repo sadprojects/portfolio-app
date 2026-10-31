@@ -31,7 +31,6 @@ export const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-/** Scroll-driven openers settle with this spring. Their frame settles over the first part of their progress; their line fades in, holds to be read, and fades out again over these beats, leaving the screen clear before the section follows. */
+/** Scroll-driven openers settle with this spring and fade their line in over this part of their progress. */
 export const OPENER_SPRING = { stiffness: 80, damping: 24, mass: 0.4 };
-export const OPENER_SETTLES = [0, 0.55];
-export const OPENER_LINE = [0.04, 0.3, 0.74, 0.86];
+export const OPENER_FADE_IN = [0.05, 0.4];

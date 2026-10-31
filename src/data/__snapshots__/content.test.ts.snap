@@ -33,7 +33,7 @@ exports[`content > matches the approved copy 1`] = `
     "location": "Bucharest, Romania",
     "name": "Silviu Dinu",
     "position": "Lead Software Engineer",
-    "profileImage": "me.jpg",
+    "profileImage": "me.webp",
   },
   "education": [
     {

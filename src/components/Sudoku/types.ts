@@ -11,7 +11,7 @@ export interface CellPosition {
   col: number;
 }
 
-export interface HistoryEntry {
+interface HistoryEntry {
   row: number;
   col: number;
   previousValue: number;

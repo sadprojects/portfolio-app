@@ -1,6 +1,6 @@
 import { CellButton } from '../Sudoku.styles';
 
-export interface SudokuCellProps {
+interface SudokuCellProps {
   value: number;
   row: number;
   col: number;

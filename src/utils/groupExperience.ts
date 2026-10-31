@@ -1,6 +1,6 @@
 import type { Experience } from '@data/types';
 
-export interface CompanyTenure {
+interface CompanyTenure {
   company: string;
   city: string;
   startDate: string;

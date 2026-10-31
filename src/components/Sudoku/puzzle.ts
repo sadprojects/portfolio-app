@@ -52,7 +52,7 @@ const findEmptyCell = (puzzle: SudokuGrid): CellPosition | null => {
   return null;
 };
 
-export function solveSudoku(puzzle: SudokuGrid): SudokuGrid | false {
+function solveSudoku(puzzle: SudokuGrid): SudokuGrid | false {
   const grid = cloneGrid(puzzle);
 
   const fillNext = (): boolean => {
