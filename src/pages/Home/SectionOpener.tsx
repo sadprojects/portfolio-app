@@ -2,8 +2,8 @@ import { Statement } from '@components/motion/Statement';
 import { Camera } from '@components/openers/Camera';
 import { Laptop } from '@components/openers/Laptop';
 import { Resume } from '@components/openers/Resume';
-import { FadeIn, Zoom } from '@components/openers/Zoom';
-import { useReducedMotion } from 'framer-motion';
+import { Zoom } from '@components/openers/Zoom';
+import { motion, useReducedMotion } from 'framer-motion';
 
 import type { Section } from './sections';
 
@@ -18,6 +18,7 @@ export const SectionOpener = ({
 
   if (transition === 'camera') return <Camera intro={intro} photos={banners} />;
   if (!intro) return null;
+  if (reduceMotion) return <Statement {...intro} />;
   if (transition === 'resume') return <Resume intro={intro} />;
   if (transition === 'laptop') {
     return (
@@ -26,13 +27,12 @@ export const SectionOpener = ({
       </Laptop>
     );
   }
-  if (reduceMotion) return <Statement {...intro} />;
   return (
     <Zoom width="min(92vw, 72rem)">
-      {(progress) => (
-        <FadeIn progress={progress}>
+      {(opacity) => (
+        <motion.div style={{ opacity }}>
           <Statement {...intro} />
-        </FadeIn>
+        </motion.div>
       )}
     </Zoom>
   );

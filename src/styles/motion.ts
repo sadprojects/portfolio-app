@@ -30,3 +30,7 @@ export const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
+
+/** Scroll-driven openers settle with this spring and fade their line in over this part of their progress. */
+export const OPENER_SPRING = { stiffness: 80, damping: 24, mass: 0.4 };
+export const OPENER_FADE_IN = [0.05, 0.4];

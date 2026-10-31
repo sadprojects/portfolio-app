@@ -1,6 +1,7 @@
 import { MediaBlock } from '@components/motion/MediaBlock';
 import { Statement } from '@components/motion/Statement';
 import type { SectionBanner, SectionIntro } from '@data/types';
+import { OPENER_SPRING } from '@styles/motion';
 import {
   motion,
   useReducedMotion,
@@ -24,7 +25,6 @@ const READ_VIEWPORTS = 1;
 const ZOOM_VIEWPORTS = 1;
 const VIEWPORTS_PER_PHOTO = 0.6;
 const INTRO_FADE_OUT_START = 0.8;
-const CAMERA_SPRING = { stiffness: 80, damping: 24, mass: 0.4 };
 
 const CameraTrack = styled.div<{ $photos: number }>`
   height: calc(
@@ -167,7 +167,7 @@ export const Camera = ({ intro, photos }: CameraProps) => {
     target: ref,
     offset: ['start start', 'end end'],
   });
-  const progress = useSpring(scrollYProgress, CAMERA_SPRING);
+  const progress = useSpring(scrollYProgress, OPENER_SPRING);
 
   const runway =
     READ_VIEWPORTS + ZOOM_VIEWPORTS + (photos.length - 1) * VIEWPORTS_PER_PHOTO;

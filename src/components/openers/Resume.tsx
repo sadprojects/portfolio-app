@@ -1,85 +1,49 @@
-import { Statement } from '@components/motion/Statement';
 import type { SectionIntro } from '@data/types';
-import {
-  motion,
-  useReducedMotion,
-  useTransform,
-  type MotionValue,
-} from 'framer-motion';
+import type { MotionValue } from 'framer-motion';
 import styled from 'styled-components';
 
+import {
+  Cutout,
+  ScrollFrame,
+  Startup,
+  type Rect,
+  type WindowProps,
+} from './ScrollFrame';
 import { Zoom } from './Zoom';
 
+/* A portrait sheet whose margins, in % of its width, frame the section. */
+const SHEET_ASPECT = 0.8;
+const MARGIN = 7;
+const PAGE: Rect = {
+  left: MARGIN,
+  top: MARGIN * SHEET_ASPECT,
+  width: 100 - 2 * MARGIN,
+  height: 100 - 2 * MARGIN * SHEET_ASPECT,
+};
 const START_SCALE = 2.6;
-const HIGHLIGHT_FADE_IN = [0.05, 0.4];
-const TEMPLATE_FADE_IN = [0.35, 0.75];
-const CHIP_WIDTHS = ['18%', '12%', '22%', '15%', '10%', '19%'];
+const OPENER_WIDTH = 'min(92vw, 70vh)';
+/* Pinned, the page runs nearly edge to edge, clear of the section dots on the right, and taller than the viewport. */
+const PINNED_WIDTH = '88vw';
 
-const Paper = styled.div`
-  display: grid;
-  grid-template-rows: 1fr auto 1fr;
-  gap: clamp(1rem, 2.4vw, 2rem);
-  height: min(86vh, 58rem);
-  aspect-ratio: 1 / 1.3;
-  margin: 0 auto;
-  padding: clamp(1.25rem, 3vw, 3rem);
+const Sheet = styled.div`
+  position: relative;
+  aspect-ratio: ${SHEET_ASPECT};
+  overflow: hidden;
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 4px;
-  background: ${({ theme }) => theme.colors.card};
-  box-shadow: ${({ theme }) => theme.shadows.xl};
-
-  @media (max-width: 768px) {
-    height: auto;
-    width: 100%;
-    aspect-ratio: auto;
-  }
+  box-shadow:
+    ${({ theme }) => theme.shadows.xl},
+    0 0 0 200vmax ${({ theme }) => theme.colors.background};
 `;
 
-const PlaceholderBlock = styled(motion.div)`
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-
-  &:last-child {
-    align-self: end;
-  }
-`;
-
-const PlaceholderBar = styled.span<{
-  $width?: string;
-  $height?: string;
-  $dark?: boolean;
-}>`
-  display: block;
-  width: ${({ $width }) => $width ?? '100%'};
-  height: ${({ $height }) => $height ?? '0.45rem'};
-  border-radius: 999px;
-  background: ${({ theme, $dark }) =>
-    $dark ? theme.colors.secondary : theme.colors.border};
-  opacity: ${({ $dark }) => ($dark ? 0.7 : 1)};
-`;
-
-const PlaceholderChips = styled.span`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.25rem;
-
-  ${PlaceholderBar} {
-    height: 1.1rem;
-    border-radius: 999px;
-  }
-`;
-
-const PlaceholderGap = styled.span`
-  display: block;
-  height: 0.6rem;
-`;
-
-const Highlight = styled(motion.div)`
+/* Narrow enough to stay inside the viewport while the sheet arrives at full zoom. */
+const Highlight = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  width: 100%;
+  max-width: 34rem;
+  padding: 0 6%;
 `;
 
 const HighlightLabel = styled.p`
@@ -99,51 +63,46 @@ const HighlightText = styled.p`
   letter-spacing: -0.01em;
 `;
 
-interface ResumeSheetProps {
-  progress: MotionValue<number>;
+interface ResumeFrameProps {
+  startupOpacity: MotionValue<number>;
   intro: SectionIntro;
 }
 
-const ResumeSheet = ({ progress, intro }: ResumeSheetProps) => {
-  const highlightOpacity = useTransform(progress, HIGHLIGHT_FADE_IN, [0, 1]);
-  const templateOpacity = useTransform(progress, TEMPLATE_FADE_IN, [0, 1]);
-  return (
-    <Paper>
-      <PlaceholderBlock style={{ opacity: templateOpacity }}>
-        <PlaceholderBar $width="42%" $height="1.1rem" $dark />
-        <PlaceholderBar $width="30%" />
-        <PlaceholderGap />
-        <PlaceholderBar $width="16%" $dark />
-        <PlaceholderBar />
-        <PlaceholderBar />
-        <PlaceholderBar $width="72%" />
-      </PlaceholderBlock>
-      <Highlight style={{ opacity: highlightOpacity }}>
-        <HighlightLabel>{intro.label}</HighlightLabel>
-        <HighlightText>{intro.text}</HighlightText>
-      </Highlight>
-      <PlaceholderBlock style={{ opacity: templateOpacity }}>
-        <PlaceholderBar $width="12%" $dark />
-        <PlaceholderChips>
-          {CHIP_WIDTHS.map((width) => (
-            <PlaceholderBar key={width} $width={width} />
-          ))}
-        </PlaceholderChips>
-        <PlaceholderGap />
-        <PlaceholderBar $width="18%" $dark />
-        <PlaceholderBar $width="88%" />
-        <PlaceholderBar $width="56%" />
-      </PlaceholderBlock>
-    </Paper>
-  );
-};
+const ResumeFrame = ({ startupOpacity, intro }: ResumeFrameProps) => (
+  <Sheet>
+    <Cutout $rect={PAGE} $tone="card">
+      <Startup style={{ opacity: startupOpacity }}>
+        <Highlight>
+          <HighlightLabel>{intro.label}</HighlightLabel>
+          <HighlightText>{intro.text}</HighlightText>
+        </Highlight>
+      </Startup>
+    </Cutout>
+  </Sheet>
+);
 
-export const Resume = ({ intro }: { intro: SectionIntro }) => {
-  const reduceMotion = useReducedMotion();
-  if (reduceMotion) return <Statement {...intro} />;
-  return (
-    <Zoom start={START_SCALE} width="min(92vw, 60rem)">
-      {(progress) => <ResumeSheet progress={progress} intro={intro} />}
-    </Zoom>
-  );
-};
+/** Opener alone: the sheet zooms out to show its highlight; the section follows below. */
+export const Resume = ({ intro }: { intro: SectionIntro }) => (
+  <Zoom start={START_SCALE} width={OPENER_WIDTH}>
+    {(startupOpacity) => (
+      <ResumeFrame startupOpacity={startupOpacity} intro={intro} />
+    )}
+  </Zoom>
+);
+
+/** The sheet stays pinned while the section scrolls down its page, then shrinks away. */
+export const ResumeWindow = ({ id, intro, children }: WindowProps) => (
+  <ScrollFrame
+    id={id}
+    width={PINNED_WIDTH}
+    aspect={SHEET_ASPECT}
+    cutout={PAGE}
+    tone="card"
+    start={START_SCALE}
+    artwork={(startupOpacity) => (
+      <ResumeFrame startupOpacity={startupOpacity} intro={intro} />
+    )}
+  >
+    {children}
+  </ScrollFrame>
+);

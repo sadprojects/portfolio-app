@@ -16,7 +16,7 @@ const alias = Object.fromEntries(
     '@styles': 'src/styles',
     '@utils': 'src/utils',
     '@lib': 'src/lib',
-  }).map(([k, v]) => [k, path.resolve(__dirname, v)]),
+  }).map(([k, v]) => [k, path.resolve(import.meta.dirname, v)]),
 );
 
 // Vendor chunks keyed by package so a content change doesn't bust the whole bundle cache.
