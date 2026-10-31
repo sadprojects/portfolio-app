@@ -1,42 +1,65 @@
+import { contentData } from '@data/content';
 import type { SectionIntro } from '@data/types';
-import type { MotionValue } from 'framer-motion';
+import { motion, type MotionStyle, type MotionValue } from 'framer-motion';
 import styled from 'styled-components';
 
-import {
-  Cutout,
-  ScrollFrame,
-  Startup,
-  type Rect,
-  type WindowProps,
-} from './ScrollFrame';
+import { Cutout, Startup, type Rect } from './Cutout';
 import { Zoom } from './Zoom';
 
-/* A portrait sheet whose margins, in % of its width, frame the section. */
-const SHEET_ASPECT = 0.8;
-const MARGIN = 7;
+/* A document viewer with the laptop screen's proportions: a slim title bar, then the page. */
+const WINDOW_ASPECT = 1.5;
+const TITLE_BAR_HEIGHT = 5;
 const PAGE: Rect = {
-  left: MARGIN,
-  top: MARGIN * SHEET_ASPECT,
-  width: 100 - 2 * MARGIN,
-  height: 100 - 2 * MARGIN * SHEET_ASPECT,
+  left: 0,
+  top: TITLE_BAR_HEIGHT,
+  width: 100,
+  height: 100 - TITLE_BAR_HEIGHT,
 };
-const START_SCALE = 2.6;
-const OPENER_WIDTH = 'min(92vw, 70vh)';
-/* Pinned, the page runs nearly edge to edge, clear of the section dots on the right, and taller than the viewport. */
-const PINNED_WIDTH = '88vw';
+const DOCK_SCALE = 0.06;
+const OPENER_WIDTH = 'min(92vw, 64rem)';
 
-const Sheet = styled.div`
+const Viewer = styled(motion.div)`
   position: relative;
-  aspect-ratio: ${SHEET_ASPECT};
+  aspect-ratio: ${WINDOW_ASPECT};
   overflow: hidden;
   border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 4px;
-  box-shadow:
-    ${({ theme }) => theme.shadows.xl},
-    0 0 0 200vmax ${({ theme }) => theme.colors.background};
+  border-radius: 10px;
+  box-shadow: ${({ theme }) => theme.shadows.xl};
 `;
 
-/* Narrow enough to stay inside the viewport while the sheet arrives at full zoom. */
+const TitleBar = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: ${TITLE_BAR_HEIGHT}%;
+  display: grid;
+  place-items: center;
+  background: ${({ theme }) => theme.colors.background};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: clamp(0.55rem, 0.85vw, 0.8rem);
+  letter-spacing: 0.04em;
+  color: ${({ theme }) => theme.colors.secondary};
+`;
+
+const WindowControls = styled.span`
+  position: absolute;
+  left: 1.2%;
+  top: 50%;
+  display: flex;
+  gap: 0.55em;
+  translate: 0 -50%;
+
+  span {
+    width: 0.8em;
+    height: 0.8em;
+    border-radius: 50%;
+    background: ${({ theme }) => theme.colors.border};
+  }
+`;
+
+/* Narrow enough to stay inside the viewport at full zoom in the phone opener. */
 const Highlight = styled.div`
   display: flex;
   flex-direction: column;
@@ -64,45 +87,45 @@ const HighlightText = styled.p`
 `;
 
 interface ResumeFrameProps {
-  startupOpacity: MotionValue<number>;
+  /** Opacity of the first page, which carries the section's line and fades to let the section through. */
+  firstPageOpacity: MotionValue<number>;
   intro: SectionIntro;
+  className?: string;
+  style?: MotionStyle;
 }
 
-const ResumeFrame = ({ startupOpacity, intro }: ResumeFrameProps) => (
-  <Sheet>
+/** The CV as a viewer window: a title bar with the file name over a page that shows what is behind it. */
+export const ResumeFrame = ({
+  firstPageOpacity,
+  intro,
+  className,
+  style,
+}: ResumeFrameProps) => (
+  <Viewer className={className} style={style}>
     <Cutout $rect={PAGE} $tone="card">
-      <Startup style={{ opacity: startupOpacity }}>
+      <Startup style={{ opacity: firstPageOpacity }}>
         <Highlight>
           <HighlightLabel>{intro.label}</HighlightLabel>
           <HighlightText>{intro.text}</HighlightText>
         </Highlight>
       </Startup>
     </Cutout>
-  </Sheet>
+    <TitleBar aria-hidden="true">
+      <WindowControls>
+        <span />
+        <span />
+        <span />
+      </WindowControls>
+      {contentData.contact.cv}
+    </TitleBar>
+  </Viewer>
 );
 
-/** Opener alone: the sheet zooms out to show its highlight; the section follows below. */
+/** Opener alone: the viewer opens up to show its first page; the section follows below. */
 export const Resume = ({ intro }: { intro: SectionIntro }) => (
-  <Zoom start={START_SCALE} width={OPENER_WIDTH}>
-    {(startupOpacity) => (
-      <ResumeFrame startupOpacity={startupOpacity} intro={intro} />
+  <Zoom start={DOCK_SCALE} origin="50% 100%" width={OPENER_WIDTH}>
+    {(lineOpacity) => (
+      <ResumeFrame firstPageOpacity={lineOpacity} intro={intro} />
     )}
   </Zoom>
-);
-
-/** The sheet stays pinned while the section scrolls down its page, then shrinks away. */
-export const ResumeWindow = ({ id, intro, children }: WindowProps) => (
-  <ScrollFrame
-    id={id}
-    width={PINNED_WIDTH}
-    aspect={SHEET_ASPECT}
-    cutout={PAGE}
-    tone="card"
-    start={START_SCALE}
-    artwork={(startupOpacity) => (
-      <ResumeFrame startupOpacity={startupOpacity} intro={intro} />
-    )}
-  >
-    {children}
-  </ScrollFrame>
 );

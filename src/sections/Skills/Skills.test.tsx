@@ -21,6 +21,9 @@ describe('Skills & Credentials', () => {
     contentData.skills.professional.forEach((skill) => {
       expect(screen.getByText(skill.name)).toBeInTheDocument();
     });
+    expect(screen.getAllByText(/^\d+%$/)).toHaveLength(
+      contentData.skills.professional.length,
+    );
   });
 
   it('filters the grid by category', () => {

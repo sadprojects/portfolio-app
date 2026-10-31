@@ -67,6 +67,8 @@ export interface Skill {
   name: string;
   /** Groups skills in the filter bar, e.g. 'Frontend'. */
   category: string;
+  /** Self-assessed, 0–100. */
+  level: number;
 }
 
 export interface Skills {

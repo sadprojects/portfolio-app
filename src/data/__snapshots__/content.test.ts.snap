@@ -486,62 +486,77 @@ exports[`content > matches the approved copy 1`] = `
     "professional": [
       {
         "category": "Frontend",
+        "level": 95,
         "name": "JavaScript",
       },
       {
         "category": "Frontend",
+        "level": 90,
         "name": "TypeScript",
       },
       {
         "category": "Frontend",
+        "level": 95,
         "name": "React",
       },
       {
         "category": "Frontend",
+        "level": 86,
         "name": "Angular",
       },
       {
         "category": "Frontend",
+        "level": 75,
         "name": "AngularJS",
       },
       {
         "category": "Frontend",
+        "level": 65,
         "name": "Vue.js",
       },
       {
         "category": "Frontend",
+        "level": 90,
         "name": "HTML & CSS",
       },
       {
         "category": "Backend & data",
+        "level": 80,
         "name": "Node.js & Express",
       },
       {
         "category": "Backend & data",
+        "level": 82,
         "name": "REST APIs",
       },
       {
         "category": "Backend & data",
+        "level": 68,
         "name": "WebSockets & Socket.io",
       },
       {
         "category": "Backend & data",
+        "level": 72,
         "name": "MongoDB",
       },
       {
         "category": "Backend & data",
+        "level": 57,
         "name": "PHP",
       },
       {
         "category": "AI & data",
+        "level": 72,
         "name": "Python & PyTorch",
       },
       {
         "category": "AI & data",
+        "level": 68,
         "name": "Neural networks",
       },
       {
         "category": "AI & data",
+        "level": 75,
         "name": "AI agents & MCP",
       },
     ],

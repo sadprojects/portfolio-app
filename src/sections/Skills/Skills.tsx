@@ -1,6 +1,7 @@
 import { Scrub } from '@components/motion/Scrub';
 import { SectionHeading } from '@components/ui/SectionHeading';
 import { contentData } from '@data/content';
+import type { Skill } from '@data/types';
 import { useTilt } from '@hooks/useTilt';
 import { lift, stagger } from '@styles/motion';
 import { LayoutGroup, motion } from 'framer-motion';
@@ -72,10 +73,11 @@ const SkillGrid = styled(motion.div)`
 `;
 
 const Tile = styled(motion.div)`
+  position: relative;
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1.1rem 1.25rem;
+  padding: 1.1rem 1.25rem 1.6rem;
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   background: ${({ theme }) => `${theme.colors.card}e6`};
@@ -102,6 +104,30 @@ const SkillCategory = styled.div`
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: ${({ theme }) => theme.colors.secondary};
+`;
+
+const SkillLevel = styled.span`
+  margin-left: auto;
+  font-family: ${({ theme }) => theme.typography.fonts.display};
+  font-size: 1.4rem;
+  line-height: 1;
+`;
+
+const LevelBar = styled.span<{ $level: number }>`
+  position: absolute;
+  left: 1.25rem;
+  right: 1.25rem;
+  bottom: 0.8rem;
+  height: 2px;
+  background: ${({ theme }) => theme.colors.border};
+
+  &::after {
+    content: '';
+    display: block;
+    width: ${({ $level }) => $level}%;
+    height: 100%;
+    background: ${({ theme }) => theme.colors.foreground};
+  }
 `;
 
 const SubHeading = styled.h3`
@@ -247,12 +273,7 @@ const Chip = styled.span`
   font-weight: 500;
 `;
 
-interface SkillTileProps {
-  name: string;
-  category: string;
-}
-
-const SkillTile = ({ name, category }: SkillTileProps) => {
+const SkillTile = ({ name, category, level }: Skill) => {
   const tilt = useTilt(TILE_TILT_DEGREES);
   return (
     <Tile layout {...tilt}>
@@ -260,6 +281,8 @@ const SkillTile = ({ name, category }: SkillTileProps) => {
         <SkillName>{name}</SkillName>
         <SkillCategory>{category}</SkillCategory>
       </TileText>
+      <SkillLevel>{level}%</SkillLevel>
+      <LevelBar $level={level} aria-hidden="true" />
     </Tile>
   );
 };

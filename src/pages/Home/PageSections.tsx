@@ -1,6 +1,5 @@
-import { LaptopWindow } from '@components/openers/Laptop';
-import { ResumeWindow } from '@components/openers/Resume';
-import type { WindowProps } from '@components/openers/ScrollFrame';
+import { Desk, type DeskApp } from '@components/openers/Desk';
+import type { SectionId } from '@data/types';
 import { useMediaQuery } from '@hooks/useMediaQuery';
 import { Grid, col } from '@styles/grid';
 import { useReducedMotion } from 'framer-motion';
@@ -8,14 +7,12 @@ import { Fragment, Suspense, type ComponentType } from 'react';
 import styled from 'styled-components';
 
 import { SectionOpener } from './SectionOpener';
-import { SECTIONS, type Section } from './sections';
+import { SECTIONS } from './sections';
 
 const PHONE = '(max-width: 768px)';
 
-/* Frames that keep the section inside them on wide screens; phones and reduced motion get the opener alone. */
-const WINDOWS: Partial<
-  Record<NonNullable<Section['transition']>, ComponentType<WindowProps>>
-> = { laptop: LaptopWindow, resume: ResumeWindow };
+/* On wide screens one laptop hosts these two: the first on its screen, the second opened from its dock as the CV. Phones and reduced motion get an opener and the body for each. */
+const DESK: [SectionId, SectionId] = ['projects', 'skills'];
 
 const SectionBody = styled.section`
   padding: clamp(1rem, 3vw, 4rem) 0 clamp(4rem, 8vw, 10rem);
@@ -31,26 +28,35 @@ const SectionPlaceholder = styled.div`
   min-height: 60vh;
 `;
 
+const sectionBody = (Component: ComponentType) => (
+  <Suspense fallback={<SectionPlaceholder />}>
+    <Component />
+  </Suspense>
+);
+
+// Both desk sections are registered with a body and an intro; sections.test guards it.
+const deskApp = (id: SectionId): DeskApp => {
+  const { Component, intro } = SECTIONS.find((section) => section.id === id)!;
+  return { id, intro: intro!, body: sectionBody(Component!) };
+};
+
 export const PageSections = () => {
   const reduceMotion = useReducedMotion();
   const phone = useMediaQuery(PHONE);
+  const desk = !reduceMotion && !phone;
 
   return (
     <>
       {SECTIONS.map(({ id, Component, transition, intro, banners }) => {
         if (!Component) return null;
-        const body = (
-          <Suspense fallback={<SectionPlaceholder />}>
-            <Component />
-          </Suspense>
-        );
-        const Window = transition && WINDOWS[transition];
-        if (Window && intro && !reduceMotion && !phone) {
-          return (
-            <Window key={id} id={id} intro={intro}>
-              {body}
-            </Window>
-          );
+        if (desk && DESK.includes(id)) {
+          return id === DESK[0] ? (
+            <Desk
+              key={id}
+              onScreen={deskApp(DESK[0])}
+              inDock={deskApp(DESK[1])}
+            />
+          ) : null;
         }
         return (
           <Fragment key={id}>
@@ -61,7 +67,7 @@ export const PageSections = () => {
             />
             <SectionBody data-section={id}>
               <Grid>
-                <SectionInset>{body}</SectionInset>
+                <SectionInset>{sectionBody(Component)}</SectionInset>
               </Grid>
             </SectionBody>
           </Fragment>

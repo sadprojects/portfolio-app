@@ -46,13 +46,16 @@ describe('section openers', () => {
     ).toBeInTheDocument();
   });
 
-  it('keep projects and skills inside their frames on wide screens', () => {
+  it('host projects and skills on one laptop on wide screens', () => {
     const { container } = renderSections();
-    const projects = container.querySelector('[data-section="projects"]')!;
-    const skills = container.querySelector('[data-section="skills"]')!;
-    expect(projects).toContainElement(container.querySelector(LAPTOP));
-    expect(skills).toContainElement(
-      screen.getByText(contentData.sections.skills.intro!.label),
+    const laptops = container.querySelectorAll(LAPTOP);
+    expect(laptops).toHaveLength(1);
+    const desk = laptops[0].closest('section')!;
+    expect(desk).toContainElement(
+      container.querySelector('[data-section="projects"]'),
+    );
+    expect(desk).toContainElement(
+      container.querySelector('[data-section="skills"]'),
     );
     expect(container.querySelectorAll('[data-section]')).toHaveLength(4);
   });
