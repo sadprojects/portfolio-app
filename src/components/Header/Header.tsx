@@ -1,17 +1,15 @@
 import { useSnowfall } from '@contexts/SnowfallContext';
 import { useTheme } from '@contexts/ThemeContext';
 import type { Section } from '@pages/Home/sections';
-import { motion } from 'framer-motion';
 import { Menu, Moon, Snowflake, Sun } from 'lucide-react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { MobileMenu } from './MobileMenu';
-import { useHeaderVisibility } from './useHeaderVisibility';
 
-const HeaderBar = styled(motion.header)`
-  position: sticky;
-  top: 0;
+/* Only at the top of the page; it scrolls away with it. */
+const HeaderBar = styled.header`
+  position: relative;
   z-index: 100;
   background-color: ${({ theme }) => `${theme.colors.background}40`};
   border-bottom: 1px solid ${({ theme }) => `${theme.colors.border}30`};
@@ -127,20 +125,6 @@ const DesktopToggles = styled.div`
   }
 `;
 
-const HoverTriggerZone = styled.div<{ $isActive: boolean }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  z-index: 99;
-  pointer-events: ${({ $isActive }) => ($isActive ? 'auto' : 'none')};
-
-  @media (max-width: 1024px) {
-    display: none;
-  }
-`;
-
 interface HeaderProps {
   sections?: Section[];
   onNavigate?: (sectionId: string) => void;
@@ -150,7 +134,6 @@ export const Header = ({ sections = [], onNavigate }: HeaderProps = {}) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { mode, toggleTheme } = useTheme();
   const { enabled: snowing, toggle: toggleSnowfall } = useSnowfall();
-  const visibility = useHeaderVisibility(menuOpen);
 
   const closeMenu = () => setMenuOpen(false);
   const navigate = (sectionId: string) => {
@@ -175,47 +158,34 @@ export const Header = ({ sections = [], onNavigate }: HeaderProps = {}) => {
   );
 
   return (
-    <>
-      <HoverTriggerZone
-        $isActive={visibility.hidden}
-        onMouseEnter={visibility.hoverIn}
-      />
-      <HeaderBar
-        initial={{ y: 0 }}
-        animate={{ y: visibility.visible ? 0 : '-100%' }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        onMouseEnter={visibility.hoverIn}
-        onMouseLeave={visibility.hoverOut}
-        onFocus={visibility.show}
-      >
-        <Nav>
-          <Logo
-            onClick={() => onNavigate?.('home')}
-            aria-label="Silviu Dinu, back to top"
-          >
-            Silviu Dinu
-          </Logo>
+    <HeaderBar>
+      <Nav>
+        <Logo
+          onClick={() => onNavigate?.('home')}
+          aria-label="Silviu Dinu, back to top"
+        >
+          Silviu Dinu
+        </Logo>
 
-          <RightActions>
-            <DesktopToggles>{toggles}</DesktopToggles>
-            <MobileMenuButton
-              onClick={() => setMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu size={24} />
-            </MobileMenuButton>
-          </RightActions>
-
-          <MobileMenu
-            open={menuOpen}
-            sections={sections}
-            onNavigate={navigate}
-            onClose={closeMenu}
+        <RightActions>
+          <DesktopToggles>{toggles}</DesktopToggles>
+          <MobileMenuButton
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
           >
-            {toggles}
-          </MobileMenu>
-        </Nav>
-      </HeaderBar>
-    </>
+            <Menu size={24} />
+          </MobileMenuButton>
+        </RightActions>
+
+        <MobileMenu
+          open={menuOpen}
+          sections={sections}
+          onNavigate={navigate}
+          onClose={closeMenu}
+        >
+          {toggles}
+        </MobileMenu>
+      </Nav>
+    </HeaderBar>
   );
 };

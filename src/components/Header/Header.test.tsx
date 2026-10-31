@@ -172,27 +172,4 @@ describe('Header behaviour', () => {
       expect(screen.queryByLabelText('Close menu')).toBeNull(),
     );
   });
-
-  it('hides on the way down, shows on the way up, and stays while the pointer is at the top', () => {
-    setup();
-    const scrollTo = (y: number) => {
-      Object.defineProperty(window, 'scrollY', {
-        value: y,
-        configurable: true,
-      });
-      fireEvent.scroll(window);
-    };
-    scrollTo(200);
-    scrollTo(400); // down: hidden
-    const header = screen.getByRole('banner');
-    fireEvent.mouseEnter(header); // hover keeps it out
-    fireEvent.mouseLeave(header);
-    fireEvent.mouseEnter(header); // back before the leave timer fires
-    scrollTo(300); // up, still past the top band: shown
-    scrollTo(50); // in the top band: shown
-    scrollTo(60); // down but inside the band: unchanged
-    fireEvent.click(screen.getByLabelText('Open menu'));
-    scrollTo(500); // never hides while the menu is open
-    expect(screen.getByLabelText('Close menu')).toBeInTheDocument();
-  });
 });
