@@ -7,20 +7,17 @@ import {
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 
-import { Cutout, Startup, type Rect } from './Cutout';
+import { Cutout, Startup } from './Cutout';
 import { ARTWORK, HINGE, SCREEN, SCREEN_CENTRE } from './laptopArtwork';
 import { Zoom } from './Zoom';
 
 const OPENER_WIDTH = 'min(94vw, 80rem)';
 
-/* The lid minus its screen, so whatever is behind shows through. */
-const lidCutout = ({ left, top, width, height }: Rect) =>
-  `polygon(evenodd, 0 0, 100% 0, 100% ${HINGE}%, 0 ${HINGE}%, 0 0, ${left}% ${top}%, ${left + width}% ${top}%, ${left + width}% ${top + height}%, ${left}% ${top + height}%, ${left}% ${top}%)`;
-
 const Shell = styled.div`
   position: relative;
   aspect-ratio: ${ARTWORK.width} / ${ARTWORK.height};
-  perspective: 6000px;
+  perspective: 3200px;
+  perspective-origin: 50% ${HINGE}%;
 
   img {
     position: absolute;
@@ -36,21 +33,13 @@ const Mask = motion.create(styled(Cutout)`
   pointer-events: none;
 `);
 
-/* Folds down around the hinge, towards the viewer, when the laptop closes. */
+/* Folds down around the hinge, towards the viewer, when the laptop closes. Its artwork has the screen cut out, so nothing here needs a clip. */
 const Lid = styled(motion.div)`
   position: absolute;
   inset: 0;
   transform-origin: 50% ${HINGE}%;
   backface-visibility: hidden;
   will-change: transform;
-
-  img {
-    clip-path: ${lidCutout(SCREEN)};
-  }
-`;
-
-const Base = styled.img`
-  clip-path: inset(${HINGE}% 0 0 0);
 `;
 
 /* The screen's box inside the lid, with its gloss; the mask around it is the frame's, not the lid's. */
@@ -113,13 +102,13 @@ export const LaptopFrame = ({
           {screenOff && <ScreenOff style={{ opacity: screenOff }} />}
         </Screen>
         <img
-          src="/media/images/laptop.svg"
+          src="/media/images/laptop-lid.svg"
           alt=""
           width={ARTWORK.width}
           height={ARTWORK.height}
         />
       </Lid>
-      <Base src="/media/images/laptop.svg" alt="" aria-hidden="true" />
+      <img src="/media/images/laptop-base.svg" alt="" aria-hidden="true" />
     </Shell>
   );
 };

@@ -8,7 +8,6 @@ export const SECRET_CODE = 'b25111996b';
 export const SECRET_CODE_TIMEOUT_MS = 10_000;
 
 export const DIFFICULTIES: SudokuDifficulty[] = [
-  'beginner',
   'easy',
   'medium',
   'hard',
@@ -18,7 +17,6 @@ export const DIFFICULTIES: SudokuDifficulty[] = [
 export const DEFAULT_DIFFICULTY: SudokuDifficulty = 'medium';
 
 export const CELLS_REMOVED_BY_DIFFICULTY: Record<SudokuDifficulty, number> = {
-  beginner: 25,
   easy: 35,
   medium: 45,
   hard: 52,

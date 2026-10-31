@@ -24,12 +24,12 @@ describe('WinOverlay', () => {
 
   it('should not render when isComplete is false', () => {
     renderWithTheme(<WinOverlay {...defaultProps} isComplete={false} />);
-    expect(screen.queryByText(/Puzzle Complete!/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Solved\./i)).not.toBeInTheDocument();
   });
 
   it('should render puzzle complete message when isComplete is true', () => {
     renderWithTheme(<WinOverlay {...defaultProps} />);
-    expect(screen.getByText(/Puzzle Complete!/i)).toBeInTheDocument();
+    expect(screen.getByText(/Solved\./i)).toBeInTheDocument();
   });
 
   it('should display formatted time', () => {
@@ -39,19 +39,12 @@ describe('WinOverlay', () => {
 
   it('should show new record badge when isNewBestTime is true', () => {
     renderWithTheme(<WinOverlay {...defaultProps} isNewBestTime={true} />);
-    expect(screen.getByText(/New Record!/i)).toBeInTheDocument();
+    expect(screen.getByText(/New best/i)).toBeInTheDocument();
   });
 
   it('should not show new record badge when isNewBestTime is false', () => {
     renderWithTheme(<WinOverlay {...defaultProps} isNewBestTime={false} />);
-    expect(screen.queryByText(/New Record!/i)).not.toBeInTheDocument();
-  });
-
-  it('should render trophy icon', () => {
-    const { container } = renderWithTheme(<WinOverlay {...defaultProps} />);
-    const svg = container.querySelector('svg');
-    expect(svg).toBeInTheDocument();
-    expect(svg).toHaveClass('lucide-trophy');
+    expect(screen.queryByText(/New best/i)).not.toBeInTheDocument();
   });
 
   it('should call onPlayAgain with difficulty when Play Again button is clicked', async () => {

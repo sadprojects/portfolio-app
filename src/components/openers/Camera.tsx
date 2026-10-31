@@ -3,6 +3,7 @@ import { Statement } from '@components/motion/Statement';
 import type { SectionBanner, SectionIntro } from '@data/types';
 import { OPENER_SPRING } from '@styles/motion';
 import {
+  easeOut,
   motion,
   useReducedMotion,
   useScroll,
@@ -21,6 +22,8 @@ const SCREEN_CENTRE = {
   y: SCREEN.top + SCREEN.height / 2,
 };
 const ZOOM = 1.8;
+/* The camera rises into place from below the viewport over this much scroll once its stage has pinned. */
+const ENTER_VIEWPORTS = 0.5;
 const READ_VIEWPORTS = 1.2;
 const ZOOM_VIEWPORTS = 1.2;
 const VIEWPORTS_PER_PHOTO = 0.75;
@@ -28,7 +31,7 @@ const INTRO_FADE_OUT_START = 0.8;
 
 const CameraTrack = styled.div<{ $photos: number }>`
   height: calc(
-    ${(READ_VIEWPORTS + ZOOM_VIEWPORTS + 1) * 100}vh +
+    ${(ENTER_VIEWPORTS + READ_VIEWPORTS + ZOOM_VIEWPORTS + 1) * 100}vh +
       ${({ $photos }) => ($photos - 1) * VIEWPORTS_PER_PHOTO * 100}vh
   );
 `;
@@ -41,6 +44,10 @@ const CameraStage = styled.div`
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
+`;
+
+const Entrance = styled(motion.div)`
+  will-change: transform;
 `;
 
 const CameraBody = styled(motion.div)`
@@ -170,10 +177,17 @@ export const Camera = ({ intro, photos }: CameraProps) => {
   const progress = useSpring(scrollYProgress, OPENER_SPRING);
 
   const runway =
-    READ_VIEWPORTS + ZOOM_VIEWPORTS + (photos.length - 1) * VIEWPORTS_PER_PHOTO;
-  const zoomStart = READ_VIEWPORTS / runway;
-  const zoomEnd = (READ_VIEWPORTS + ZOOM_VIEWPORTS) / runway;
+    ENTER_VIEWPORTS +
+    READ_VIEWPORTS +
+    ZOOM_VIEWPORTS +
+    (photos.length - 1) * VIEWPORTS_PER_PHOTO;
+  const enterEnd = ENTER_VIEWPORTS / runway;
+  const zoomStart = (ENTER_VIEWPORTS + READ_VIEWPORTS) / runway;
+  const zoomEnd = zoomStart + ZOOM_VIEWPORTS / runway;
 
+  const entry = useTransform(progress, [0, enterEnd], ['100vh', '0vh'], {
+    ease: easeOut,
+  });
   const scale = useTransform(progress, [zoomStart, zoomEnd], [1, ZOOM]);
   const startupOpacity = useTransform(
     progress,
@@ -218,46 +232,48 @@ export const Camera = ({ intro, photos }: CameraProps) => {
   return (
     <CameraTrack ref={ref} $photos={photos.length}>
       <CameraStage>
-        <CameraBody
-          style={{
-            scale,
-            x: `${50 - SCREEN_CENTRE.x}%`,
-            y: `${50 - SCREEN_CENTRE.y}%`,
-            transformOrigin: `${SCREEN_CENTRE.x}% ${SCREEN_CENTRE.y}%`,
-          }}
-        >
-          <img
-            src="/media/images/camera.webp"
-            alt=""
-            width={2000}
-            height={1558}
-            loading="lazy"
-          />
-          <CameraScreen>
-            <FilmStrip style={{ x: stripX }}>
-              {photos.map((photo) => (
-                <PlaybackFrame key={photo.image}>
-                  <img
-                    src={`/media/images/${photo.image}`}
-                    alt={photo.alt ?? ''}
-                    loading="lazy"
-                  />
-                </PlaybackFrame>
-              ))}
-            </FilmStrip>
-            <Counter aria-hidden="true">{counter}</Counter>
-            <Caption aria-hidden="true">{caption}</Caption>
-            <ShotDetails aria-hidden="true">
-              <DetailLine>{exposure}</DetailLine>
-              <DetailLine>{context}</DetailLine>
-            </ShotDetails>
-            {intro && (
-              <StartupScreen style={{ opacity: startupOpacity }}>
-                <Statement {...intro} animate={false} />
-              </StartupScreen>
-            )}
-          </CameraScreen>
-        </CameraBody>
+        <Entrance style={{ y: entry }}>
+          <CameraBody
+            style={{
+              scale,
+              x: `${50 - SCREEN_CENTRE.x}%`,
+              y: `${50 - SCREEN_CENTRE.y}%`,
+              transformOrigin: `${SCREEN_CENTRE.x}% ${SCREEN_CENTRE.y}%`,
+            }}
+          >
+            <img
+              src="/media/images/camera.webp"
+              alt=""
+              width={2000}
+              height={1558}
+              loading="lazy"
+            />
+            <CameraScreen>
+              <FilmStrip style={{ x: stripX }}>
+                {photos.map((photo) => (
+                  <PlaybackFrame key={photo.image}>
+                    <img
+                      src={`/media/images/${photo.image}`}
+                      alt={photo.alt ?? ''}
+                      loading="lazy"
+                    />
+                  </PlaybackFrame>
+                ))}
+              </FilmStrip>
+              <Counter aria-hidden="true">{counter}</Counter>
+              <Caption aria-hidden="true">{caption}</Caption>
+              <ShotDetails aria-hidden="true">
+                <DetailLine>{exposure}</DetailLine>
+                <DetailLine>{context}</DetailLine>
+              </ShotDetails>
+              {intro && (
+                <StartupScreen style={{ opacity: startupOpacity }}>
+                  <Statement {...intro} animate={false} />
+                </StartupScreen>
+              )}
+            </CameraScreen>
+          </CameraBody>
+        </Entrance>
       </CameraStage>
     </CameraTrack>
   );

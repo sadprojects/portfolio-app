@@ -64,7 +64,7 @@ describe('Sudoku play', () => {
     fireEvent.click(cell(1, 1));
     key('1');
     expect(cell(1, 1, 1)).toBeInTheDocument();
-    expect(screen.getByText('✓ No errors')).toBeInTheDocument();
+    expect(screen.getByText('No errors')).toBeInTheDocument();
 
     key('ArrowRight');
     key('5');
@@ -133,7 +133,7 @@ describe('Sudoku play', () => {
   it('solves itself on the secret code', async () => {
     renderGame();
     'b25111996b'.split('').forEach((k) => key(k));
-    expect(await screen.findByText('Puzzle Complete!')).toBeInTheDocument();
+    expect(await screen.findByText('Solved.')).toBeInTheDocument();
     expect(screen.getByLabelText(/Number 7/)).toBeDisabled();
     key('9'); // input after completion is ignored
     key('Backspace');
@@ -141,7 +141,7 @@ describe('Sudoku play', () => {
     fireEvent.click(cell(2, 2, 2));
     fireEvent.click(screen.getByLabelText(/Number 7/));
     await waitFor(() =>
-      expect(screen.getByText('Puzzle Complete!')).toBeInTheDocument(),
+      expect(screen.getByText('Solved.')).toBeInTheDocument(),
     );
   });
 });

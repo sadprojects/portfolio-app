@@ -10,7 +10,7 @@ vi.mock('framer-motion', async (importOriginal) => ({
   useReducedMotion: () => motion.reduce,
 }));
 
-const LAPTOP = 'img[src="/media/images/laptop.svg"]';
+const LAPTOP = 'img[src^="/media/images/laptop-"]';
 const CAMERA = 'img[src="/media/images/camera.webp"]';
 
 const renderSections = () =>
@@ -50,7 +50,7 @@ describe('section openers', () => {
 
   it('host projects and skills on one laptop on wide screens', () => {
     const { container } = renderSections();
-    // The artwork is drawn twice, as a lid and a base, inside one desk.
+    // The artwork comes as a lid and a base, both inside one desk.
     const laptops = [...container.querySelectorAll<HTMLImageElement>(LAPTOP)];
     const desk = laptops[0].closest('section')!;
     laptops.forEach((laptop) => expect(desk).toContainElement(laptop));

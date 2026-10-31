@@ -1,4 +1,3 @@
-import { Eraser, RefreshCw, RotateCcw, Undo2 } from 'lucide-react';
 import { useEffect, useReducer, useRef, useState } from 'react';
 
 import { Board } from './Board';
@@ -29,13 +28,8 @@ import type { SudokuDifficulty } from './types';
 import { useSecretCode } from './useSecretCode';
 import { useSudokuKeyboard } from './useSudokuKeyboard';
 
-const DIFFICULTY_EMOJI: Partial<Record<SudokuDifficulty, string>> = {
-  beginner: '👶',
-  expert: '🔥',
-};
-
 const errorSummary = (count: number) =>
-  count === 0 ? '✓ No errors' : `${count} error${count > 1 ? 's' : ''}`;
+  count === 0 ? 'No errors' : `${count} error${count > 1 ? 's' : ''}`;
 
 export const Sudoku = () => {
   const [state, dispatch] = useReducer(
@@ -159,7 +153,7 @@ export const Sudoku = () => {
                 aria-selected={state.difficulty === difficulty}
                 onClick={() => startNewGame(difficulty)}
               >
-                {DIFFICULTY_EMOJI[difficulty] ?? ''} {difficulty}
+                {difficulty}
               </DifficultyTab>
             ))}
           </DifficultyTabs>
@@ -191,7 +185,6 @@ export const Sudoku = () => {
             disabled={state.history.length === 0 || state.isComplete}
             aria-label="Undo last action (Ctrl+Z)"
           >
-            <Undo2 size={16} aria-hidden="true" />
             Undo
           </ActionButton>
           <ActionButton
@@ -199,14 +192,12 @@ export const Sudoku = () => {
             disabled={!state.selectedCell || state.isComplete}
             aria-label="Erase selected cell"
           >
-            <Eraser size={16} aria-hidden="true" />
             Erase
           </ActionButton>
           <ActionButton
             onClick={resetPuzzle}
             aria-label="Reset puzzle to initial state"
           >
-            <RotateCcw size={16} aria-hidden="true" />
             Reset
           </ActionButton>
         </ActionRow>
@@ -216,16 +207,14 @@ export const Sudoku = () => {
           onClick={() => startNewGame(state.difficulty)}
           aria-label={`Start new ${state.difficulty} game`}
         >
-          <RefreshCw size={16} aria-hidden="true" />
-          New Game
+          New game
         </ActionButton>
 
         {bestTime && (
           <ControlGroup>
-            <ControlLabel>Best Time</ControlLabel>
-            <HighScoreItem $rank={1} role="status">
-              <span>🏆</span>
-              <span>{formatTime(bestTime.time)}</span>
+            <ControlLabel>Best time</ControlLabel>
+            <HighScoreItem role="status">
+              {formatTime(bestTime.time)}
             </HighScoreItem>
           </ControlGroup>
         )}

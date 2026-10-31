@@ -1,4 +1,3 @@
-import { Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { formatTime } from '../scores';
@@ -26,10 +25,5 @@ export const Timer = ({ startTime, isComplete }: TimerProps) => {
     return () => clearInterval(ticker);
   }, [startTime, isComplete]);
 
-  return (
-    <TimerDisplay>
-      <Clock size={18} />
-      {formatTime(elapsed)}
-    </TimerDisplay>
-  );
+  return <TimerDisplay>{formatTime(elapsed)}</TimerDisplay>;
 };

@@ -90,16 +90,6 @@ describe('Timer', () => {
     expect(screen.getByText('00:05')).toBeInTheDocument();
   });
 
-  it('should have timer icon', () => {
-    const now = Date.now();
-    vi.setSystemTime(now);
-    const { container } = renderWithTheme(
-      <Timer startTime={now} isComplete={false} />,
-    );
-    const svg = container.querySelector('svg');
-    expect(svg).toBeInTheDocument();
-  });
-
   it('should reset elapsed when startTime changes', () => {
     const now = Date.now();
     vi.setSystemTime(now);

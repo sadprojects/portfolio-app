@@ -36,7 +36,6 @@ describe('Sudoku', () => {
 
   it('should render difficulty tabs', () => {
     renderWithTheme(<Sudoku />);
-    expect(screen.getByText(/beginner/i)).toBeInTheDocument();
     expect(screen.getByText(/easy/i)).toBeInTheDocument();
     expect(screen.getByText(/medium/i)).toBeInTheDocument();
     expect(screen.getByText(/hard/i)).toBeInTheDocument();

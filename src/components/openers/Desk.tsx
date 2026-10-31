@@ -45,9 +45,8 @@ const SETTLE_VH = 33;
 const LEAVE_VH = 75;
 const CLOSE_VH = 150;
 const START_SCALE = 2.2;
-const END_SCALE = 0.6;
-const CLOSED_SCALE = 0.4;
-const LID_CLOSED_DEGREES = -78;
+const END_SCALE = 0.55;
+const LID_CLOSED_DEGREES = -80;
 const DOCUMENT_ICON_SCALE = 0.06;
 const FIRST_PAGE_ZOOM = 1.8;
 
@@ -64,12 +63,10 @@ const DOCUMENT_APPEARS = [0.16, 0.22];
 const SCREEN_SECTION_FADES = [0.4, 0.62];
 const FIRST_PAGE_SETTLES = [0.16, 0.62];
 const FIRST_PAGE_FADES = [0.8, 0.88];
-/* Beats of the closing runway: the display goes dark behind a solid backdrop, the lid folds down onto the keyboard as the laptop recedes, the laptop rises out of the viewport before the fold is done, then the backdrop lifts off the camera already waiting underneath. */
+/* Beats of the closing runway: the display goes dark, the lid folds down onto the keyboard, and the laptop rises out of the viewport before the fold is done; the camera, pinned underneath from then on, rises into its place from below. Nothing scales during the fold, so the lid's layer is never re-rasterised mid-turn. */
 const SCREEN_GOES_DARK = [0, 0.15];
-const LID_FOLDS = [0.15, 0.62];
-const LAPTOP_RECEDES = [0, 0.85];
-const LAPTOP_RISES = [0.45, 0.85];
-const BACKDROP_LIFTS = [0.85, 1];
+const LID_FOLDS = [0.15, 0.6];
+const LAPTOP_RISES = [0.4, 0.85];
 const RISEN_OUT = '-100vh';
 
 /* The dock's apps, as tinted tiles; the CV sits in the middle, where the document grows from. */
@@ -124,11 +121,11 @@ const geometry = {
   '--screen-centre': `calc(100vh - ${laptopHeight} * ${SCREEN.height / 200})`,
 } as CSSProperties;
 
-/* A formatting root, so the leaving runways (the last section's bottom margin) count towards the pin's travel. The next section is pinned underneath for the backdrop's lift, so it is in place the moment the backdrop clears; the pin then lets go unseen. */
+/* A formatting root, so the leaving runways (the last section's bottom margin) count towards the pin's travel. The next section is pinned underneath from the moment the laptop has risen out, so it can rise into the empty viewport; the pin then lets go unseen. */
 const Track = styled.section`
   position: relative;
   display: flow-root;
-  margin-bottom: -${100 + CLOSE_VH * (1 - BACKDROP_LIFTS[0])}vh;
+  margin-bottom: -${100 + CLOSE_VH * (1 - LAPTOP_RISES[1])}vh;
   scroll-margin-top: 4rem;
 `;
 
@@ -143,14 +140,6 @@ const Pin = styled.div`
   height: 100vh;
   overflow: hidden;
   pointer-events: none;
-`;
-
-/* The page's colour over whatever is behind the pin: set while the display goes dark, lifted once the laptop has risen out. Opacity alone, so the compositor carries it. */
-const Backdrop = styled(motion.div)`
-  position: absolute;
-  inset: 0;
-  background: ${({ theme }) => theme.colors.background};
-  will-change: opacity;
 `;
 
 const Artwork = styled(motion.div)`
@@ -292,7 +281,7 @@ interface DeskProps {
   inDock: DeskApp;
 }
 
-/** A pinned laptop that hosts two sections: the first scrolls on its screen, then its dock rises, the CV's icon is clicked and the document opens to scroll the second; finally the laptop shrinks away with the document still open, closes its lid as it recedes, rises out of the viewport, and the backdrop lifts off the camera waiting underneath. */
+/** A pinned laptop that hosts two sections: the first scrolls on its screen, then its dock rises, the CV's icon is clicked and the document opens to scroll the second; finally the laptop shrinks away with the document still open, closes its lid, and rises out of the viewport for the camera to rise in behind it. */
 export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const track = useRef<HTMLElement>(null);
   const screenSection = useRef<HTMLDivElement>(null);
@@ -322,15 +311,9 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const zoomOut = useTransform(leave, [0, 1], [1, END_SCALE], {
     ease: easeInOut,
   });
-  const recede = useTransform(
-    close,
-    LAPTOP_RECEDES,
-    [1, CLOSED_SCALE / END_SCALE],
-    { ease: easeInOut },
-  );
   const laptopScale = useTransform(
-    [zoomIn, zoomOut, recede],
-    ([entering, leaving, receding]: number[]) => entering * leaving * receding,
+    [zoomIn, zoomOut],
+    ([entering, leaving]: number[]) => entering * leaving,
   );
   const laptopY = useTransform(close, LAPTOP_RISES, ['0vh', RISEN_OUT], {
     ease: easeIn,
@@ -359,13 +342,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   ]);
   const firstPageOpacity = useTransform(desk, FIRST_PAGE_FADES, [1, 0]);
 
-  // The display goes dark as the backdrop sets in behind the laptop; the backdrop lifts again once the laptop has risen out.
   const screenOff = useTransform(close, SCREEN_GOES_DARK, [0, 1]);
-  const backdropOpacity = useTransform(
-    close,
-    [...SCREEN_GOES_DARK, ...BACKDROP_LIFTS],
-    [0, 1, 1, 0],
-  );
   // Gone once the display is dark, so no layer of it can poke through the folded lid.
   const documentVisibility = useTransform(screenOff, (dark) =>
     dark < 1 ? 'visible' : 'hidden',
@@ -402,7 +379,6 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   return (
     <Track ref={track} style={geometry}>
       <Pin>
-        <Backdrop style={{ opacity: backdropOpacity }} />
         <Artwork
           style={{
             scale: laptopScale,
