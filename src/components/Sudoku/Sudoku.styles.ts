@@ -8,30 +8,20 @@ const ENTRY_BLUE_DARK = '#60a5fa';
 const ENTRY_BLUE_LIGHT = '#2563eb';
 const BEST_TIME_GOLD = 'rgba(251, 191, 36, 0.12)';
 
+/* The board and the controls sit side by side where there is room for both; else the controls wrap below the board. */
 export const GameContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 1.5rem;
-  padding: 0;
-  max-width: 100%;
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    gap: 2rem;
-    align-items: center;
-  }
-
-  @media (min-width: 1025px) {
-    flex-direction: row;
-    gap: 2.5rem;
-    align-items: flex-start;
-  }
+  align-items: flex-start;
 `;
 
 export const BoardSection = styled.div`
   display: flex;
+  flex: 3 1 18rem;
   flex-direction: column;
   gap: 1rem;
-  align-items: center;
+  min-width: 0;
 `;
 
 export const StatusBar = styled.div`
@@ -44,20 +34,10 @@ export const StatusBar = styled.div`
 
 export const ControlsSection = styled.div`
   display: flex;
+  flex: 1 1 15rem;
   flex-direction: column;
   gap: 1.5rem;
-  flex: 1;
   min-width: 0;
-  width: 100%;
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    max-width: 500px;
-  }
-
-  @media (min-width: 1025px) {
-    min-width: 240px;
-    width: auto;
-  }
 `;
 
 export const TimerDisplay = styled.div`
@@ -79,23 +59,15 @@ export const TimerDisplay = styled.div`
   }
 `;
 
+/* As wide as its column; the cells take their size and their digits from it. */
 export const BoardFrame = styled.div`
   position: relative;
+  container-type: inline-size;
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow:
     0 0 0 2px ${({ theme }) => theme.colors.foreground},
     0 8px 32px rgba(0, 0, 0, 0.12);
-
-  @media (max-width: 767px) {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    max-width: 500px;
-    width: 100%;
-  }
 `;
 
 export const BoardGrid = styled.div`
@@ -115,12 +87,12 @@ export const BoardBox = styled.div`
 `;
 
 const cellBase = css`
-  width: 42px;
-  height: 42px;
+  width: 100%;
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-size: 5cqw;
   border: none;
   padding: 0;
   transition:
@@ -128,19 +100,6 @@ const cellBase = css`
     transform 80ms ease;
   user-select: none;
   position: relative;
-
-  @media (max-width: 767px) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
-    font-size: clamp(1.25rem, 4vw, 1.75rem);
-  }
-
-  @media (min-width: 768px) {
-    width: 48px;
-    height: 48px;
-    font-size: clamp(1.5rem, 2vw, 2rem);
-  }
 `;
 
 export const CellButton = styled.button<{

@@ -21,9 +21,9 @@ const SCREEN_CENTRE = {
   y: SCREEN.top + SCREEN.height / 2,
 };
 const ZOOM = 1.8;
-const READ_VIEWPORTS = 1.08;
-const ZOOM_VIEWPORTS = 1.08;
-const VIEWPORTS_PER_PHOTO = 0.65;
+const READ_VIEWPORTS = 1.2;
+const ZOOM_VIEWPORTS = 1.2;
+const VIEWPORTS_PER_PHOTO = 0.75;
 const INTRO_FADE_OUT_START = 0.8;
 
 const CameraTrack = styled.div<{ $photos: number }>`

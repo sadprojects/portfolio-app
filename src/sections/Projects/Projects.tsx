@@ -25,8 +25,14 @@ const ProjectRow = styled(Grid).attrs({ as: 'article' })`
   }
 `;
 
-const MediaColumn = styled.div<{ $flip: boolean }>`
-  ${({ $flip }) => ($flip ? col('6 / 12', '6 / 13') : col('2 / 8', '1 / 8'))}
+/* A game takes two more columns than a video, so its board and controls fit side by side on the laptop's screen. */
+const MediaColumn = styled.div<{ $flip: boolean; $wide: boolean }>`
+  ${({ $flip, $wide }) =>
+    $wide
+      ? col($flip ? '5 / 13' : '1 / 9')
+      : $flip
+        ? col('6 / 12', '6 / 13')
+        : col('2 / 8', '1 / 8')}
   min-width: 0;
 `;
 
@@ -105,16 +111,6 @@ const Links = styled.div`
   margin-top: 0.75rem;
 `;
 
-const GameSlot = styled(Scrub)`
-  max-width: 32rem;
-  margin: 0 auto;
-
-  & > div {
-    flex-direction: column;
-    align-items: stretch;
-  }
-`;
-
 const Projects = () => {
   const { projects } = contentData;
 
@@ -125,13 +121,13 @@ const Projects = () => {
         const showsGame = project.easterEgg === 'sudoku' || !project.video;
         return (
           <ProjectRow key={project.title} aria-label={project.title}>
-            <MediaColumn $flip={flip}>
+            <MediaColumn $flip={flip} $wide={showsGame}>
               {showsGame ? (
-                <GameSlot>
+                <Scrub>
                   <Suspense fallback={<Kicker>Loading game...</Kicker>}>
                     <Sudoku />
                   </Suspense>
-                </GameSlot>
+                </Scrub>
               ) : (
                 <RevealMedia ratio="16 / 10" parallax={MEDIA_PARALLAX_PX}>
                   <ProjectMedia video={project.video!} title={project.title} />

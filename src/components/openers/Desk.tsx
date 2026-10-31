@@ -37,16 +37,15 @@ export interface DeskApp {
   body: ReactNode;
 }
 
-/* Scroll runways in viewports: the laptop zooms in over the first (and 0.7 before it pins); each section settles past its end, so nothing sits under the dock or the fold; the dock and the document take 1.5; the laptop shrinks away over 0.65, closes its lid while receding further over 0.6, then dissolves over 0.5 to leave the camera in its place. */
-const ARRIVE_VH = 108;
-const DESK_VH = 150;
-const SETTLE_VH = 27;
-const LEAVE_VH = 65;
-const CLOSE_VH = 60;
-const FADE_VH = 50;
+/* Scroll runways in viewports: the laptop zooms in over the first (and 0.7 before it pins); each section settles past its end, so nothing sits under the dock or the fold; the dock and the document take 1.65; the laptop shrinks away over 0.75, then closes its lid, recedes and rises out of the viewport over 1.5, and the camera follows from below. */
+const ARRIVE_VH = 120;
+const DESK_VH = 165;
+const SETTLE_VH = 30;
+const LEAVE_VH = 75;
+const CLOSE_VH = 150;
 const START_SCALE = 2.2;
 const END_SCALE = 0.6;
-const CLOSED_SCALE = 0.45;
+const CLOSED_SCALE = 0.4;
 const LID_CLOSED_DEGREES = -84;
 const DOCUMENT_ICON_SCALE = 0.06;
 const FIRST_PAGE_ZOOM = 1.8;
@@ -61,9 +60,11 @@ const DOCUMENT_APPEARS = [0.2, 0.26];
 const SCREEN_SECTION_FADES = [0.5, 0.8];
 const FIRST_PAGE_SETTLES = [0.2, 0.9];
 const FIRST_PAGE_FADES = [0.9, 1];
-/* Beats of the closing runway: the display goes dark and the backdrop sets in, then the lid folds down onto the keyboard. */
-const SCREEN_GOES_DARK = [0, 0.25];
-const LID_FOLDS = [0.25, 1];
+/* Beats of the closing runway: the display goes dark and the backdrop sets in, the lid folds down onto the keyboard, and the laptop rises away before the fold is done. */
+const SCREEN_GOES_DARK = [0, 0.15];
+const LID_FOLDS = [0.15, 0.6];
+const LAPTOP_RISES = [0.5, 1];
+const RISEN_OUT = '-100vh';
 
 /* The dock's apps, as tinted tiles; the CV sits in the middle, where the document grows from. */
 const DOCK_APPS = [
@@ -117,15 +118,14 @@ const geometry = {
   '--screen-centre': `calc(100vh - ${laptopHeight} * ${SCREEN.height / 200})`,
 } as CSSProperties;
 
-/* The next section is pinned underneath before the closed laptop dissolves, so it is simply there once the laptop has gone; the pin then slides out unseen. A formatting root, so the leaving runways (the last section's bottom margin) count towards the pin's travel. */
+/* A formatting root, so the leaving runways (the last section's bottom margin) count towards the pin's travel. The pin lets go, in the page's own colour, once the laptop has risen out, and the next section follows from below. */
 const Track = styled.section`
   position: relative;
   display: flow-root;
-  margin-bottom: -${100 + FADE_VH}vh;
   scroll-margin-top: 4rem;
 `;
 
-/* Pinned for the whole runway, above the sections, so they show only through the laptop's screen. Centred on both axes even though the laptop outgrows the viewport. Takes a solid backdrop while the lid closes, then dissolves with the laptop. */
+/* Pinned for the whole runway, above the sections, so they show only through the laptop's screen. Centred on both axes even though the laptop outgrows the viewport. Takes a solid backdrop, the page's colour, while the lid closes. */
 const Pin = styled(motion.div)`
   position: sticky;
   top: 0;
@@ -141,7 +141,7 @@ const Pin = styled(motion.div)`
 const Artwork = styled(motion.div)`
   position: relative;
   top: var(--shift);
-  will-change: transform, opacity;
+  will-change: transform;
 `;
 
 const Dock = styled(motion.div)`
@@ -258,7 +258,7 @@ const SectionOnScreen = styled(motion.div)`
 const SectionInDocument = styled(SectionOnScreen)`
   z-index: 1;
   padding: ${DESK_VH + SETTLE_VH}vh 0 ${SETTLE_VH}vh;
-  margin-bottom: ${LEAVE_VH + CLOSE_VH + FADE_VH}vh;
+  margin-bottom: ${LEAVE_VH + CLOSE_VH}vh;
   background: ${({ theme }) => theme.colors.card};
   transform-origin: 50% calc(100% - 100vh + var(--screen-centre));
 `;
@@ -277,7 +277,7 @@ interface DeskProps {
   inDock: DeskApp;
 }
 
-/** A pinned laptop that hosts two sections: the first scrolls on its screen, then its dock rises, the CV's icon is clicked and the document opens to scroll the second; finally the laptop shrinks away with the document still open, closes its lid as it recedes, and dissolves to leave the camera behind it. */
+/** A pinned laptop that hosts two sections: the first scrolls on its screen, then its dock rises, the CV's icon is clicked and the document opens to scroll the second; finally the laptop shrinks away with the document still open, closes its lid as it recedes, and rises out of the viewport before the camera follows. */
 export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const track = useRef<HTMLElement>(null);
   const screenSection = useRef<HTMLDivElement>(null);
@@ -293,24 +293,16 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   });
   const { scrollYProgress: departure } = useScroll({
     target: track,
-    offset: [
-      `end ${100 + LEAVE_VH + CLOSE_VH + FADE_VH}%`,
-      `end ${100 + CLOSE_VH + FADE_VH}%`,
-    ],
+    offset: [`end ${100 + LEAVE_VH + CLOSE_VH}%`, `end ${100 + CLOSE_VH}%`],
   });
   const { scrollYProgress: closing } = useScroll({
     target: track,
-    offset: [`end ${100 + CLOSE_VH + FADE_VH}%`, `end ${100 + FADE_VH}%`],
-  });
-  const { scrollYProgress: fading } = useScroll({
-    target: track,
-    offset: [`end ${100 + FADE_VH}%`, 'end end'],
+    offset: [`end ${100 + CLOSE_VH}%`, 'end end'],
   });
   const arrive = useSpring(arrival, OPENER_SPRING);
   const desk = useSpring(deskRunway, OPENER_SPRING);
   const leave = useSpring(departure, OPENER_SPRING);
   const close = useSpring(closing, OPENER_SPRING);
-  const fade = useSpring(fading, OPENER_SPRING);
 
   const zoomIn = useTransform(arrive, [0, 1], [START_SCALE, 1]);
   const zoomOut = useTransform(leave, [0, 1], [1, END_SCALE]);
@@ -319,7 +311,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
     [zoomIn, zoomOut, recede],
     ([entering, leaving, receding]: number[]) => entering * leaving * receding,
   );
-  const laptopOpacity = useTransform(fade, [0, 1], [1, 0]);
+  const laptopY = useTransform(close, LAPTOP_RISES, ['0vh', RISEN_OUT]);
   const lineOpacity = useTransform(
     arrive,
     [...OPENER_FADE_IN, 0.85, 1],
@@ -344,19 +336,15 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   ]);
   const firstPageOpacity = useTransform(desk, FIRST_PAGE_FADES, [1, 0]);
 
-  // The display goes dark and the pin takes a solid backdrop before the lid folds down; both dissolve with the laptop at the end.
+  // The display goes dark and the pin takes a solid backdrop before the lid folds down.
   const screenOff = useTransform(close, SCREEN_GOES_DARK, [0, 1]);
   // Gone once the display is dark, so no layer of it can poke through the folded lid.
   const documentVisibility = useTransform(screenOff, (dark) =>
     dark < 1 ? 'visible' : 'hidden',
   );
   const lidAngle = useTransform(close, LID_FOLDS, [0, LID_CLOSED_DEGREES]);
-  const backdropOpacity = useTransform(
-    [useTransform(close, SCREEN_GOES_DARK, [0, 1]), laptopOpacity],
-    ([set, remaining]: number[]) => set * remaining,
-  );
   const backdrop = useTransform(
-    backdropOpacity,
+    screenOff,
     (alpha) =>
       `${theme.colors.background}${Math.round(alpha * 255)
         .toString(16)
@@ -394,7 +382,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
         <Artwork
           style={{
             scale: laptopScale,
-            opacity: laptopOpacity,
+            y: laptopY,
             width: PINNED_WIDTH,
             transformOrigin: SCREEN_CENTRE,
           }}
