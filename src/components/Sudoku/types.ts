@@ -15,13 +15,11 @@ export interface HistoryEntry {
   row: number;
   col: number;
   previousValue: number;
-  newValue: number;
 }
 
 export interface HighScore {
   difficulty: SudokuDifficulty;
   time: number; // in seconds
-  date: string;
 }
 
 export interface SudokuGameState {

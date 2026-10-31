@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 import { Footer } from './Footer';
 
@@ -102,51 +102,8 @@ describe('Footer', () => {
     );
 
     const nameElement = screen.getByText(/Test Name. All rights reserved./i);
-
-    // First click
-    fireEvent.click(nameElement);
     expect(screen.queryByTestId('version-modal')).toBeNull();
-
-    // Second click (double click)
-    fireEvent.click(nameElement);
-    expect(screen.getByTestId('version-modal')).toBeDefined();
-  });
-
-  it('should reset click counter after timeout', () => {
-    render(
-      <ThemeProvider>
-        <Footer />
-      </ThemeProvider>,
-    );
-
-    const nameElement = screen.getByText(/Test Name. All rights reserved./i);
-
-    // First click
-    fireEvent.click(nameElement);
-
-    // Wait for timeout (400ms)
-    act(() => {
-      vi.advanceTimersByTime(500);
-    });
-
-    // Click again - should not open modal since counter was reset
-    fireEvent.click(nameElement);
-    expect(screen.queryByTestId('version-modal')).toBeNull();
-  });
-
-  it('should handle touch events on name', () => {
-    render(
-      <ThemeProvider>
-        <Footer />
-      </ThemeProvider>,
-    );
-
-    const nameElement = screen.getByText(/Test Name. All rights reserved./i);
-
-    // Double touch
-    fireEvent.touchEnd(nameElement);
-    fireEvent.touchEnd(nameElement);
-
+    fireEvent.doubleClick(nameElement);
     expect(screen.getByTestId('version-modal')).toBeDefined();
   });
 
@@ -159,9 +116,7 @@ describe('Footer', () => {
 
     const nameElement = screen.getByText(/Test Name. All rights reserved./i);
 
-    // Open modal with double click
-    fireEvent.click(nameElement);
-    fireEvent.click(nameElement);
+    fireEvent.doubleClick(nameElement);
     expect(screen.getByTestId('version-modal')).toBeDefined();
 
     // Close modal

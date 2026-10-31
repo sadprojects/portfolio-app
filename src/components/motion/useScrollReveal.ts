@@ -1,16 +1,6 @@
 import { clamp01 } from '@utils/math';
-import {
-  useScroll,
-  useSpring,
-  useTransform,
-  type MotionValue,
-} from 'framer-motion';
+import { useScroll, useSpring, useTransform } from 'framer-motion';
 import type { RefObject } from 'react';
-
-export interface ScrollReveal {
-  enter: MotionValue<number>;
-  exit: MotionValue<number>;
-}
 
 const REVEAL_SPRING = { stiffness: 90, damping: 26, mass: 0.6 };
 const PAGE_END_REVEAL_FRACTION = 0.45;
@@ -22,9 +12,7 @@ const progressTowardPageEnd = (scrollY: number) => {
   return clamp01(1 - remaining / (viewportHeight * PAGE_END_REVEAL_FRACTION));
 };
 
-export const useScrollReveal = (
-  ref: RefObject<HTMLElement | null>,
-): ScrollReveal => {
+export const useScrollReveal = (ref: RefObject<HTMLElement | null>) => {
   const { scrollYProgress: enterByPosition } = useScroll({
     target: ref,
     offset: ['start 89%', 'start 51%'],

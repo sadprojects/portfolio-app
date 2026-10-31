@@ -3,7 +3,6 @@ import { Scrub } from '@components/motion/Scrub';
 import { LineButton } from '@components/ui/LineButton';
 import { VersionModal } from '@components/VersionModal/VersionModal';
 import { contentData } from '@data/content';
-import { useDoubleClick } from '@hooks/useDoubleClick';
 import { Grid, col } from '@styles/grid';
 import { useState } from 'react';
 import styled from 'styled-components';
@@ -84,6 +83,7 @@ const LegalRow = styled.div`
 const VersionTrigger = styled.span`
   cursor: pointer;
   user-select: none;
+  touch-action: manipulation;
 
   &:hover {
     color: ${({ theme }) => theme.colors.foreground};
@@ -94,7 +94,6 @@ export const Footer = () => {
   const { social, footer, contact } = contentData;
   const currentYear = new Date().getFullYear();
   const [versionModalOpen, setVersionModalOpen] = useState(false);
-  const onNameClick = useDoubleClick(() => setVersionModalOpen(true));
 
   return (
     <>
@@ -136,13 +135,7 @@ export const Footer = () => {
           <LegalRow>
             <span>
               © {currentYear}{' '}
-              <VersionTrigger
-                onClick={onNameClick}
-                onTouchEnd={(event) => {
-                  event.preventDefault();
-                  onNameClick();
-                }}
-              >
+              <VersionTrigger onDoubleClick={() => setVersionModalOpen(true)}>
                 {footer}
               </VersionTrigger>
             </span>

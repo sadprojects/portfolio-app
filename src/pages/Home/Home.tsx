@@ -3,7 +3,7 @@ import { ScrollProgress } from '@components/ui/ScrollProgress';
 import { contentData } from '@data/content';
 import { useSectionScroll } from '@hooks/useSectionScroll';
 import { useSmoothScroll } from '@hooks/useSmoothScroll';
-import { calculateAge, calculateYearsOfExperience } from '@utils/dates';
+import { yearsSince } from '@utils/dates';
 import { useRef } from 'react';
 import styled from 'styled-components';
 
@@ -47,8 +47,8 @@ const Home = () => {
           />
           <AboutSection
             ref={aboutRef}
-            age={calculateAge(contact.birthDate)}
-            yearsOfExperience={calculateYearsOfExperience(contact.firstJobDate)}
+            age={yearsSince(contact.birthDate)}
+            yearsOfExperience={yearsSince(contact.firstJobDate)}
           />
         </HomeSection>
 

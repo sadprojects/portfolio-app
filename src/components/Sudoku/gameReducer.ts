@@ -47,10 +47,7 @@ const writeCell = (state: SudokuGameState, value: number): SudokuGameState => {
 
   const grid = cloneGrid(state.grid);
   grid[row][col] = value;
-  const history = [
-    ...state.history,
-    { row, col, previousValue, newValue: value },
-  ];
+  const history = [...state.history, { row, col, previousValue }];
   const errors = findErrors(grid, state.solution);
 
   if (value !== 0 && isGridComplete(grid, state.solution)) {
@@ -58,7 +55,6 @@ const writeCell = (state: SudokuGameState, value: number): SudokuGameState => {
     saveHighScore({
       difficulty: state.difficulty,
       time: elapsed,
-      date: new Date().toISOString(),
     });
     return {
       ...state,

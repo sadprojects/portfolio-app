@@ -375,7 +375,7 @@ export const DifficultyTab = styled.button<{ $isActive: boolean }>`
     min-height: 40px;
   }
 
-  &:hover:not([data-active='true']) {
+  &:hover:not([aria-selected='true']) {
     color: ${({ theme }) => theme.colors.foreground};
     background: ${({ theme }) => theme.colors.accent};
   }

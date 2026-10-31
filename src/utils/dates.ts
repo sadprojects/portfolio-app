@@ -12,7 +12,7 @@ const wholeMonthsBetween = (start: Date, end: Date): number =>
   (end.getMonth() - start.getMonth()) -
   (end.getDate() < start.getDate() ? 1 : 0);
 
-const wholeYearsSince = (iso: string): number =>
+export const yearsSince = (iso: string): number =>
   Math.floor(
     wholeMonthsBetween(parseIsoDate(iso), new Date()) / MONTHS_PER_YEAR,
   );
@@ -24,12 +24,6 @@ const monthAndYear = new Intl.DateTimeFormat('en', {
   month: 'short',
   year: 'numeric',
 });
-
-export const calculateAge = (birthDate: string): number =>
-  wholeYearsSince(birthDate);
-
-export const calculateYearsOfExperience = (firstJobDate: string): number =>
-  wholeYearsSince(firstJobDate);
 
 export const calculateDuration = (
   startDate: string,

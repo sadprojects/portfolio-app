@@ -1,15 +1,10 @@
-import {
-  calculateAge,
-  calculateDuration,
-  calculateYearsOfExperience,
-  formatDateRange,
-} from './dates';
+import { calculateDuration, formatDateRange, yearsSince } from './dates';
 
 describe('Date Utilities', () => {
-  describe('calculateAge', () => {
+  describe('yearsSince, as an age', () => {
     it('calculates age correctly', () => {
       const birthDate = '1990-01-01';
-      const age = calculateAge(birthDate);
+      const age = yearsSince(birthDate);
 
       expect(age).toBeGreaterThan(30);
       expect(typeof age).toBe('number');
@@ -17,16 +12,16 @@ describe('Date Utilities', () => {
 
     it('handles recent birth dates', () => {
       const birthDate = '2020-01-01';
-      const age = calculateAge(birthDate);
+      const age = yearsSince(birthDate);
 
       expect(age).toBeLessThan(10);
     });
   });
 
-  describe('calculateYearsOfExperience', () => {
+  describe('yearsSince, as experience', () => {
     it('calculates years of experience correctly', () => {
       const firstJobDate = '2015-01-01';
-      const experience = calculateYearsOfExperience(firstJobDate);
+      const experience = yearsSince(firstJobDate);
 
       expect(experience).toBeGreaterThan(5);
       expect(typeof experience).toBe('number');
@@ -34,7 +29,7 @@ describe('Date Utilities', () => {
 
     it('handles recent start dates', () => {
       const firstJobDate = '2023-01-01';
-      const experience = calculateYearsOfExperience(firstJobDate);
+      const experience = yearsSince(firstJobDate);
 
       expect(experience).toBeGreaterThanOrEqual(0);
     });

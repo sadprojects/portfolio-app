@@ -2,13 +2,9 @@
 
 import { execSync } from 'child_process';
 import { readFileSync, writeFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const versionPath = join(__dirname, '../src/version.json');
+const versionPath = join(import.meta.dirname, '../src/version.json');
 
 try {
   // Read current version (this is what was just deployed)

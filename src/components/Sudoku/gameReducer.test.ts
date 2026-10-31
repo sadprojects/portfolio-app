@@ -194,7 +194,7 @@ describe('gameReducer', () => {
       const currentState: SudokuGameState = {
         ...initialState,
         grid,
-        history: [{ row: 0, col: 0, previousValue: 0, newValue: 5 }],
+        history: [{ row: 0, col: 0, previousValue: 0 }],
       };
 
       const action: GameAction = { type: 'UNDO' };
@@ -233,7 +233,7 @@ describe('gameReducer', () => {
         ...initialState,
         grid,
         initial,
-        history: [{ row: 1, col: 1, previousValue: 0, newValue: 7 }],
+        history: [{ row: 1, col: 1, previousValue: 0 }],
       };
 
       const action: GameAction = { type: 'RESET' };

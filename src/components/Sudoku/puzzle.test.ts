@@ -53,8 +53,8 @@ describe('puzzle and scores', () => {
 
     it('should return stored scores', () => {
       const scores = [
-        { difficulty: 'easy' as const, time: 120, date: '2024-01-01' },
-        { difficulty: 'medium' as const, time: 180, date: '2024-01-02' },
+        { difficulty: 'easy' as const, time: 120 },
+        { difficulty: 'medium' as const, time: 180 },
       ];
       localStorage.setItem('sudoku_highscores', JSON.stringify(scores));
 
@@ -72,7 +72,6 @@ describe('puzzle and scores', () => {
       const score = {
         difficulty: 'easy' as const,
         time: 120,
-        date: '2024-01-01',
       };
       saveHighScore(score);
 
@@ -85,12 +84,10 @@ describe('puzzle and scores', () => {
       const oldScore = {
         difficulty: 'easy' as const,
         time: 180,
-        date: '2024-01-01',
       };
       const newScore = {
         difficulty: 'easy' as const,
         time: 120,
-        date: '2024-01-02',
       };
 
       saveHighScore(oldScore);
@@ -105,12 +102,10 @@ describe('puzzle and scores', () => {
       const oldScore = {
         difficulty: 'easy' as const,
         time: 120,
-        date: '2024-01-01',
       };
       const newScore = {
         difficulty: 'easy' as const,
         time: 180,
-        date: '2024-01-02',
       };
 
       saveHighScore(oldScore);
@@ -125,12 +120,10 @@ describe('puzzle and scores', () => {
       const easyScore = {
         difficulty: 'easy' as const,
         time: 120,
-        date: '2024-01-01',
       };
       const hardScore = {
         difficulty: 'hard' as const,
         time: 300,
-        date: '2024-01-02',
       };
 
       saveHighScore(easyScore);
@@ -150,7 +143,6 @@ describe('puzzle and scores', () => {
       saveHighScore({
         difficulty: 'easy' as const,
         time: 180,
-        date: '2024-01-01',
       });
       expect(isNewBest('easy', 120)).toBe(true);
     });
@@ -159,7 +151,6 @@ describe('puzzle and scores', () => {
       saveHighScore({
         difficulty: 'easy' as const,
         time: 120,
-        date: '2024-01-01',
       });
       expect(isNewBest('easy', 180)).toBe(false);
     });
@@ -168,7 +159,6 @@ describe('puzzle and scores', () => {
       saveHighScore({
         difficulty: 'easy' as const,
         time: 120,
-        date: '2024-01-01',
       });
       expect(isNewBest('hard', 180)).toBe(true);
     });

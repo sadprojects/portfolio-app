@@ -126,7 +126,7 @@ describe('Sudoku', () => {
 
   it('should show high score section when best time exists', () => {
     vi.mocked(scores.getHighScores).mockReturnValue([
-      { difficulty: 'medium', time: 120, date: '2024-01-01' },
+      { difficulty: 'medium', time: 120 },
     ]);
 
     renderWithTheme(<Sudoku />);
@@ -168,7 +168,7 @@ describe('Sudoku', () => {
     fireEvent.click(easyTab);
 
     await waitFor(() => {
-      expect(easyTab).toHaveAttribute('data-active', 'true');
+      expect(easyTab).toHaveAttribute('aria-selected', 'true');
     });
   });
 

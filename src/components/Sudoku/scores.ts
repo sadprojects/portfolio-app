@@ -34,8 +34,6 @@ export function saveHighScore(score: HighScore): void {
 }
 
 export function isNewBest(difficulty: SudokuDifficulty, time: number): boolean {
-  const times = getHighScores()
-    .filter((score) => score.difficulty === difficulty)
-    .map((score) => score.time);
-  return times.length === 0 || time < Math.min(...times);
+  const best = getHighScores().find((score) => score.difficulty === difficulty);
+  return !best || time < best.time;
 }

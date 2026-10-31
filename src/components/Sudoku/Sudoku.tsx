@@ -158,7 +158,6 @@ export const Sudoku = () => {
                 $isActive={state.difficulty === difficulty}
                 aria-selected={state.difficulty === difficulty}
                 onClick={() => startNewGame(difficulty)}
-                data-active={state.difficulty === difficulty}
               >
                 {DIFFICULTY_EMOJI[difficulty] ?? ''} {difficulty}
               </DifficultyTab>

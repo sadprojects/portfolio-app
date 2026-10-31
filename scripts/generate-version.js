@@ -1,13 +1,9 @@
 #!/usr/bin/env node
 
 import { readFileSync, writeFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const versionPath = join(__dirname, '../src/version.json');
+const versionPath = join(import.meta.dirname, '../src/version.json');
 
 // Keep the current version (or start one); the build time is epoch ms, so timezone-agnostic.
 const readVersion = () => {

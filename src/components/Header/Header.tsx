@@ -9,8 +9,6 @@ import { MobileMenu } from './MobileMenu';
 
 /* Only at the top of the page; it scrolls away with it. */
 const HeaderBar = styled.header`
-  position: relative;
-  z-index: 100;
   background-color: ${({ theme }) => `${theme.colors.background}40`};
   border-bottom: 1px solid ${({ theme }) => `${theme.colors.border}30`};
   backdrop-filter: blur(24px) saturate(220%);

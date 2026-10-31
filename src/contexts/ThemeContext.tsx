@@ -1,5 +1,11 @@
 import { theme, type ThemeMode } from '@styles/theme';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 
 interface ThemeContextType {
@@ -17,11 +23,7 @@ export const useTheme = () => {
   return context;
 };
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
-}
-
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<ThemeMode>(() => {
     const stored = localStorage.getItem('theme') as ThemeMode;
     return stored || 'dark';
