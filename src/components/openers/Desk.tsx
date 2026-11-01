@@ -39,6 +39,7 @@ import {
   PINNED_WIDTH,
   SCREEN,
   SCREEN_CENTRE,
+  SCREEN_LIFT,
 } from './laptopArtwork';
 import { MenuBar } from './MenuBar';
 import { ResumeFrame } from './Resume';
@@ -137,9 +138,10 @@ const viewportHeight = () => document.documentElement.clientHeight;
 
 const laptopHeight = `calc(${PINNED_WIDTH} / ${ARTWORK.width / ARTWORK.height})`;
 
-/* The laptop is pushed down until its screen's bottom edge meets the viewport's; the sections are as wide as the screen and shrink towards its centre. */
+/* The laptop is pushed down until its screen's bottom edge meets the viewport's, less the lift a tall viewport gives it; the sections, lifted with it, are as wide as the screen and shrink towards its centre. */
 const geometry = {
-  '--shift': `calc(100vh - calc((100vh - ${laptopHeight}) / 2 + ${laptopHeight} * ${(SCREEN.top + SCREEN.height) / 100}))`,
+  '--screen-lift': SCREEN_LIFT,
+  '--shift': `calc(100vh - calc((100vh - ${laptopHeight}) / 2 + ${laptopHeight} * ${(SCREEN.top + SCREEN.height) / 100}) - var(--screen-lift))`,
   '--screen-width': `calc(${PINNED_WIDTH} * ${SCREEN.width / 100})`,
   '--screen-centre': `calc(100vh - ${laptopHeight} * ${SCREEN.height / 200})`,
 } as CSSProperties;
@@ -295,6 +297,7 @@ const SectionOnScreen = styled(motion.div)`
   width: var(--screen-width);
   margin: 0 auto;
   padding-top: ${ARRIVE_VH}vh;
+  translate: 0 calc(-1 * var(--screen-lift));
   will-change: transform, opacity;
 `;
 
