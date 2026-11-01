@@ -21,17 +21,17 @@ const Shell = styled.div`
   aspect-ratio: ${ARTWORK.width} / ${ARTWORK.height};
   perspective: 3200px;
   perspective-origin: 50% ${HINGE}%;
-
-  img {
-    position: absolute;
-    inset: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
 `;
 
-/* Hides whatever is behind the frame except through the screen. It stays flat in the frame's plane while the lid folds, so the lid's own layer is no bigger than the artwork; once the display is dark a solid backdrop has taken over and it is dropped unseen. */
+const Artwork = styled.img`
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+`;
+
+/* Hides whatever is behind the frame except through the screen. It stays flat in the frame's plane while the lid folds, so the lid's own layer is no bigger than the artwork; once the screen is covered by a sheet of its own it is dropped unseen. */
 const Mask = motion.create(styled(Cutout)`
   pointer-events: none;
 `);
@@ -62,14 +62,6 @@ const Screen = styled(Cutout)`
   }
 `;
 
-/* The display going dark as the lid comes down. */
-const ScreenOff = styled(motion.div)`
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg, #141416, #060607);
-  will-change: opacity;
-`;
-
 export const ScreenInset = styled.div`
   padding: 0 4%;
 `;
@@ -78,19 +70,19 @@ interface LaptopFrameProps {
   children: ReactNode;
   /** Degrees the lid has folded down; open when absent. */
   lidAngle?: MotionValue<number>;
-  /** How far the display has gone dark; lit when absent. */
-  screenOff?: MotionValue<number>;
+  /** How far a sheet of the screen's own has covered it, so the mask behind can go; open to what is behind when absent. */
+  screenCovered?: MotionValue<number>;
 }
 
 /** The laptop artwork; children sit on its screen. */
 export const LaptopFrame = ({
   children,
   lidAngle,
-  screenOff,
+  screenCovered,
 }: LaptopFrameProps) => {
-  const lit = useMotionValue(0);
-  const maskVisibility = useTransform(screenOff ?? lit, (dark) =>
-    dark < 1 ? 'visible' : 'hidden',
+  const open = useMotionValue(0);
+  const maskVisibility = useTransform(screenCovered ?? open, (covered) =>
+    covered < 1 ? 'visible' : 'hidden',
   );
   return (
     <Shell>
@@ -102,16 +94,15 @@ export const LaptopFrame = ({
       <Lid style={{ rotateX: lidAngle }}>
         <Screen $rect={SCREEN} $tone="background">
           {children}
-          {screenOff && <ScreenOff style={{ opacity: screenOff }} />}
         </Screen>
-        <img
+        <Artwork
           src={lidArtwork}
           alt=""
           width={ARTWORK.width}
           height={ARTWORK.height}
         />
       </Lid>
-      <img src={baseArtwork} alt="" aria-hidden="true" />
+      <Artwork src={baseArtwork} alt="" aria-hidden="true" />
     </Shell>
   );
 };

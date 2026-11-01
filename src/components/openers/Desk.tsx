@@ -38,9 +38,9 @@ export interface DeskApp {
   body: ReactNode;
 }
 
-/* Scroll runways in viewports: the laptop zooms in and its line is read over the first (and 0.7 before it pins); each section settles past its end, so nothing sits under the dock or the fold; the dock and the document take 2; the laptop shrinks away over 0.75, then closes its lid and rises out of the viewport over 1.4, and the camera follows from below. */
+/* Scroll runways in viewports: the laptop zooms in and its line is read over the first (and 0.7 before it pins); each section settles past its end, so nothing sits under the dock or the fold; the dock, the document and its first page take 2.4; the laptop shrinks away over 0.75, then closes its lid and rises out of the viewport over 1.4, and the camera follows from below. */
 const ARRIVE_VH = 170;
-const DESK_VH = 200;
+const DESK_VH = 240;
 const SETTLE_VH = 33;
 const LEAVE_VH = 75;
 const CLOSE_VH = 140;
@@ -53,18 +53,19 @@ const FIRST_PAGE_ZOOM = 1.8;
 /* Beats of the arrival: the laptop settles over the first part, and its line fades in, holds to be read, and fades out, leaving the screen clear before the section enters. */
 const LAPTOP_SETTLES = [0, 0.55];
 const LINE_SHOWS = [0.04, 0.3, 0.78, 0.91];
-/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document grows out of it over the section on screen, its first page zooms into place and holds to be read, then it clears, and the page stays blank for a beat before the section follows. */
-const DOCK_SHOWS = [0, 0.08, 0.72, 0.78];
-const ICON_CLICK = [0.08, 0.12, 0.16];
-const ICON_OPENS = [0.12, 0.16];
-const LABEL_SHOWS = [0.08, 0.12, 0.26, 0.3];
-const DOCUMENT_OPENS = [0.16, 0.62];
-const DOCUMENT_APPEARS = [0.16, 0.22];
-const SCREEN_SECTION_FADES = [0.4, 0.62];
-const FIRST_PAGE_SETTLES = [0.16, 0.62];
-const FIRST_PAGE_FADES = [0.82, 0.93];
-/* Beats of the closing runway: the display goes dark, the lid folds down onto the keyboard, and the laptop rises out of the viewport before the fold is done; the camera, pinned underneath from then on, rises into its place from below. Nothing scales during the fold, so the lid's layer is never re-rasterised mid-turn. */
-const SCREEN_GOES_DARK = [0, 0.15];
+/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document grows out of it over the section on screen, its first page zooms into place and holds to be read, then the page scrolls up out of the viewer with the section following right behind it, one scroll with the page. */
+const DOCK_SHOWS = [0, 0.07, 0.6, 0.66];
+const ICON_CLICK = [0.07, 0.1, 0.14];
+const ICON_OPENS = [0.1, 0.14];
+const LABEL_SHOWS = [0.07, 0.1, 0.22, 0.26];
+const DOCUMENT_OPENS = [0.14, 0.48];
+const DOCUMENT_APPEARS = [0.14, 0.19];
+const SCREEN_SECTION_FADES = [0.34, 0.48];
+const DOCUMENT_SECTION_SHOWS = [0.48, 0.5];
+const FIRST_PAGE_SETTLES = [0.14, 0.48];
+const FIRST_PAGE_SCROLLS = [0.6, 1];
+/* Beats of the closing runway: a sheet of the CV covers the page, the lid folds down onto the keyboard with it still on, and the laptop rises out of the viewport before the fold is done; the camera, pinned underneath from then on, rises into its place from below. Nothing scales during the fold, so the lid's layer is never re-rasterised mid-turn. */
+const SHEET_COVERS = [0, 0.15];
 const LID_FOLDS = [0.15, 0.6];
 const LAPTOP_RISES = [0.4, 0.8];
 const RISEN_OUT = '-100vh';
@@ -258,10 +259,10 @@ const SectionOnScreen = styled(motion.div)`
   will-change: transform, opacity;
 `;
 
-/* Fades in as the document's first page clears, above whatever section waits below the laptop; settles a little past its end (its page still painted below it), then holds still and shrinks with the laptop as it leaves, and goes dark with the display. */
+/* Behind the document's page, above whatever section waits below the laptop. Its first line sits at the page's bottom edge the moment the first page starts scrolling, so the two move as one; it settles a little past its end (its page still painted below it), then holds still and shrinks with the laptop as it leaves, and goes under the closing sheet. */
 const SectionInDocument = styled(SectionOnScreen)`
   z-index: 1;
-  padding: ${DESK_VH + SETTLE_VH}vh 0 ${SETTLE_VH}vh;
+  padding: ${SETTLE_VH + FIRST_PAGE_SCROLLS[0] * DESK_VH}vh 0 ${SETTLE_VH}vh;
   margin-bottom: ${LEAVE_VH + CLOSE_VH}vh;
   background: ${({ theme }) => theme.colors.card};
   transform-origin: 50% calc(100% - 100vh + var(--screen-centre));
@@ -281,7 +282,7 @@ interface DeskProps {
   inDock: DeskApp;
 }
 
-/** A pinned laptop that hosts two sections: the first scrolls on its screen, then its dock rises, the CV's icon is clicked and the document opens to scroll the second; finally the laptop shrinks away with the document still open, closes its lid, and rises out of the viewport for the camera to rise in behind it. */
+/** A pinned laptop that hosts two sections: the first scrolls on its screen, then its dock rises, the CV's icon is clicked and the document opens to scroll the second; finally the laptop shrinks away with the document still open, closes its lid with a sheet of the CV on the screen, and rises out of the viewport for the camera to rise in behind it. */
 export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const track = useRef<HTMLElement>(null);
   const screenSection = useRef<HTMLDivElement>(null);
@@ -319,6 +320,10 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
     ease: easeIn,
   });
   const lineOpacity = useTransform(arrive, LINE_SHOWS, [0, 1, 1, 0]);
+  // The line can be selected while it shows; afterwards the pin lets clicks through to the section.
+  const linePointerEvents = useTransform(lineOpacity, (visible) =>
+    visible > 0 ? 'auto' : 'none',
+  );
 
   const dockY = useTransform(desk, DOCK_SHOWS.slice(0, 2), ['140%', '0%']);
   const dockOpacity = useTransform(desk, DOCK_SHOWS, [0, 1, 1, 0]);
@@ -340,13 +345,17 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
     FIRST_PAGE_ZOOM,
     1,
   ]);
-  const firstPageOpacity = useTransform(desk, FIRST_PAGE_FADES, [1, 0]);
-
-  const screenOff = useTransform(close, SCREEN_GOES_DARK, [0, 1]);
-  // Gone once the display is dark, so no layer of it can poke through the folded lid.
-  const documentVisibility = useTransform(screenOff, (dark) =>
-    dark < 1 ? 'visible' : 'hidden',
+  // Raw, not sprung, so the page and the section behind it stay locked together.
+  const firstPageY = useTransform(
+    deskRunway,
+    (progress) =>
+      (-Math.max(0, progress - FIRST_PAGE_SCROLLS[0]) *
+        DESK_VH *
+        viewportHeight()) /
+      100,
   );
+
+  const sheetCover = useTransform(close, SHEET_COVERS, [0, 1]);
   const lidAngle = useTransform(close, LID_FOLDS, [0, LID_CLOSED_DEGREES], {
     ease: easeInOut,
   });
@@ -362,10 +371,10 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
     screenSectionOpacity,
     (visible) => (visible > 0 ? 'visible' : 'hidden'),
   );
-  // The section in the document fades in as the first page clears, holds still and shrinks with the laptop as it leaves, and goes with the display.
+  // The section in the document is there once the section on screen has gone, holds still and shrinks with the laptop as it leaves, and goes under the closing sheet.
   const documentSectionOpacity = useTransform(
-    [useTransform(desk, FIRST_PAGE_FADES, [0, 1]), screenOff],
-    ([shown, dark]: number[]) => shown * (1 - dark),
+    [useTransform(desk, DOCUMENT_SECTION_SHOWS, [0, 1]), sheetCover],
+    ([shown, covered]: number[]) => shown * (1 - covered),
   );
   const documentSectionVisibility = useTransform(
     documentSectionOpacity,
@@ -387,8 +396,10 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
             transformOrigin: SCREEN_CENTRE,
           }}
         >
-          <LaptopFrame lidAngle={lidAngle} screenOff={screenOff}>
-            <Startup style={{ opacity: lineOpacity }}>
+          <LaptopFrame lidAngle={lidAngle} screenCovered={sheetCover}>
+            <Startup
+              style={{ opacity: lineOpacity, pointerEvents: linePointerEvents }}
+            >
               <Statement {...onScreen.intro} exitOnScroll={false} />
             </Startup>
             <Dock
@@ -421,14 +432,11 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
               )}
             </Dock>
             <Document
-              firstPageOpacity={firstPageOpacity}
+              firstPageY={firstPageY}
               firstPageScale={firstPageScale}
+              closingOpacity={sheetCover}
               intro={inDock.intro}
-              style={{
-                scale: documentScale,
-                opacity: documentOpacity,
-                visibility: documentVisibility,
-              }}
+              style={{ scale: documentScale, opacity: documentOpacity }}
             />
           </LaptopFrame>
         </Artwork>

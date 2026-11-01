@@ -20,6 +20,17 @@ const DOCK_SCALE = 0.06;
 const OPENER_WIDTH = 'min(92vw, 64rem)';
 const TRAFFIC_LIGHTS = ['#ff5f57', '#febc2e', '#28c840'];
 
+/* A CV's shape in faint bars, in % of the page: [left, top, widths of the lines]. The middle band stays clear for the section's line. */
+const SKELETON_GROUPS: [number, number, number[]][] = [
+  [8, 10, [24, 14]],
+  [8, 22, [28, 28, 22]],
+  [44, 22, [46, 46, 38, 42]],
+  [8, 70, [28, 28, 20]],
+  [44, 70, [46, 42, 46, 34]],
+  [44, 86, [38, 44]],
+];
+const LINE_PITCH = 2.6;
+
 const Viewer = styled(motion.div)`
   position: relative;
   aspect-ratio: ${WINDOW_ASPECT};
@@ -61,35 +72,101 @@ const WindowControls = styled.span`
   }
 `;
 
+/* A sheet of the document: opaque in the page's tone, so what it shows can be read and selected. */
+const Sheet = styled(Startup)`
+  pointer-events: auto;
+`;
+
+const Skeleton = styled.div`
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+`;
+
+const Portrait = styled.img`
+  position: absolute;
+  top: 8%;
+  right: 8%;
+  width: 11%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 3px;
+  opacity: 0.85;
+`;
+
+const Bar = styled.i<{ $left: number; $top: number; $width: number }>`
+  position: absolute;
+  left: ${({ $left }) => $left}%;
+  top: ${({ $top }) => $top}%;
+  width: ${({ $width }) => $width}%;
+  height: 1.1%;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.border};
+  opacity: 0.7;
+`;
+
 const FirstPage = styled(motion.div)`
+  position: relative;
   width: 100%;
 `;
 
+/* What makes a sheet read as the CV: the portrait in a corner and the faint lines of a résumé. */
+const ResumeSheet = () => (
+  <Skeleton aria-hidden="true">
+    <Portrait
+      src={`/media/images/${contentData.contact.profileImage}`}
+      alt=""
+    />
+    {SKELETON_GROUPS.flatMap(([left, top, widths]) =>
+      widths.map((width, line) => (
+        <Bar
+          key={`${left}-${top}-${line}`}
+          $left={left}
+          $top={top + line * LINE_PITCH}
+          $width={width}
+        />
+      )),
+    )}
+  </Skeleton>
+);
+
 interface ResumeFrameProps {
-  /** Opacity of the first page, which carries the section's line and fades to let the section through. */
-  firstPageOpacity: MotionValue<number>;
-  /** Zoom of that line as the document opens; settled when absent. */
-  firstPageScale?: MotionValue<number>;
   intro: SectionIntro;
+  /** Opacity of the first page, for an opener that fades it away. */
+  firstPageOpacity?: MotionValue<number>;
+  /** How far the first page has scrolled up, in px, with the section following right behind it. */
+  firstPageY?: MotionValue<number>;
+  /** Zoom of the line as the document opens; settled when absent. */
+  firstPageScale?: MotionValue<number>;
+  /** Opacity of the sheet that covers the page while the laptop closes, so the lid folds with the CV still on. */
+  closingOpacity?: MotionValue<number>;
   className?: string;
   style?: MotionStyle;
 }
 
 /** The CV as a viewer window: a title bar with the file name over a page that shows what is behind it. */
 export const ResumeFrame = ({
-  firstPageOpacity,
-  firstPageScale,
   intro,
+  firstPageOpacity,
+  firstPageY,
+  firstPageScale,
+  closingOpacity,
   className,
   style,
 }: ResumeFrameProps) => (
   <Viewer className={className} style={style}>
     <Cutout $rect={PAGE} $tone="card">
-      <Startup style={{ opacity: firstPageOpacity }}>
+      <Sheet style={{ opacity: firstPageOpacity, y: firstPageY }}>
+        <ResumeSheet />
         <FirstPage style={{ scale: firstPageScale }}>
           <Statement {...intro} exitOnScroll={false} />
         </FirstPage>
-      </Startup>
+      </Sheet>
+      {closingOpacity && (
+        <Sheet style={{ opacity: closingOpacity }}>
+          <ResumeSheet />
+        </Sheet>
+      )}
     </Cutout>
     <TitleBar aria-hidden="true">
       <WindowControls>

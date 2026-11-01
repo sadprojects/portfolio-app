@@ -13,14 +13,14 @@ export const contentData: ContentData = {
       title: 'Experience',
       intro: {
         label: 'Where I work',
-        text: 'Eight years of shipping for the web, from WordPress tickets to the trading tools a team now builds with me.',
+        text: 'Eight years of building for the web, from WordPress themes and plugins to the trading tools my team builds today.',
       },
     },
     projects: {
       label: 'Projects',
       intro: {
         label: 'Side projects',
-        text: 'Things I built to learn something, mostly after hours and mostly still running.',
+        text: 'Things I built to learn something, mostly after hours.',
       },
     },
     skills: {
@@ -28,7 +28,7 @@ export const contentData: ContentData = {
       title: 'Skills & Credentials',
       intro: {
         label: 'Craft',
-        text: 'Front-end first, full-stack when it matters, and opinionated about the details users feel.',
+        text: 'Front-end first, full-stack when the job needs it. The tools I work with, and the credentials behind them.',
       },
     },
     hobbies: {
@@ -193,7 +193,7 @@ export const contentData: ContentData = {
     },
   ],
   introduction: [
-    "{{age}} years old, based in Bucharest. I've spent {{years}}+ years building for the web, from WordPress support tickets to the trading tools at London Stock Exchange Group, where I now lead a team and still write code every day.",
+    "{{age}} years old, based in Bucharest. I've spent {{years}}+ years building for the web, from WordPress themes and plugins to the trading tools at London Stock Exchange Group, where I now lead a team and still write code every day.",
     'Off the clock I shoot photos and lose evenings to open-world games.',
   ],
   footer: 'Built with ❤️ by Silviu Dinu',
@@ -255,7 +255,7 @@ export const contentData: ContentData = {
       title: 'React Weather App',
       city: 'Ploiești',
       description:
-        'Search the weather anywhere in the world, or let it find you and show what matters where you are. React in front, Express behind.',
+        'A weather app built with React and Express. Search any city in the world, or let it detect your location and show the forecast there.',
       period: 'Jun 2021 - Jul 2021',
       tools: [
         'React Hooks',
@@ -273,7 +273,7 @@ export const contentData: ContentData = {
       title: 'WebSockets Chat',
       city: 'Ploiești',
       description:
-        'A real-time chat room: React on the front end, Socket.io on the back end, messages fan out to everyone connected.',
+        'A real-time chat room built with React and Socket.io. Everyone connected sees each message as it is sent.',
       period: 'Apr 2021',
       tools: [
         'React Hooks',
@@ -289,7 +289,7 @@ export const contentData: ContentData = {
       title: 'URL Shortener',
       city: 'Ploiești',
       description:
-        'A bit.ly clone: paste a long URL, get a short one. Vue on the front end, Express and MongoDB behind it.',
+        'A URL shortener like bit.ly, built with Vue, Express and MongoDB. Paste a long link and get a short one.',
       period: 'Oct 2020',
       tools: ['VueJS', 'NodeJS', 'Express', 'MongoDB', 'REST APIs'],
       repo: 'https://github.com/SilviuDinu/url-shortener',
@@ -386,7 +386,7 @@ export const contentData: ContentData = {
       responsibilities: [
         'Lead a team of engineers building the trading and analytics tools our users rely on every day; own technical direction, code quality and delivery',
         'Mentor engineers, run design reviews and keep the team shipping, while staying hands-on in the codebase',
-        "Put AI to work for the team rather than instead of it: coding agents in the daily loop, MCP servers wired into our internal tooling, and the same review bar for their output as for anyone else's",
+        "Brought AI into the team's daily work: coding agents for everyday tasks, MCP servers connected to our internal tooling, and the same code review for their output as for ours",
         'Stack: React, TypeScript, WebSockets, SharedWorkers, CI/CD, AI agents, MCP',
       ],
     },

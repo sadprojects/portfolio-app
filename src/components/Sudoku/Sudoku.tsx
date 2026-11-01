@@ -10,11 +10,9 @@ import { formatTime, getHighScores, isNewBest } from './scores';
 import {
   ActionButton,
   ActionRow,
+  Actions,
   BoardFrame,
-  BoardSection,
-  ControlGroup,
   ControlLabel,
-  ControlsSection,
   DifficultyTab,
   DifficultyTabs,
   ErrorBadge,
@@ -22,7 +20,9 @@ import {
   HighScoreItem,
   NumberButton,
   NumberPad,
+  Readout,
   StatusBar,
+  TopBar,
 } from './Sudoku.styles';
 import type { SudokuDifficulty } from './types';
 import { useSecretCode } from './useSecretCode';
@@ -113,9 +113,21 @@ export const Sudoku = () => {
 
   return (
     <GameContainer ref={containerRef}>
-      <BoardSection>
-        <StatusBar>
-          <Timer startTime={state.startTime} isComplete={state.isComplete} />
+      <TopBar>
+        <DifficultyTabs role="tablist" aria-label="Difficulty">
+          {DIFFICULTIES.map((difficulty) => (
+            <DifficultyTab
+              key={difficulty}
+              role="tab"
+              $isActive={state.difficulty === difficulty}
+              aria-selected={state.difficulty === difficulty}
+              onClick={() => startNewGame(difficulty)}
+            >
+              {difficulty}
+            </DifficultyTab>
+          ))}
+        </DifficultyTabs>
+        <Readout>
           <ErrorBadge
             $hasErrors={state.errors.size > 0}
             role="status"
@@ -123,63 +135,41 @@ export const Sudoku = () => {
           >
             {errorSummary(state.errors.size)}
           </ErrorBadge>
-        </StatusBar>
+          <Timer startTime={state.startTime} isComplete={state.isComplete} />
+        </Readout>
+      </TopBar>
 
-        <BoardFrame>
-          <Board
-            state={state}
-            heldDigit={heldDigit}
-            onCellClick={onCellClick}
-          />
-          <WinOverlay
-            isComplete={state.isComplete}
-            elapsedTime={state.elapsedTime}
-            isNewBestTime={isNewBestTime}
-            difficulty={state.difficulty}
-            onPlayAgain={startNewGame}
-          />
-        </BoardFrame>
-      </BoardSection>
+      <BoardFrame>
+        <Board state={state} heldDigit={heldDigit} onCellClick={onCellClick} />
+        <WinOverlay
+          isComplete={state.isComplete}
+          elapsedTime={state.elapsedTime}
+          isNewBestTime={isNewBestTime}
+          difficulty={state.difficulty}
+          onPlayAgain={startNewGame}
+        />
+      </BoardFrame>
 
-      <ControlsSection>
-        <ControlGroup>
-          <ControlLabel id="difficulty-label">Difficulty</ControlLabel>
-          <DifficultyTabs role="tablist" aria-labelledby="difficulty-label">
-            {DIFFICULTIES.map((difficulty) => (
-              <DifficultyTab
-                key={difficulty}
-                role="tab"
-                $isActive={state.difficulty === difficulty}
-                aria-selected={state.difficulty === difficulty}
-                onClick={() => startNewGame(difficulty)}
-              >
-                {difficulty}
-              </DifficultyTab>
-            ))}
-          </DifficultyTabs>
-        </ControlGroup>
+      <ControlLabel id="numbers-label" $hidden>
+        Numbers {heldDigit && `(${heldDigit} highlighted)`}
+      </ControlLabel>
+      <NumberPad role="group" aria-labelledby="numbers-label">
+        {DIGITS.map((digit) => (
+          <NumberButton
+            key={digit}
+            $isActive={heldDigit === digit}
+            onClick={() => onDigitClick(digit)}
+            disabled={state.isComplete || remaining[digit] === 0}
+            aria-label={`Number ${digit}${remaining[digit] === 0 ? ', completed' : ''}`}
+            aria-pressed={heldDigit === digit}
+          >
+            {digit}
+          </NumberButton>
+        ))}
+      </NumberPad>
 
-        <ControlGroup>
-          <ControlLabel id="numbers-label">
-            Numbers {heldDigit && `(${heldDigit} highlighted)`}
-          </ControlLabel>
-          <NumberPad role="group" aria-labelledby="numbers-label">
-            {DIGITS.map((digit) => (
-              <NumberButton
-                key={digit}
-                $isActive={heldDigit === digit}
-                onClick={() => onDigitClick(digit)}
-                disabled={state.isComplete || remaining[digit] === 0}
-                aria-label={`Number ${digit}${remaining[digit] === 0 ? ', completed' : ''}`}
-                aria-pressed={heldDigit === digit}
-              >
-                {digit}
-              </NumberButton>
-            ))}
-          </NumberPad>
-        </ControlGroup>
-
-        <ActionRow>
+      <ActionRow>
+        <Actions>
           <ActionButton
             onClick={() => dispatch({ type: 'UNDO' })}
             disabled={state.history.length === 0 || state.isComplete}
@@ -200,8 +190,7 @@ export const Sudoku = () => {
           >
             Reset
           </ActionButton>
-        </ActionRow>
-
+        </Actions>
         <ActionButton
           $variant="primary"
           onClick={() => startNewGame(state.difficulty)}
@@ -209,16 +198,16 @@ export const Sudoku = () => {
         >
           New game
         </ActionButton>
+      </ActionRow>
 
-        {bestTime && (
-          <ControlGroup>
-            <ControlLabel>Best time</ControlLabel>
-            <HighScoreItem role="status">
-              {formatTime(bestTime.time)}
-            </HighScoreItem>
-          </ControlGroup>
-        )}
-      </ControlsSection>
+      {bestTime && (
+        <StatusBar>
+          <ControlLabel>Best time</ControlLabel>
+          <HighScoreItem role="status">
+            {formatTime(bestTime.time)}
+          </HighScoreItem>
+        </StatusBar>
+      )}
     </GameContainer>
   );
 };

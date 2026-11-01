@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
 /** Kept in the accessibility tree, removed from the picture. */
-const srOnly = css`
+export const srOnly = css`
   position: absolute;
   width: 1px;
   height: 1px;

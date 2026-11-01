@@ -5,12 +5,12 @@ import { motionValue } from 'framer-motion';
 import { LaptopFrame } from './Laptop';
 
 describe('LaptopFrame', () => {
-  it('keeps its mask until the display is dark, and folds the lid by its angle', async () => {
+  it('keeps its mask until the screen is covered, and folds the lid by its angle', async () => {
     const screenOff = motionValue(0);
     const lidAngle = motionValue(0);
     const { container } = render(
       <ThemeProvider>
-        <LaptopFrame lidAngle={lidAngle} screenOff={screenOff}>
+        <LaptopFrame lidAngle={lidAngle} screenCovered={screenOff}>
           <p>On screen</p>
         </LaptopFrame>
       </ThemeProvider>,
@@ -44,7 +44,6 @@ describe('LaptopFrame', () => {
     ] as HTMLElement[];
     expect(mask).toHaveStyle({ visibility: 'visible' });
     expect(lid.style.transform).not.toContain('rotateX');
-    // The screen alone: no dark overlay waits to fade in.
     expect(lid.querySelectorAll('div')).toHaveLength(1);
   });
 });

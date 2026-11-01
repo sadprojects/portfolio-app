@@ -3,10 +3,17 @@ import { SectionHeading } from '@components/ui/SectionHeading';
 import { contentData } from '@data/content';
 import type { Skill } from '@data/types';
 import { useTilt } from '@hooks/useTilt';
-import { lift, stagger } from '@styles/motion';
-import { LayoutGroup, motion } from 'framer-motion';
-import { ArrowUpRight, Globe, Trophy, Wrench } from 'lucide-react';
-import { useState } from 'react';
+import { OPENER_SPRING, lift, stagger } from '@styles/motion';
+import {
+  LayoutGroup,
+  easeOut,
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
+import { ArrowUpRight, Check, Globe, Trophy, Wrench } from 'lucide-react';
+import { useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import { CodewarsStats } from './CodewarsStats';
@@ -15,6 +22,14 @@ import { useCodewars } from './useCodewars';
 const ALL_SKILLS_FILTER = 'All';
 const TILE_TILT_DEGREES = 6;
 const PILL_SPRING = { type: 'spring', stiffness: 400, damping: 32 } as const;
+const CHECK_GREEN = '#28c840';
+/* Each credential slides in from the right of the screen as it enters, its ring fades in and its check zooms down into the ring. */
+const CREDENTIAL_ENTERS = ['start 96%', 'start 52%'] as const;
+const RING_FADES_IN = [0.15, 0.55];
+const CHECK_LANDS = [0.4, 1];
+const CHECK_ZOOM = 3.2;
+
+type Credential = (typeof contentData.certifications)[number];
 
 const Container = styled.div`
   max-width: 1200px;
@@ -69,7 +84,7 @@ const ActivePill = styled(motion.span)`
 const SkillGrid = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
-  gap: 2.75rem;
+  gap: 4.5rem 2.75rem;
 `;
 
 const Tile = styled(motion.div)`
@@ -131,14 +146,16 @@ const LevelBar = styled.span<{ $level: number }>`
 `;
 
 const SubHeading = styled.h3`
-  margin: 6rem 0 2.5rem;
+  margin: 8rem 0 3rem;
   font-family: ${({ theme }) => theme.typography.fonts.display};
   font-weight: 400;
   font-size: clamp(1.6rem, 3vw, 2.25rem);
   line-height: 1.1;
 `;
 
+/* Rows wait off to the right before they enter; clipped here so they never widen the page. */
 const CredentialList = styled.div`
+  overflow-x: clip;
   border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
@@ -148,7 +165,7 @@ const CredentialRow = styled.a`
   align-items: center;
   gap: 0.75rem 1.5rem;
   margin: 0 -1.25rem;
-  padding: 2.75rem 1.25rem;
+  padding: clamp(3rem, 6vw, 5.5rem) 1.25rem;
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 0.75rem;
   color: inherit;
@@ -176,10 +193,28 @@ const CredentialRow = styled.a`
   }
 `;
 
-const CredentialIndex = styled.span`
-  font-family: ${({ theme }) => theme.typography.fonts.display};
-  font-size: 1.5rem;
-  color: ${({ theme }) => theme.colors.secondary};
+const CredentialSlide = styled(motion.div)`
+  will-change: transform, opacity;
+`;
+
+const Badge = styled.span`
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  aspect-ratio: 1;
+  color: ${CHECK_GREEN};
+`;
+
+const BadgeRing = styled(motion.i)`
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+`;
+
+const BadgeCheck = styled(motion.span)`
+  display: grid;
 `;
 
 const CredentialTitle = styled.span`
@@ -224,7 +259,7 @@ const CredentialAction = styled.span`
 const AtAGlance = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  margin-top: 6rem;
+  margin-top: 8rem;
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 1rem;
   background: ${({ theme }) => `${theme.colors.card}e6`};
@@ -287,6 +322,50 @@ const SkillTile = ({ name, category, level }: Skill) => {
   );
 };
 
+const CredentialItem = ({ credential }: { credential: Credential }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: [...CREDENTIAL_ENTERS],
+  });
+  const entered = useSpring(scrollYProgress, OPENER_SPRING);
+  const x = useTransform(entered, [0, 1], ['100%', '0%'], { ease: easeOut });
+  const opacity = useTransform(entered, [0, 0.35], [0, 1]);
+  const ring = useTransform(entered, RING_FADES_IN, [0, 1]);
+  const checkScale = useTransform(entered, CHECK_LANDS, [CHECK_ZOOM, 1], {
+    ease: easeOut,
+  });
+  const checkOpacity = useTransform(entered, [CHECK_LANDS[0], 0.65], [0, 1]);
+
+  return (
+    <CredentialSlide ref={ref} style={{ x, opacity }}>
+      <CredentialRow
+        href={credential.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${credential.title}, view certificate`}
+      >
+        <Badge aria-hidden="true">
+          <BadgeRing style={{ opacity: ring }} />
+          <BadgeCheck style={{ scale: checkScale, opacity: checkOpacity }}>
+            <Check size={20} strokeWidth={2.5} />
+          </BadgeCheck>
+        </Badge>
+        <span>
+          <CredentialTitle>{credential.title}</CredentialTitle>
+          <CredentialMeta>
+            {[credential.issuer, credential.date].filter(Boolean).join(' · ')}
+          </CredentialMeta>
+        </span>
+        <CredentialAction>
+          Open
+          <ArrowUpRight size={16} />
+        </CredentialAction>
+      </CredentialRow>
+    </CredentialSlide>
+  );
+};
+
 const Skills = () => {
   const { skills, certifications, codewars, sections } = contentData;
   const [filter, setFilter] = useState(ALL_SKILLS_FILTER);
@@ -341,31 +420,8 @@ const Skills = () => {
         <>
           <SubHeading>Credentials</SubHeading>
           <CredentialList>
-            {certifications.map((credential, position) => (
-              <Scrub key={credential.url} distance={50}>
-                <CredentialRow
-                  href={credential.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${credential.title}, view certificate`}
-                >
-                  <CredentialIndex>
-                    {String(position + 1).padStart(2, '0')}
-                  </CredentialIndex>
-                  <span>
-                    <CredentialTitle>{credential.title}</CredentialTitle>
-                    <CredentialMeta>
-                      {[credential.issuer, credential.date]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </CredentialMeta>
-                  </span>
-                  <CredentialAction>
-                    Open
-                    <ArrowUpRight size={16} />
-                  </CredentialAction>
-                </CredentialRow>
-              </Scrub>
+            {certifications.map((credential) => (
+              <CredentialItem key={credential.url} credential={credential} />
             ))}
           </CredentialList>
         </>

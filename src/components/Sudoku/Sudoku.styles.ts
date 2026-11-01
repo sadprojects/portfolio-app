@@ -1,4 +1,5 @@
 import { LineButton } from '@components/ui/LineButton';
+import { srOnly } from '@styles/a11y';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
@@ -18,28 +19,33 @@ const kicker = css`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-/* The board and the controls sit side by side where there is room for both; else the controls wrap below the board. */
+/* One column, as wide as it is tall allows: the level and the clock above the board, the digits in a row beneath it, the actions last. */
 export const GameContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  gap: 2rem 3rem;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: min(100%, 58vh);
+  margin: 0 auto;
 `;
 
-export const BoardSection = styled.div`
+export const TopBar = styled.div`
   display: flex;
-  flex: 3 1 16rem;
-  flex-direction: column;
-  gap: 0.9rem;
-  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+`;
+
+export const Readout = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
 `;
 
 export const StatusBar = styled.div`
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
   gap: 1rem;
-  width: 100%;
 `;
 
 export const TimerDisplay = styled.div`
@@ -161,22 +167,9 @@ export const CellButton = styled.button<{
   }
 `;
 
-export const ControlsSection = styled.div`
-  display: flex;
-  flex: 1 1 14rem;
-  flex-direction: column;
-  gap: 1.75rem;
-  min-width: 0;
-`;
-
-export const ControlGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-`;
-
-export const ControlLabel = styled.span`
+export const ControlLabel = styled.span<{ $hidden?: boolean }>`
   ${kicker}
+  ${({ $hidden }) => $hidden && srOnly}
 `;
 
 export const DifficultyTabs = styled.div`
@@ -215,7 +208,7 @@ export const DifficultyTab = styled.button<{ $isActive: boolean }>`
 
 export const NumberPad = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 3rem);
+  grid-template-columns: repeat(9, 1fr);
   gap: 0.4rem;
 `;
 
@@ -255,6 +248,14 @@ export const NumberButton = styled.button<{ $isActive?: boolean }>`
 `;
 
 export const ActionRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.75rem;
+`;
+
+export const Actions = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.75rem;
