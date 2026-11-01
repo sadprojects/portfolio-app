@@ -21,7 +21,7 @@ export interface Section extends SectionCopy {
 
 const { sections } = contentData;
 
-/** Page order, top to bottom. Labels and copy come from content.ts. */
+/** Page order, top to bottom; reorder freely. Labels and copy come from content.ts. Each opener stands on its own wherever it sits, with one pairing: a laptop section directly followed by a resume section share one desk on wide screens (the first on the laptop's screen, the second opened from its dock as the CV), and whatever follows the desk enters once the laptop has gone, a camera rising in behind it. */
 export const SECTIONS: Section[] = [
   { id: 'home', icon: Home, ...sections.home },
   {

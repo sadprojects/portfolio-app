@@ -146,11 +146,12 @@ const geometry = {
   '--screen-centre': `calc(100vh - ${laptopHeight} * ${SCREEN.height / 200})`,
 } as CSSProperties;
 
-/* A formatting root, so the leaving runways (the last section's bottom margin) count towards the pin's travel. The next section is pinned underneath from the moment the laptop has risen out, so it can rise into the empty viewport; the pin then lets go unseen. */
-const Track = styled.section`
+/* A formatting root, so the leaving runways (the last section's bottom margin) count towards the pin's travel. The next section reaches the viewport's bottom edge the moment the laptop has risen out; one that rises in from below is pinned underneath from then, so it can rise into the empty viewport while the pin lets go unseen. */
+const Track = styled.section<{ $nextRisesIn: boolean }>`
   position: relative;
   display: flow-root;
-  margin-bottom: -${100 + CLOSE_VH * (1 - LAPTOP_RISES[1])}vh;
+  margin-bottom: -${({ $nextRisesIn }) =>
+    CLOSE_VH - CLOSE_VH * LAPTOP_RISES[1] + ($nextRisesIn ? 100 : 0)}vh;
   scroll-margin-top: 4rem;
 `;
 
@@ -322,10 +323,12 @@ interface DeskProps {
   onScreen: DeskApp;
   /** Opened from the dock as the CV once the first has scrolled through. */
   inDock: DeskApp;
+  /** Whether the section after this one pins at the top of the viewport and rises in from below, as the camera does: then it waits underneath while the laptop closes. Otherwise it follows once the laptop has gone. */
+  nextRisesIn?: boolean;
 }
 
-/** A pinned laptop that hosts two sections: the first scrolls on its screen, then its dock rises, the CV's icon is clicked and the document opens to scroll the second; finally the laptop shrinks away with the document still open, closes its lid with a sheet of the CV on the screen, and rises out of the viewport for the camera to rise in behind it. */
-export const Desk = ({ onScreen, inDock }: DeskProps) => {
+/** A pinned laptop that hosts two sections: the first scrolls on its screen, then its dock rises, the CV's icon is clicked and the document opens to scroll the second; finally the laptop shrinks away with the document still open, closes its lid with a sheet of the CV on the screen, and rises out of the viewport for whatever follows. */
+export const Desk = ({ onScreen, inDock, nextRisesIn = false }: DeskProps) => {
   const track = useRef<HTMLElement>(null);
   const screenSection = useRef<HTMLDivElement>(null);
   const documentSection = useRef<HTMLDivElement>(null);
@@ -460,7 +463,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   );
 
   return (
-    <Track ref={track} style={geometry}>
+    <Track ref={track} style={geometry} $nextRisesIn={nextRisesIn}>
       <Pin>
         <Artwork
           style={{

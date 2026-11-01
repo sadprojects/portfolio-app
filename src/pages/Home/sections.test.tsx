@@ -5,17 +5,17 @@ import { render } from '@testing-library/react';
 
 import { SECTIONS } from './sections';
 
-/* Guards the page's structure: the order of sections and how each one opens. */
+/* Guards the page's structure: what the order must keep and how each section opens. */
 describe('page sections', () => {
-  it('run home, experience, projects, skills, hobbies, contact', () => {
-    expect(SECTIONS.map((section) => section.id)).toEqual([
-      'home',
-      'experience',
-      'projects',
-      'skills',
-      'hobbies',
-      'contact',
-    ]);
+  it('start at home and end at contact, with a body for everything between', () => {
+    const ids = SECTIONS.map((section) => section.id);
+    expect(ids[0]).toBe('home');
+    expect(ids.at(-1)).toBe('contact');
+    expect(new Set(ids).size).toBe(ids.length);
+    SECTIONS.slice(1, -1).forEach((section) => {
+      expect(section.Component).toBeDefined();
+      expect(section.transition).toBeDefined();
+    });
   });
 
   it('open the agreed way', () => {
