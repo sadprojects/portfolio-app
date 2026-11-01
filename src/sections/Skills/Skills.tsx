@@ -6,14 +6,13 @@ import { useTilt } from '@hooks/useTilt';
 import { OPENER_SPRING, lift, stagger } from '@styles/motion';
 import {
   LayoutGroup,
-  easeIn,
   easeOut,
   motion,
   useScroll,
   useSpring,
   useTransform,
 } from 'framer-motion';
-import { ArrowUpRight, Check, Globe, Trophy, Wrench } from 'lucide-react';
+import { ArrowUpRight, Globe, Trophy, Wrench } from 'lucide-react';
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
 
@@ -24,13 +23,12 @@ const ALL_SKILLS_FILTER = 'All';
 const TILE_TILT_DEGREES = 6;
 const PILL_SPRING = { type: 'spring', stiffness: 400, damping: 32 } as const;
 const CHECK_GREEN = '#28c840';
-/* Each credential slides in from the right of the screen as it enters; once it has, its ring fades in and its check falls from far above like a stamp, lands with a squash, and the ring takes the hit. */
+/* Each credential slides in from the right of the screen as it enters; once it has, its ring draws itself round and then the check draws itself inside, in the middle of the screen where it is seen. */
 const CREDENTIAL_ENTERS = ['start 96%', 'start 72%'] as const;
-const STAMP_FALLS = ['start 70%', 'start 42%'] as const;
-const RING_FADES_IN = [0, 0.35];
-const CHECK_FALLS = [0.3, 0.82];
-const CHECK_LANDS = [0.82, 0.9, 1];
-const CHECK_ZOOM = 4.5;
+const CHECK_DRAWS = ['start 70%', 'start 42%'] as const;
+const RING_DRAWS = [0, 0.55];
+const TICK_DRAWS = [0.5, 1];
+const BADGE_SIZE = 44;
 
 type Credential = (typeof contentData.certifications)[number];
 
@@ -200,24 +198,11 @@ const CredentialSlide = styled(motion.div)`
   will-change: transform, opacity;
 `;
 
-const Badge = styled.span`
-  position: relative;
-  display: grid;
-  place-items: center;
+const Badge = styled.svg`
   width: 2.75rem;
-  aspect-ratio: 1;
+  height: 2.75rem;
+  overflow: visible;
   color: ${CHECK_GREEN};
-`;
-
-const BadgeRing = styled(motion.i)`
-  position: absolute;
-  inset: 0;
-  border: 1.5px solid currentColor;
-  border-radius: 50%;
-`;
-
-const BadgeCheck = styled(motion.span)`
-  display: grid;
 `;
 
 const CredentialTitle = styled.span`
@@ -331,22 +316,18 @@ const CredentialItem = ({ credential }: { credential: Credential }) => {
     target: ref,
     offset: [...CREDENTIAL_ENTERS],
   });
-  const { scrollYProgress: stamping } = useScroll({
+  const { scrollYProgress: drawing } = useScroll({
     target: ref,
-    offset: [...STAMP_FALLS],
+    offset: [...CHECK_DRAWS],
   });
   const entered = useSpring(scrollYProgress, OPENER_SPRING);
   const x = useTransform(entered, [0, 1], ['100%', '0%'], { ease: easeOut });
   const opacity = useTransform(entered, [0, 0.35], [0, 1]);
-  const ring = useTransform(stamping, RING_FADES_IN, [0, 1]);
-  const ringScale = useTransform(stamping, CHECK_LANDS, [1, 1.12, 1]);
-  const checkScale = useTransform(
-    stamping,
-    [CHECK_FALLS[0], CHECK_FALLS[1], CHECK_LANDS[1], CHECK_LANDS[2]],
-    [CHECK_ZOOM, 1, 0.86, 1],
-    { ease: [easeIn, easeOut, easeOut] },
-  );
-  const checkOpacity = useTransform(stamping, [CHECK_FALLS[0], 0.55], [0, 1]);
+  const ring = useTransform(drawing, RING_DRAWS, [0, 1]);
+  const tick = useTransform(drawing, TICK_DRAWS, [0, 1]);
+  // A stroke of no length still shows its round caps as a dot, so each stays unseen until it starts.
+  const ringShown = useTransform(ring, (drawn) => (drawn > 0 ? 1 : 0));
+  const tickShown = useTransform(tick, (drawn) => (drawn > 0 ? 1 : 0));
 
   return (
     <CredentialSlide ref={ref} style={{ x, opacity }}>
@@ -356,11 +337,25 @@ const CredentialItem = ({ credential }: { credential: Credential }) => {
         rel="noopener noreferrer"
         aria-label={`${credential.title}, view certificate`}
       >
-        <Badge aria-hidden="true">
-          <BadgeRing style={{ opacity: ring, scale: ringScale }} />
-          <BadgeCheck style={{ scale: checkScale, opacity: checkOpacity }}>
-            <Check size={20} strokeWidth={2.5} />
-          </BadgeCheck>
+        <Badge
+          viewBox={`0 0 ${BADGE_SIZE} ${BADGE_SIZE}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.75}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <motion.circle
+            cx={BADGE_SIZE / 2}
+            cy={BADGE_SIZE / 2}
+            r={BADGE_SIZE / 2 - 2}
+            style={{ pathLength: ring, opacity: ringShown }}
+          />
+          <motion.path
+            d="M14 23l6 6l11-13"
+            style={{ pathLength: tick, opacity: tickShown }}
+          />
         </Badge>
         <span>
           <CredentialTitle>{credential.title}</CredentialTitle>

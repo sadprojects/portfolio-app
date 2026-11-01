@@ -5,15 +5,26 @@ import { OPENER_SPRING } from '@styles/motion';
 import {
   easeIn,
   easeInOut,
-  easeOut,
   motion,
+  useMotionValueEvent,
   useScroll,
   useSpring,
   useTransform,
 } from 'framer-motion';
-import { Compass, FileText, Folder, Image, Terminal } from 'lucide-react';
+import {
+  Compass,
+  FileText,
+  Folder,
+  Image,
+  Mail,
+  Music,
+  Settings,
+  StickyNote,
+  Terminal,
+} from 'lucide-react';
 import {
   useRef,
+  useState,
   type CSSProperties,
   type FocusEvent,
   type ReactNode,
@@ -21,9 +32,11 @@ import {
 import styled from 'styled-components';
 
 import { Scrollbar, Startup } from './Cutout';
+import { Genie } from './Genie';
+import type { GenieOrigin } from './genieSlice';
 import { LaptopFrame, ScreenInset } from './Laptop';
 import { ARTWORK, PINNED_WIDTH, SCREEN, SCREEN_CENTRE } from './laptopArtwork';
-import { ResumeFrame } from './Resume';
+import { ResumeFrame, ResumeStill } from './Resume';
 
 export interface DeskApp {
   id: SectionId;
@@ -40,28 +53,20 @@ const CLOSE_VH = 140;
 const START_SCALE = 2.2;
 const END_SCALE = 0.55;
 const LID_CLOSED_DEGREES = -80;
-const DOCUMENT_ICON_SCALE = 0.06;
-/* Where the CV's dock icon sits in the screen, which the document streams up from. */
-const DOCUMENT_ORIGIN = '69% 93%';
-const STREAM_WIDTH = 0.26;
-const STREAM_LEAN_DEGREES = -12;
-const FIRST_PAGE_ZOOM = 1.8;
 
 /* Beats of the arrival: the laptop settles over the first part, and its line fades in, holds to be read, and fades out, leaving the screen clear before the section enters. */
 const LAPTOP_SETTLES = [0, 0.55];
 const LINE_SHOWS = [0.04, 0.3, 0.78, 0.91];
-/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document streams up out of it like a genie over the section on screen, its first page zooms into place and holds to be read, then the page scrolls up out of the viewer with the section following right behind it, one scroll with the page. */
+/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document genies up out of it over the section on screen, its first page holds to be read, then the page scrolls up out of the viewer with the section following right behind it, one scroll with the page. */
 const DOCK_SHOWS = [0, 0.07, 0.6, 0.66];
 const ICON_CLICK = [0.07, 0.1, 0.14];
 const ICON_OPENS = [0.1, 0.14];
 const LABEL_SHOWS = [0.07, 0.1, 0.22, 0.26];
-/* The genie: a narrow stream rises from the icon to the window's full height, leaning, then unfurls sideways to the full width. */
-const GENIE_STREAMS = [0.14, 0.3];
-const GENIE_UNFURLS = [0.3, 0.48];
-const DOCUMENT_APPEARS = [0.14, 0.17];
+/* The genie: the document is pulled out of its icon through a funnel, as the Dock does it, and the real window takes over the moment it is whole. The still it is built from is mounted only around that beat. */
+const GENIE_OPENS = [0.14, 0.48];
+const GENIE_MOUNTED = [0.03, 0.5];
 const SCREEN_SECTION_FADES = [0.34, 0.48];
 const DOCUMENT_SECTION_SHOWS = [0.48, 0.5];
-const FIRST_PAGE_SETTLES = [0.14, 0.48];
 const FIRST_PAGE_SCROLLS = [0.6, 1];
 /* Beats of the closing runway: a sheet of the CV covers the page, the lid folds down onto the keyboard with it still on, and the laptop rises out of the viewport before the fold is done; the camera, pinned underneath from then on, rises into its place from below. Nothing scales during the fold, so the lid's layer is never re-rasterised mid-turn. */
 const SHEET_COVERS = [0, 0.15];
@@ -69,7 +74,7 @@ const LID_FOLDS = [0.15, 0.6];
 const LAPTOP_RISES = [0.4, 0.8];
 const RISEN_OUT = '-100vh';
 
-/* The dock's apps, as tinted tiles; the CV sits at the right end, where the document streams up from. */
+/* The dock's apps, as tinted tiles; the CV sits at the right end, where the document genies up from. */
 const DOCK_APPS = [
   {
     name: 'files',
@@ -83,14 +88,34 @@ const DOCK_APPS = [
     tint: 'linear-gradient(160deg, #39b6ff, #1364d6)',
   },
   {
+    name: 'mail',
+    Icon: Mail,
+    tint: 'linear-gradient(160deg, #5ac8fa, #1f7ae0)',
+  },
+  {
     name: 'photos',
     Icon: Image,
     tint: 'conic-gradient(from 200deg, #ff7a59, #ffd166, #7bd389, #4cc9f0, #c77dff, #ff7a59)',
   },
   {
+    name: 'notes',
+    Icon: StickyNote,
+    tint: 'linear-gradient(160deg, #ffe27a, #f4b400)',
+  },
+  {
+    name: 'music',
+    Icon: Music,
+    tint: 'linear-gradient(160deg, #ff6b7a, #ff2d55)',
+  },
+  {
     name: 'terminal',
     Icon: Terminal,
     tint: 'linear-gradient(160deg, #3a3a3f, #141416)',
+  },
+  {
+    name: 'settings',
+    Icon: Settings,
+    tint: 'linear-gradient(160deg, #a0a0a8, #5e5e66)',
   },
   {
     name: 'cv',
@@ -143,16 +168,16 @@ const Dock = styled(motion.div)`
   left: 50%;
   bottom: 2.5%;
   display: flex;
-  gap: 0.8em;
-  height: 14%;
-  padding: 0.6em;
+  gap: 0.65em;
+  height: 10.5%;
+  padding: 0.5em;
   translate: -50% 0;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 1.3em;
   background: rgba(255, 255, 255, 0.22);
   box-shadow: 0 0.6em 1.6em rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(16px);
-  font-size: clamp(0.5rem, 0.9vw, 0.9rem);
+  font-size: clamp(0.45rem, 0.8vw, 0.8rem);
 `;
 
 const DockIcon = styled(motion.span)<{ $tint: string; $running?: boolean }>`
@@ -229,14 +254,34 @@ const DockLabel = styled(motion.span)`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-/* Fills the screen once open; streams up out of its dock icon. */
+/* Fills the screen once open. */
 const Document = styled(ResumeFrame)`
   position: absolute;
   inset: 0;
   aspect-ratio: auto;
-  transform-origin: ${DOCUMENT_ORIGIN};
-  will-change: transform, opacity;
+  will-change: opacity;
 `;
+
+/* The CV's icon in the dock, as fractions of the screen, from layout alone (the dock's own slide does not count). */
+const iconOrigin = (
+  dock: HTMLElement,
+  icon: HTMLElement,
+): GenieOrigin | null => {
+  const screen = dock.offsetParent as HTMLElement | null;
+  if (!screen) return null;
+  return {
+    x:
+      (dock.offsetLeft -
+        dock.offsetWidth / 2 +
+        icon.offsetLeft +
+        icon.offsetWidth / 2) /
+      screen.offsetWidth,
+    y:
+      (dock.offsetTop + icon.offsetTop + icon.offsetHeight / 2) /
+      screen.offsetHeight,
+    width: icon.offsetWidth / screen.offsetWidth,
+  };
+};
 
 /* Behind the pin and as wide as the screen; its first line enters at the screen's bottom edge once the laptop has settled and its line has cleared. */
 const SectionOnScreen = styled(motion.div)`
@@ -276,6 +321,9 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const track = useRef<HTMLElement>(null);
   const screenSection = useRef<HTMLDivElement>(null);
   const documentSection = useRef<HTMLDivElement>(null);
+  const dock = useRef<HTMLDivElement>(null);
+  const documentIcon = useRef<HTMLSpanElement>(null);
+  const [genie, setGenie] = useState<GenieOrigin | null>(null);
   const { scrollYProgress: arrival } = useScroll({
     target: track,
     offset: ['start 70%', `start ${-ARRIVE_VH}%`],
@@ -336,28 +384,21 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const iconScale = useTransform(desk, ICON_CLICK, [1, 1.35, 1]);
   const iconRunning = useTransform(desk, ICON_OPENS, [0, 0.8]);
   const labelOpacity = useTransform(desk, LABEL_SHOWS, [0, 1, 1, 0]);
-  const documentScaleY = useTransform(
+  const genieProgress = useTransform(desk, GENIE_OPENS, [0, 1]);
+  // The real window takes over the moment the genie is whole.
+  const documentOpacity = useTransform(
     desk,
-    GENIE_STREAMS,
-    [DOCUMENT_ICON_SCALE, 1],
-    { ease: easeOut },
+    [GENIE_OPENS[1] - 0.003, GENIE_OPENS[1]],
+    [0, 1],
   );
-  const documentScaleX = useTransform(
-    desk,
-    [GENIE_STREAMS[0], GENIE_UNFURLS[0], GENIE_UNFURLS[1]],
-    [DOCUMENT_ICON_SCALE, STREAM_WIDTH, 1],
-    { ease: easeInOut },
-  );
-  const documentSkew = useTransform(
-    desk,
-    [GENIE_STREAMS[0], GENIE_UNFURLS[0], GENIE_UNFURLS[1]],
-    [STREAM_LEAN_DEGREES, STREAM_LEAN_DEGREES / 2, 0],
-  );
-  const documentOpacity = useTransform(desk, DOCUMENT_APPEARS, [0, 1]);
-  const firstPageScale = useTransform(desk, FIRST_PAGE_SETTLES, [
-    FIRST_PAGE_ZOOM,
-    1,
-  ]);
+  useMotionValueEvent(desk, 'change', (progress) => {
+    const wanted = progress > GENIE_MOUNTED[0] && progress < GENIE_MOUNTED[1];
+    setGenie((current) => {
+      if (!wanted) return null;
+      if (current || !dock.current || !documentIcon.current) return current;
+      return iconOrigin(dock.current, documentIcon.current);
+    });
+  });
   // Raw, not sprung, so the page and the section behind it stay locked together.
   const firstPageY = useTransform(
     deskRunway,
@@ -422,6 +463,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
             </Startup>
             <Scrollbar progress={screenScrolled} opacity={screenBarOpacity} />
             <Dock
+              ref={dock}
               style={{
                 y: dockY,
                 opacity: dockOpacity,
@@ -433,6 +475,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
                 name === DOCUMENT_APP ? (
                   <DocumentIcon
                     key={name}
+                    ref={documentIcon}
                     $tint={tint}
                     style={{ scale: iconScale }}
                   >
@@ -452,17 +495,16 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
             </Dock>
             <Document
               firstPageY={firstPageY}
-              firstPageScale={firstPageScale}
               closingOpacity={sheetCover}
               intro={inDock.intro}
               scrolled={documentScrolled}
-              style={{
-                scaleX: documentScaleX,
-                scaleY: documentScaleY,
-                skewX: documentSkew,
-                opacity: documentOpacity,
-              }}
+              style={{ opacity: documentOpacity }}
             />
+            {genie && (
+              <Genie progress={genieProgress} origin={genie}>
+                <ResumeStill intro={inDock.intro} />
+              </Genie>
+            )}
           </LaptopFrame>
         </Artwork>
       </Pin>

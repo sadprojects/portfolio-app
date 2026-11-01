@@ -24,8 +24,8 @@ const SCREEN_CENTRE = {
 const ZOOM = 1.8;
 /* The camera rises into place from below the viewport over this much scroll once its stage has pinned. */
 const ENTER_VIEWPORTS = 0.35;
-const READ_VIEWPORTS = 1.2;
-const ZOOM_VIEWPORTS = 1.2;
+const READ_VIEWPORTS = 0.7;
+const ZOOM_VIEWPORTS = 0.9;
 const VIEWPORTS_PER_PHOTO = 0.75;
 const INTRO_FADE_OUT_START = 0.8;
 

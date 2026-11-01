@@ -1,5 +1,6 @@
+import type { SectionIntro } from '@data/types';
 import { Grid, col } from '@styles/grid';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { RevealText } from './RevealText';
 
@@ -13,7 +14,7 @@ const StatementGrid = styled(Grid).attrs({ as: 'section' })`
   }
 `;
 
-const StatementLabel = styled(RevealText)`
+const label = css`
   ${col('4 / 10', '3 / 11')}
   margin: 0;
   text-align: center;
@@ -24,7 +25,7 @@ const StatementLabel = styled(RevealText)`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-const StatementLine = styled(RevealText)`
+const line = css`
   ${col('3 / 11', '2 / 12')}
   margin: 0;
   text-align: center;
@@ -35,12 +36,34 @@ const StatementLine = styled(RevealText)`
   letter-spacing: -0.01em;
 `;
 
-interface StatementProps {
-  label: string;
-  text: string;
+const StatementLabel = styled(RevealText)`
+  ${label}
+`;
+
+const StatementLine = styled(RevealText)`
+  ${line}
+`;
+
+const StaticLabel = styled.p`
+  ${label}
+`;
+
+const StaticLine = styled.p`
+  ${line}
+`;
+
+interface StatementProps extends SectionIntro {
   exitOnScroll?: boolean;
   animate?: boolean;
 }
+
+/** The same lines as plain text, for stills that are drawn many times over: no reveal, no hooks. */
+export const StaticStatement = ({ label, text }: SectionIntro) => (
+  <StatementGrid aria-hidden="true">
+    <StaticLabel>{label}</StaticLabel>
+    <StaticLine>{text}</StaticLine>
+  </StatementGrid>
+);
 
 export const Statement = ({
   label,
