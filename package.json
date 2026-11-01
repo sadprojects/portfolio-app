@@ -15,6 +15,7 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev",
+    "dev:host": "vp dev --host",
     "prebuild": "node scripts/generate-version.js",
     "build": "tsc && vp build",
     "postdeploy": "node scripts/post-deploy.js",
