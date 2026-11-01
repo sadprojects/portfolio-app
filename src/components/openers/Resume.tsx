@@ -1,4 +1,4 @@
-import { StaticStatement, Statement } from '@components/motion/Statement';
+import { Statement } from '@components/motion/Statement';
 import { contentData } from '@data/content';
 import type { SectionIntro } from '@data/types';
 import { motion, type MotionStyle, type MotionValue } from 'framer-motion';
@@ -20,7 +20,7 @@ const DOCK_SCALE = 0.06;
 const OPENER_WIDTH = 'min(92vw, 64rem)';
 const TRAFFIC_LIGHTS = ['#ff5f57', '#febc2e', '#28c840'];
 
-/* A CV's shape in faint bars, in % of the page: [left, top, widths of the lines]. The middle band stays clear for the section's line, the top right for the portrait. */
+/* A CV's shape in faint bars, in % of the page: [left, top, widths of the lines]. The middle band stays clear for the section's line. */
 const SKELETON_GROUPS: [number, number, number[]][] = [
   [8, 10, [24, 14]],
   [8, 22, [28, 28, 22]],
@@ -38,15 +38,6 @@ const Viewer = styled(motion.div)`
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 10px;
   box-shadow: ${({ theme }) => theme.shadows.xl};
-`;
-
-/* The viewer's look with nothing moving, for a still of it. */
-const Still = styled.div`
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 10px;
 `;
 
 const TitleBar = styled.div`
@@ -115,7 +106,7 @@ const Bar = styled.i<{ $left: number; $top: number; $width: number }>`
   opacity: 0.7;
 `;
 
-const FirstPage = styled.div`
+const FirstPage = styled(motion.div)`
   position: relative;
   width: 100%;
 `;
@@ -140,23 +131,14 @@ const ResumeSheet = () => (
   </Skeleton>
 );
 
-const Chrome = () => (
-  <TitleBar aria-hidden="true">
-    <WindowControls>
-      {TRAFFIC_LIGHTS.map((colour) => (
-        <span key={colour} style={{ background: colour }} />
-      ))}
-    </WindowControls>
-    {contentData.contact.cv}
-  </TitleBar>
-);
-
 interface ResumeFrameProps {
   intro: SectionIntro;
   /** Opacity of the first page, for an opener that fades it away. */
   firstPageOpacity?: MotionValue<number>;
   /** How far the first page has scrolled up, in px, with the section following right behind it. */
   firstPageY?: MotionValue<number>;
+  /** Zoom of the line as the document opens; settled when absent. */
+  firstPageScale?: MotionValue<number>;
   /** Opacity of the sheet that covers the page while the laptop closes, so the lid folds with the CV still on. */
   closingOpacity?: MotionValue<number>;
   /** How far through the document the reader is, for the scrollbar. */
@@ -170,6 +152,7 @@ export const ResumeFrame = ({
   intro,
   firstPageOpacity,
   firstPageY,
+  firstPageScale,
   closingOpacity,
   scrolled,
   className,
@@ -179,7 +162,7 @@ export const ResumeFrame = ({
     <Cutout $rect={PAGE} $tone="card">
       <Sheet style={{ opacity: firstPageOpacity, y: firstPageY }}>
         <ResumeSheet />
-        <FirstPage>
+        <FirstPage style={{ scale: firstPageScale }}>
           <Statement {...intro} exitOnScroll={false} />
         </FirstPage>
       </Sheet>
@@ -190,23 +173,15 @@ export const ResumeFrame = ({
       )}
       {scrolled && <Scrollbar progress={scrolled} />}
     </Cutout>
-    <Chrome />
+    <TitleBar aria-hidden="true">
+      <WindowControls>
+        {TRAFFIC_LIGHTS.map((colour) => (
+          <span key={colour} style={{ background: colour }} />
+        ))}
+      </WindowControls>
+      {contentData.contact.cv}
+    </TitleBar>
   </Viewer>
-);
-
-/** A still of the viewer on its first page, as it looks the moment it has opened; nothing in it moves or listens. */
-export const ResumeStill = ({ intro }: { intro: SectionIntro }) => (
-  <Still>
-    <Cutout $rect={PAGE} $tone="card">
-      <Sheet as="div">
-        <ResumeSheet />
-        <FirstPage>
-          <StaticStatement {...intro} />
-        </FirstPage>
-      </Sheet>
-    </Cutout>
-    <Chrome />
-  </Still>
 );
 
 /** Opener alone: the viewer opens up to show its first page; the section follows below. */

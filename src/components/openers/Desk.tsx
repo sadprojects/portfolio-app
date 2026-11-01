@@ -32,8 +32,6 @@ import {
 import styled from 'styled-components';
 
 import { Scrollbar, Startup } from './Cutout';
-import { Genie } from './Genie';
-import type { GenieOrigin } from './genieSlice';
 import { LaptopFrame, ScreenInset } from './Laptop';
 import {
   ARTWORK,
@@ -43,7 +41,7 @@ import {
   SCREEN_CENTRE,
 } from './laptopArtwork';
 import { MenuBar } from './MenuBar';
-import { ResumeFrame, ResumeStill } from './Resume';
+import { ResumeFrame } from './Resume';
 
 export interface DeskApp {
   id: SectionId;
@@ -64,14 +62,17 @@ const LID_CLOSED_DEGREES = -80;
 /* Beats of the arrival: the laptop settles over the first part, and its line fades in, holds to be read, and fades out, leaving the screen clear before the section enters. */
 const LAPTOP_SETTLES = [0, 0.55];
 const LINE_SHOWS = [0.04, 0.3, 0.78, 0.91];
-/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document genies up out of it over the section on screen, its first page holds to be read, then the page scrolls up out of the viewer with the section following right behind it, one scroll with the page. */
+/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document grows out of it over the section on screen, its first page zooms into place and holds to be read, then the page scrolls up out of the viewer with the section following right behind it, one scroll with the page. */
 const DOCK_SHOWS = [0, 0.07, 0.6, 0.66];
 const ICON_CLICK = [0.07, 0.1, 0.14];
 const ICON_OPENS = [0.1, 0.14];
 const LABEL_SHOWS = [0.07, 0.1, 0.22, 0.26];
-/* The genie: the document is pulled out of its icon through a funnel, as the Dock does it, and the real window takes over the moment it is whole. The still it is built from is mounted only around that beat. */
-const GENIE_OPENS = [0.14, 0.48];
-const GENIE_MOUNTED = [0.03, 0.5];
+/* The window scales up out of its dock icon, the way macOS opens one, its first page zooming into place as it grows. */
+const DOCUMENT_ICON_SCALE = 0.06;
+const FIRST_PAGE_ZOOM = 1.8;
+const DOCUMENT_OPENS = [0.14, 0.48];
+const DOCUMENT_APPEARS = [0.14, 0.19];
+const FIRST_PAGE_SETTLES = [0.14, 0.48];
 const SCREEN_SECTION_FADES = [0.34, 0.48];
 const DOCUMENT_SECTION_SHOWS = [0.48, 0.5];
 const FIRST_PAGE_SCROLLS = [0.6, 1];
@@ -261,42 +262,30 @@ const DockLabel = styled(motion.span)`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-/* Fills the screen below the menu bar once open. */
+/* Fills the screen below the menu bar once open; grows out of its dock icon. */
 const Document = styled(ResumeFrame)`
   position: absolute;
   inset: ${MENU_BAR_HEIGHT}% 0 0 0;
   aspect-ratio: auto;
-  will-change: opacity;
+  will-change: transform, opacity;
 `;
 
-/* Where the genie plays: the same box as the document. */
-const GenieWindow = styled.div`
-  position: absolute;
-  inset: ${MENU_BAR_HEIGHT}% 0 0 0;
-  pointer-events: none;
-`;
-
-/* The CV's icon in the dock, as fractions of the document's box below the menu bar, from layout alone (the dock's own slide does not count). */
-const iconOrigin = (
-  dock: HTMLElement,
-  icon: HTMLElement,
-): GenieOrigin | null => {
+/* Where the CV's icon sits in the document's box below the menu bar, as a transform origin, from layout alone (the dock's own slide does not count). */
+const iconOrigin = (dock: HTMLElement, icon: HTMLElement): string | null => {
   const screen = dock.offsetParent as HTMLElement | null;
   if (!screen) return null;
-  return {
-    x:
-      (dock.offsetLeft -
-        dock.offsetWidth / 2 +
-        icon.offsetLeft +
-        icon.offsetWidth / 2) /
-      screen.offsetWidth,
-    y:
-      ((dock.offsetTop + icon.offsetTop + icon.offsetHeight / 2) /
-        screen.offsetHeight -
-        MENU_BAR_HEIGHT / 100) /
-      (1 - MENU_BAR_HEIGHT / 100),
-    width: icon.offsetWidth / screen.offsetWidth,
-  };
+  const x =
+    (dock.offsetLeft -
+      dock.offsetWidth / 2 +
+      icon.offsetLeft +
+      icon.offsetWidth / 2) /
+    screen.offsetWidth;
+  const y =
+    ((dock.offsetTop + icon.offsetTop + icon.offsetHeight / 2) /
+      screen.offsetHeight -
+      MENU_BAR_HEIGHT / 100) /
+    (1 - MENU_BAR_HEIGHT / 100);
+  return `${x * 100}% ${y * 100}%`;
 };
 
 /* Behind the pin and as wide as the screen; its first line enters at the screen's bottom edge once the laptop has settled and its line has cleared. */
@@ -339,7 +328,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const documentSection = useRef<HTMLDivElement>(null);
   const dock = useRef<HTMLDivElement>(null);
   const documentIcon = useRef<HTMLSpanElement>(null);
-  const [genie, setGenie] = useState<GenieOrigin | null>(null);
+  const [documentOrigin, setDocumentOrigin] = useState<string | null>(null);
   const { scrollYProgress: arrival } = useScroll({
     target: track,
     offset: ['start 70%', `start ${-ARRIVE_VH}%`],
@@ -400,20 +389,23 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const iconScale = useTransform(desk, ICON_CLICK, [1, 1.35, 1]);
   const iconRunning = useTransform(desk, ICON_OPENS, [0, 0.8]);
   const labelOpacity = useTransform(desk, LABEL_SHOWS, [0, 1, 1, 0]);
-  const genieProgress = useTransform(desk, GENIE_OPENS, [0, 1]);
-  // The real window takes over the moment the genie is whole.
-  const documentOpacity = useTransform(
+  const documentScale = useTransform(
     desk,
-    [GENIE_OPENS[1] - 0.003, GENIE_OPENS[1]],
-    [0, 1],
+    DOCUMENT_OPENS,
+    [DOCUMENT_ICON_SCALE, 1],
+    { ease: easeInOut },
   );
+  const documentOpacity = useTransform(desk, DOCUMENT_APPEARS, [0, 1]);
+  const firstPageScale = useTransform(desk, FIRST_PAGE_SETTLES, [
+    FIRST_PAGE_ZOOM,
+    1,
+  ]);
+  // Measured once the dock is in the picture, before the window opens from its icon.
   useMotionValueEvent(desk, 'change', (progress) => {
-    const wanted = progress > GENIE_MOUNTED[0] && progress < GENIE_MOUNTED[1];
-    setGenie((current) => {
-      if (!wanted) return null;
-      if (current || !dock.current || !documentIcon.current) return current;
-      return iconOrigin(dock.current, documentIcon.current);
-    });
+    if (progress <= 0 || !dock.current || !documentIcon.current) return;
+    setDocumentOrigin(
+      (current) => current ?? iconOrigin(dock.current!, documentIcon.current!),
+    );
   });
   // Raw, not sprung, so the page and the section behind it stay locked together.
   const firstPageY = useTransform(
@@ -515,18 +507,16 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
             </Dock>
             <Document
               firstPageY={firstPageY}
+              firstPageScale={firstPageScale}
               closingOpacity={sheetCover}
               intro={inDock.intro}
               scrolled={documentScrolled}
-              style={{ opacity: documentOpacity }}
+              style={{
+                scale: documentScale,
+                opacity: documentOpacity,
+                transformOrigin: documentOrigin ?? '50% 100%',
+              }}
             />
-            {genie && (
-              <GenieWindow>
-                <Genie progress={genieProgress} origin={genie}>
-                  <ResumeStill intro={inDock.intro} />
-                </Genie>
-              </GenieWindow>
-            )}
             <MenuBar />
           </LaptopFrame>
         </Artwork>
