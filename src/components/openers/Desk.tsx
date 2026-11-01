@@ -399,6 +399,10 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
     { ease: easeInOut },
   );
   const documentOpacity = useTransform(desk, DOCUMENT_APPEARS, [0, 1]);
+  // Gone until it opens: its sheets catch clicks, which belong to the section on screen until then.
+  const documentVisibility = useTransform(documentOpacity, (visible) =>
+    visible > 0 ? 'visible' : 'hidden',
+  );
   const firstPageScale = useTransform(desk, FIRST_PAGE_SETTLES, [
     FIRST_PAGE_ZOOM,
     1,
@@ -517,6 +521,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
               style={{
                 scale: documentScale,
                 opacity: documentOpacity,
+                visibility: documentVisibility,
                 transformOrigin: documentOrigin ?? '50% 100%',
               }}
             />

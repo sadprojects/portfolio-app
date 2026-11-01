@@ -1,7 +1,12 @@
 import { Statement } from '@components/motion/Statement';
 import { contentData } from '@data/content';
 import type { SectionIntro } from '@data/types';
-import { motion, type MotionStyle, type MotionValue } from 'framer-motion';
+import {
+  motion,
+  useTransform,
+  type MotionStyle,
+  type MotionValue,
+} from 'framer-motion';
 import styled from 'styled-components';
 
 import { Cutout, Scrollbar, Startup, type Rect } from './Cutout';
@@ -131,6 +136,18 @@ const ResumeSheet = () => (
   </Skeleton>
 );
 
+/* The sheet the lid closes on: there only while it covers, since even transparent it would catch the clicks and selections meant for the section behind it. */
+const ClosingSheet = ({ opacity }: { opacity: MotionValue<number> }) => {
+  const visibility = useTransform(opacity, (covering) =>
+    covering > 0 ? 'visible' : 'hidden',
+  );
+  return (
+    <Sheet style={{ opacity, visibility }}>
+      <ResumeSheet />
+    </Sheet>
+  );
+};
+
 interface ResumeFrameProps {
   intro: SectionIntro;
   /** Opacity of the first page, for an opener that fades it away. */
@@ -166,11 +183,7 @@ export const ResumeFrame = ({
           <Statement {...intro} exitOnScroll={false} />
         </FirstPage>
       </Sheet>
-      {closingOpacity && (
-        <Sheet style={{ opacity: closingOpacity }}>
-          <ResumeSheet />
-        </Sheet>
-      )}
+      {closingOpacity && <ClosingSheet opacity={closingOpacity} />}
       {scrolled && <Scrollbar progress={scrolled} />}
     </Cutout>
     <TitleBar aria-hidden="true">
