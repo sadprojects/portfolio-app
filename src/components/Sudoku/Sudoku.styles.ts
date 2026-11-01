@@ -261,12 +261,8 @@ export const Actions = styled.div`
   gap: 0.75rem 1.75rem;
 `;
 
-/* The site's line button; red for the one that throws work away. */
-export const ActionButton = styled(LineButton)<{
-  $variant?: 'primary' | 'danger';
-}>`
-  color: ${({ $variant }) => ($variant === 'danger' ? ERROR_RED_TEXT : 'inherit')};
-
+/* The site's line button; a disabled one just waits. */
+export const ActionButton = styled(LineButton)`
   &:disabled {
     opacity: 0.35;
     cursor: not-allowed;

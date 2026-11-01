@@ -20,7 +20,7 @@ export const contentData: ContentData = {
       label: 'Projects',
       intro: {
         label: 'Side projects',
-        text: 'Things I built to learn something, mostly after hours.',
+        text: 'Things I built in my own time to learn something.',
       },
     },
     skills: {

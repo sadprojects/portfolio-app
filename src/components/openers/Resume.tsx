@@ -4,7 +4,7 @@ import type { SectionIntro } from '@data/types';
 import { motion, type MotionStyle, type MotionValue } from 'framer-motion';
 import styled from 'styled-components';
 
-import { Cutout, Startup, type Rect } from './Cutout';
+import { Cutout, Scrollbar, Startup, type Rect } from './Cutout';
 import { Zoom } from './Zoom';
 
 /* A document viewer with the laptop screen's proportions: a slim title bar, then the page. */
@@ -24,7 +24,7 @@ const TRAFFIC_LIGHTS = ['#ff5f57', '#febc2e', '#28c840'];
 const SKELETON_GROUPS: [number, number, number[]][] = [
   [8, 10, [24, 14]],
   [8, 22, [28, 28, 22]],
-  [44, 22, [46, 46, 38, 42]],
+  [44, 22, [32, 32, 26, 30]],
   [8, 70, [28, 28, 20]],
   [44, 70, [46, 42, 46, 34]],
   [44, 86, [38, 44]],
@@ -72,9 +72,10 @@ const WindowControls = styled.span`
   }
 `;
 
-/* A sheet of the document: opaque in the page's tone, so what it shows can be read and selected. */
+/* A sheet of the document: opaque in the page's tone, so what it shows can be read and selected; on its own layer, since the first one scrolls. */
 const Sheet = styled(Startup)`
   pointer-events: auto;
+  will-change: transform;
 `;
 
 const Skeleton = styled.div`
@@ -140,6 +141,8 @@ interface ResumeFrameProps {
   firstPageScale?: MotionValue<number>;
   /** Opacity of the sheet that covers the page while the laptop closes, so the lid folds with the CV still on. */
   closingOpacity?: MotionValue<number>;
+  /** How far through the document the reader is, for the scrollbar. */
+  scrolled?: MotionValue<number>;
   className?: string;
   style?: MotionStyle;
 }
@@ -151,6 +154,7 @@ export const ResumeFrame = ({
   firstPageY,
   firstPageScale,
   closingOpacity,
+  scrolled,
   className,
   style,
 }: ResumeFrameProps) => (
@@ -167,6 +171,7 @@ export const ResumeFrame = ({
           <ResumeSheet />
         </Sheet>
       )}
+      {scrolled && <Scrollbar progress={scrolled} />}
     </Cutout>
     <TitleBar aria-hidden="true">
       <WindowControls>

@@ -192,7 +192,6 @@ export const Sudoku = () => {
           </ActionButton>
         </Actions>
         <ActionButton
-          $variant="primary"
           onClick={() => startNewGame(state.difficulty)}
           aria-label={`Start new ${state.difficulty} game`}
         >

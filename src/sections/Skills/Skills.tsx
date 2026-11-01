@@ -6,6 +6,7 @@ import { useTilt } from '@hooks/useTilt';
 import { OPENER_SPRING, lift, stagger } from '@styles/motion';
 import {
   LayoutGroup,
+  easeIn,
   easeOut,
   motion,
   useScroll,
@@ -23,11 +24,13 @@ const ALL_SKILLS_FILTER = 'All';
 const TILE_TILT_DEGREES = 6;
 const PILL_SPRING = { type: 'spring', stiffness: 400, damping: 32 } as const;
 const CHECK_GREEN = '#28c840';
-/* Each credential slides in from the right of the screen as it enters, its ring fades in and its check zooms down into the ring. */
-const CREDENTIAL_ENTERS = ['start 96%', 'start 52%'] as const;
-const RING_FADES_IN = [0.15, 0.55];
-const CHECK_LANDS = [0.4, 1];
-const CHECK_ZOOM = 3.2;
+/* Each credential slides in from the right of the screen as it enters; once it has, its ring fades in and its check falls from far above like a stamp, lands with a squash, and the ring takes the hit. */
+const CREDENTIAL_ENTERS = ['start 96%', 'start 72%'] as const;
+const STAMP_FALLS = ['start 70%', 'start 42%'] as const;
+const RING_FADES_IN = [0, 0.35];
+const CHECK_FALLS = [0.3, 0.82];
+const CHECK_LANDS = [0.82, 0.9, 1];
+const CHECK_ZOOM = 4.5;
 
 type Credential = (typeof contentData.certifications)[number];
 
@@ -328,14 +331,22 @@ const CredentialItem = ({ credential }: { credential: Credential }) => {
     target: ref,
     offset: [...CREDENTIAL_ENTERS],
   });
+  const { scrollYProgress: stamping } = useScroll({
+    target: ref,
+    offset: [...STAMP_FALLS],
+  });
   const entered = useSpring(scrollYProgress, OPENER_SPRING);
   const x = useTransform(entered, [0, 1], ['100%', '0%'], { ease: easeOut });
   const opacity = useTransform(entered, [0, 0.35], [0, 1]);
-  const ring = useTransform(entered, RING_FADES_IN, [0, 1]);
-  const checkScale = useTransform(entered, CHECK_LANDS, [CHECK_ZOOM, 1], {
-    ease: easeOut,
-  });
-  const checkOpacity = useTransform(entered, [CHECK_LANDS[0], 0.65], [0, 1]);
+  const ring = useTransform(stamping, RING_FADES_IN, [0, 1]);
+  const ringScale = useTransform(stamping, CHECK_LANDS, [1, 1.12, 1]);
+  const checkScale = useTransform(
+    stamping,
+    [CHECK_FALLS[0], CHECK_FALLS[1], CHECK_LANDS[1], CHECK_LANDS[2]],
+    [CHECK_ZOOM, 1, 0.86, 1],
+    { ease: [easeIn, easeOut, easeOut] },
+  );
+  const checkOpacity = useTransform(stamping, [CHECK_FALLS[0], 0.55], [0, 1]);
 
   return (
     <CredentialSlide ref={ref} style={{ x, opacity }}>
@@ -346,7 +357,7 @@ const CredentialItem = ({ credential }: { credential: Credential }) => {
         aria-label={`${credential.title}, view certificate`}
       >
         <Badge aria-hidden="true">
-          <BadgeRing style={{ opacity: ring }} />
+          <BadgeRing style={{ opacity: ring, scale: ringScale }} />
           <BadgeCheck style={{ scale: checkScale, opacity: checkOpacity }}>
             <Check size={20} strokeWidth={2.5} />
           </BadgeCheck>

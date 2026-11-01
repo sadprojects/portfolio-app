@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useTransform, type MotionValue } from 'framer-motion';
 import styled, { type DefaultTheme } from 'styled-components';
 
 /** A rectangle inside a frame's artwork, in % of its box. */
@@ -11,10 +11,10 @@ export interface Rect {
 
 type Tone = keyof DefaultTheme['colors'];
 
-/* The see-through part of an artwork; everything around it is masked in the frame's tone, as far as --mask reaches. */
+/* The see-through part of an artwork; everything around it is masked in the frame's tone, as far as --mask reaches: enough to cover a viewport above the screen when the frame has shrunk to half, without the layer growing past what the compositor tiles comfortably. */
 export const Cutout = styled.div<{ $rect: Rect; $tone: Tone }>`
   --tone: ${({ theme, $tone }) => theme.colors[$tone]};
-  --mask: 200vmax;
+  --mask: 120vh;
   position: absolute;
   left: ${({ $rect }) => $rect.left}%;
   top: ${({ $rect }) => $rect.top}%;
@@ -47,3 +47,32 @@ export const Startup = styled(motion.div)`
     }
   }
 `;
+
+/* A macOS-style overlay scrollbar at the frame's right edge: the thumb sits as far down as the content has been scrolled. */
+const SCROLLBAR_THUMB_PERCENT = 14;
+const THUMB_TRAVEL_PERCENT =
+  ((98 - SCROLLBAR_THUMB_PERCENT) / SCROLLBAR_THUMB_PERCENT) * 100;
+
+const Thumb = styled(motion.i)`
+  position: absolute;
+  top: 1%;
+  right: 0.5%;
+  width: 0.45%;
+  height: ${SCROLLBAR_THUMB_PERCENT}%;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.foreground};
+  opacity: 0.35;
+  pointer-events: none;
+  will-change: transform;
+`;
+
+interface ScrollbarProps {
+  /** How far through the content the frame is, 0 to 1. */
+  progress: MotionValue<number>;
+  opacity?: MotionValue<number>;
+}
+
+export const Scrollbar = ({ progress, opacity }: ScrollbarProps) => {
+  const y = useTransform(progress, [0, 1], ['0%', `${THUMB_TRAVEL_PERCENT}%`]);
+  return <Thumb style={{ y, opacity }} aria-hidden="true" />;
+};

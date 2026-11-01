@@ -5,20 +5,13 @@ import { OPENER_SPRING } from '@styles/motion';
 import {
   easeIn,
   easeInOut,
+  easeOut,
   motion,
   useScroll,
   useSpring,
   useTransform,
 } from 'framer-motion';
-import {
-  Compass,
-  FileText,
-  Folder,
-  Image,
-  Music,
-  Settings,
-  Terminal,
-} from 'lucide-react';
+import { Compass, FileText, Folder, Image, Terminal } from 'lucide-react';
 import {
   useRef,
   type CSSProperties,
@@ -27,7 +20,7 @@ import {
 } from 'react';
 import styled from 'styled-components';
 
-import { Startup } from './Cutout';
+import { Scrollbar, Startup } from './Cutout';
 import { LaptopFrame, ScreenInset } from './Laptop';
 import { ARTWORK, PINNED_WIDTH, SCREEN, SCREEN_CENTRE } from './laptopArtwork';
 import { ResumeFrame } from './Resume';
@@ -48,18 +41,24 @@ const START_SCALE = 2.2;
 const END_SCALE = 0.55;
 const LID_CLOSED_DEGREES = -80;
 const DOCUMENT_ICON_SCALE = 0.06;
+/* Where the CV's dock icon sits in the screen, which the document streams up from. */
+const DOCUMENT_ORIGIN = '69% 93%';
+const STREAM_WIDTH = 0.26;
+const STREAM_LEAN_DEGREES = -12;
 const FIRST_PAGE_ZOOM = 1.8;
 
 /* Beats of the arrival: the laptop settles over the first part, and its line fades in, holds to be read, and fades out, leaving the screen clear before the section enters. */
 const LAPTOP_SETTLES = [0, 0.55];
 const LINE_SHOWS = [0.04, 0.3, 0.78, 0.91];
-/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document grows out of it over the section on screen, its first page zooms into place and holds to be read, then the page scrolls up out of the viewer with the section following right behind it, one scroll with the page. */
+/* Beats of the desk runway, as progress: the dock rises, the CV's icon is clicked and labelled, the document streams up out of it like a genie over the section on screen, its first page zooms into place and holds to be read, then the page scrolls up out of the viewer with the section following right behind it, one scroll with the page. */
 const DOCK_SHOWS = [0, 0.07, 0.6, 0.66];
 const ICON_CLICK = [0.07, 0.1, 0.14];
 const ICON_OPENS = [0.1, 0.14];
 const LABEL_SHOWS = [0.07, 0.1, 0.22, 0.26];
-const DOCUMENT_OPENS = [0.14, 0.48];
-const DOCUMENT_APPEARS = [0.14, 0.19];
+/* The genie: a narrow stream rises from the icon to the window's full height, leaning, then unfurls sideways to the full width. */
+const GENIE_STREAMS = [0.14, 0.3];
+const GENIE_UNFURLS = [0.3, 0.48];
+const DOCUMENT_APPEARS = [0.14, 0.17];
 const SCREEN_SECTION_FADES = [0.34, 0.48];
 const DOCUMENT_SECTION_SHOWS = [0.48, 0.5];
 const FIRST_PAGE_SETTLES = [0.14, 0.48];
@@ -70,7 +69,7 @@ const LID_FOLDS = [0.15, 0.6];
 const LAPTOP_RISES = [0.4, 0.8];
 const RISEN_OUT = '-100vh';
 
-/* The dock's apps, as tinted tiles; the CV sits in the middle, where the document grows from. */
+/* The dock's apps, as tinted tiles; the CV sits at the right end, where the document streams up from. */
 const DOCK_APPS = [
   {
     name: 'files',
@@ -89,24 +88,14 @@ const DOCK_APPS = [
     tint: 'conic-gradient(from 200deg, #ff7a59, #ffd166, #7bd389, #4cc9f0, #c77dff, #ff7a59)',
   },
   {
-    name: 'cv',
-    Icon: FileText,
-    tint: 'linear-gradient(160deg, #ff7b72, #d93a4a)',
-  },
-  {
-    name: 'music',
-    Icon: Music,
-    tint: 'linear-gradient(160deg, #ff6b7a, #ff2d55)',
-  },
-  {
     name: 'terminal',
     Icon: Terminal,
     tint: 'linear-gradient(160deg, #3a3a3f, #141416)',
   },
   {
-    name: 'settings',
-    Icon: Settings,
-    tint: 'linear-gradient(160deg, #a0a0a8, #5e5e66)',
+    name: 'cv',
+    Icon: FileText,
+    tint: 'linear-gradient(160deg, #ff7b72, #d93a4a)',
   },
 ];
 const DOCUMENT_APP = 'cv';
@@ -154,16 +143,16 @@ const Dock = styled(motion.div)`
   left: 50%;
   bottom: 2.5%;
   display: flex;
-  gap: 0.5em;
-  height: 9.5%;
-  padding: 0.5em;
+  gap: 0.8em;
+  height: 14%;
+  padding: 0.6em;
   translate: -50% 0;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 1.3em;
   background: rgba(255, 255, 255, 0.22);
   box-shadow: 0 0.6em 1.6em rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(16px);
-  font-size: clamp(0.4rem, 0.7vw, 0.7rem);
+  font-size: clamp(0.5rem, 0.9vw, 0.9rem);
 `;
 
 const DockIcon = styled(motion.span)<{ $tint: string; $running?: boolean }>`
@@ -240,12 +229,12 @@ const DockLabel = styled(motion.span)`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-/* Fills the screen once open; grows out of its dock icon. */
+/* Fills the screen once open; streams up out of its dock icon. */
 const Document = styled(ResumeFrame)`
   position: absolute;
   inset: 0;
   aspect-ratio: auto;
-  transform-origin: 50% 93%;
+  transform-origin: ${DOCUMENT_ORIGIN};
   will-change: transform, opacity;
 `;
 
@@ -286,6 +275,7 @@ interface DeskProps {
 export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const track = useRef<HTMLElement>(null);
   const screenSection = useRef<HTMLDivElement>(null);
+  const documentSection = useRef<HTMLDivElement>(null);
   const { scrollYProgress: arrival } = useScroll({
     target: track,
     offset: ['start 70%', `start ${-ARRIVE_VH}%`],
@@ -302,6 +292,18 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const { scrollYProgress: closing } = useScroll({
     target: track,
     offset: [`end ${100 + CLOSE_VH}%`, 'end end'],
+  });
+  // How far through each section the reader is, for the scrollbars: from its first line entering at the frame's bottom edge to its end settled.
+  const { scrollYProgress: screenScrolled } = useScroll({
+    target: screenSection,
+    offset: [`start ${100 - ARRIVE_VH}%`, `end ${100 - SETTLE_VH}%`],
+  });
+  const { scrollYProgress: documentScrolled } = useScroll({
+    target: documentSection,
+    offset: [
+      `start ${100 - SETTLE_VH - FIRST_PAGE_SCROLLS[0] * DESK_VH}%`,
+      `end ${100 - SETTLE_VH}%`,
+    ],
   });
   const arrive = useSpring(arrival, OPENER_SPRING);
   const desk = useSpring(deskRunway, OPENER_SPRING);
@@ -334,11 +336,22 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
   const iconScale = useTransform(desk, ICON_CLICK, [1, 1.35, 1]);
   const iconRunning = useTransform(desk, ICON_OPENS, [0, 0.8]);
   const labelOpacity = useTransform(desk, LABEL_SHOWS, [0, 1, 1, 0]);
-  const documentScale = useTransform(
+  const documentScaleY = useTransform(
     desk,
-    DOCUMENT_OPENS,
+    GENIE_STREAMS,
     [DOCUMENT_ICON_SCALE, 1],
+    { ease: easeOut },
+  );
+  const documentScaleX = useTransform(
+    desk,
+    [GENIE_STREAMS[0], GENIE_UNFURLS[0], GENIE_UNFURLS[1]],
+    [DOCUMENT_ICON_SCALE, STREAM_WIDTH, 1],
     { ease: easeInOut },
+  );
+  const documentSkew = useTransform(
+    desk,
+    [GENIE_STREAMS[0], GENIE_UNFURLS[0], GENIE_UNFURLS[1]],
+    [STREAM_LEAN_DEGREES, STREAM_LEAN_DEGREES / 2, 0],
   );
   const documentOpacity = useTransform(desk, DOCUMENT_APPEARS, [0, 1]);
   const firstPageScale = useTransform(desk, FIRST_PAGE_SETTLES, [
@@ -362,6 +375,11 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
 
   // The section on screen holds its last screen while the document opens over it, then goes.
   const screenSectionOpacity = useTransform(desk, SCREEN_SECTION_FADES, [1, 0]);
+  // The screen's scrollbar shows once the line has cleared and goes with the section.
+  const screenBarOpacity = useTransform(
+    [lineOpacity, screenSectionOpacity],
+    ([line, section]: number[]) => (1 - line) * section,
+  );
   const screenSectionHold = useTransform(
     [deskRunway, screenSectionOpacity],
     ([progress, visible]: number[]) =>
@@ -402,6 +420,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
             >
               <Statement {...onScreen.intro} exitOnScroll={false} />
             </Startup>
+            <Scrollbar progress={screenScrolled} opacity={screenBarOpacity} />
             <Dock
               style={{
                 y: dockY,
@@ -436,7 +455,13 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
               firstPageScale={firstPageScale}
               closingOpacity={sheetCover}
               intro={inDock.intro}
-              style={{ scale: documentScale, opacity: documentOpacity }}
+              scrolled={documentScrolled}
+              style={{
+                scaleX: documentScaleX,
+                scaleY: documentScaleY,
+                skewX: documentSkew,
+                opacity: documentOpacity,
+              }}
             />
           </LaptopFrame>
         </Artwork>
@@ -454,6 +479,7 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
         <ScreenInset>{onScreen.body}</ScreenInset>
       </SectionOnScreen>
       <SectionInDocument
+        ref={documentSection}
         data-section={inDock.id}
         style={{
           y: documentSectionHold,
