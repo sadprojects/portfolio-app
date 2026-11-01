@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Silviu Alexandru Dinu - CV</title>
+    <!-- The CV as a page: edit the words here and run `node scripts/build-cv.mjs` to print it to public/media/cv. -->
+    <style>
+      @page {
+        size: letter;
+        margin: 0.6in 0.55in;
+      }
+      body {
+        margin: 0;
+        font:
+          10.5pt/1.42 Arial,
+          'Liberation Sans',
+          Helvetica,
+          sans-serif;
+        color: #1f2a44;
+      }
+      a {
+        color: #1f4e99;
+      }
+      header {
+        text-align: center;
+      }
+      h1 {
+        margin: 0;
+        font:
+          400 26pt/1.1 'Times New Roman',
+          'Liberation Serif',
+          serif;
+        color: #111;
+      }
+      .role {
+        margin: 4pt 0 9pt;
+        font:
+          italic 11.5pt 'Times New Roman',
+          'Liberation Serif',
+          serif;
+      }
+      .contact {
+        padding: 4pt 0;
+        border-top: 1px solid #9a9a9a;
+        border-bottom: 1px solid #9a9a9a;
+        font-size: 9.5pt;
+      }
+      .contact span + span::before {
+        content: '  |  ';
+        white-space: pre;
+        color: #777;
+      }
+      h2 {
+        margin: 15pt 0 6pt;
+        padding-bottom: 3pt;
+        border-bottom: 1px solid #9a9a9a;
+        font-size: 9pt;
+        font-weight: 700;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #111;
+        break-after: avoid;
+      }
+      p {
+        margin: 0;
+        text-align: justify;
+      }
+      .entry {
+        display: flex;
+        justify-content: space-between;
+        gap: 14pt;
+        margin-top: 7pt;
+        break-inside: avoid;
+      }
+      .entry h3 {
+        display: inline;
+        margin: 0;
+        font-size: 10.5pt;
+        font-weight: 700;
+      }
+      .sep {
+        color: #9a9a9a;
+      }
+      .when {
+        flex: none;
+        padding-top: 1.5pt;
+        font-size: 8.5pt;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #777;
+      }
+      ul {
+        margin: 2pt 0 0;
+        padding-left: 14pt;
+      }
+      li {
+        margin: 1pt 0;
+      }
+      .skills {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .skills th {
+        width: 122pt;
+        padding: 2pt 0;
+        text-align: left;
+        vertical-align: top;
+        font-weight: 700;
+      }
+      .skills td {
+        padding: 2pt 0;
+      }
+      /* Education and credentials breathe a little more than the jobs. */
+      .list .entry {
+        margin-top: 10pt;
+        line-height: 1.5;
+      }
+      .list .entry:first-of-type {
+        margin-top: 4pt;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Silviu Alexandru Dinu</h1>
+      <div class="role">Lead Software Engineer</div>
+      <div class="contact">
+        <span><a href="tel:+40730799252">+40 730 799 252</a></span>
+        <span
+          ><a href="mailto:silviualexd@gmail.com"
+            >silviualexd@gmail.com</a
+          ></span
+        >
+        <span>Bucharest, Romania</span>
+        <span
+          ><a
+            href="https://www.linkedin.com/in/silviu-alexandru-dinu-138128151/"
+            >LinkedIn</a
+          ></span
+        >
+        <span><a href="https://github.com/SilviuDinu">GitHub</a></span>
+        <span><a href="https://silviudinu.com">silviudinu.com</a></span>
+      </div>
+    </header>
+
+    <h2>Profile</h2>
+    <p>
+      Lead Software Engineer with 8 years in web development, now leading a team
+      at London Stock Exchange Group that builds trading and analytics tools in
+      React and TypeScript. Before that: full-stack work at Cognizant and EPAM
+      Systems, front-end consulting at Deloitte Digital and WordPress themes and
+      plugins at Themeisle. Comfortable owning a feature from design review to
+      production, and still writing code every day. MSc in signal processing,
+      with published research on neural networks for disease prediction.
+    </p>
+
+    <h2>Experience</h2>
+    <div class="entry">
+      <div>
+        <h3>Lead Software Engineer</h3>
+        <span class="sep">|</span> London Stock Exchange Group, Bucharest
+        <ul>
+          <li>
+            Lead a team of engineers building the trading and analytics tools
+            our users rely on every day; own technical direction, code quality
+            and delivery.
+          </li>
+          <li>
+            Mentor engineers, run design reviews and keep the team shipping
+            while staying hands-on in the codebase.
+          </li>
+          <li>
+            Brought AI into the team's daily work: coding agents for everyday
+            tasks, MCP servers connected to our internal tooling, and the same
+            code review for their output as for ours.
+          </li>
+          <li>
+            Stack: React, TypeScript, WebSockets, SharedWorkers, CI/CD, AI
+            agents, MCP.
+          </li>
+        </ul>
+      </div>
+      <div class="when">Oct 2026 – Present</div>
+    </div>
+    <div class="entry">
+      <div>
+        <h3>Senior Software Engineer</h3>
+        <span class="sep">|</span> London Stock Exchange Group, Bucharest
+        <ul>
+          <li>
+            Built front-end features for financial tools that simplify daily
+            operations for traders and analysts.
+          </li>
+          <li>
+            Worked with React, WebSockets, SharedWorkers and CI/CD pipelines.
+          </li>
+          <li>Promoted to Lead Software Engineer in October 2026.</li>
+        </ul>
+      </div>
+      <div class="when">Feb 2024 – Sep 2026</div>
+    </div>
+    <div class="entry">
+      <div>
+        <h3>Full Stack Developer</h3>
+        <span class="sep">|</span> Cognizant, Bucharest
+        <ul>
+          <li>
+            Engineered scalable software solutions and contributed product ideas
+            aimed at growing customer revenue.
+          </li>
+          <li>Stack: React, Node.js, MongoDB, AEM, Algolia.</li>
+        </ul>
+      </div>
+      <div class="when">Oct 2022 – Feb 2024</div>
+    </div>
+    <div class="entry">
+      <div>
+        <h3>Full Stack Developer</h3>
+        <span class="sep">|</span> EPAM Systems, Bucharest
+        <ul>
+          <li>
+            Delivered client projects end to end across web and hybrid mobile.
+          </li>
+          <li>
+            Stack: Angular, AngularJS, Node.js, TypeScript, Ionic, Cordova.
+          </li>
+        </ul>
+      </div>
+      <div class="when">Oct 2021 – Oct 2022</div>
+    </div>
+    <div class="entry">
+      <div>
+        <h3>Consultant, Middle Frontend Developer</h3>
+        <span class="sep">|</span> Deloitte Digital, Bucharest
+        <ul>
+          <li>
+            Worked directly with clients to deliver front-end solutions and
+            technical consultancy.
+          </li>
+          <li>Stack: Angular, AngularJS, React, SCSS, Node.js, Jira.</li>
+        </ul>
+      </div>
+      <div class="when">Feb 2020 – Oct 2021</div>
+    </div>
+    <div class="entry">
+      <div>
+        <h3>Junior Programmer, Technical Support Engineer</h3>
+        <span class="sep">|</span> Themeisle, Bucharest
+        <ul>
+          <li>
+            Helped customers build and fix WordPress sites, themes and plugins.
+          </li>
+          <li>
+            Debugged and reported issues across PHP, CSS, JavaScript and MySQL.
+          </li>
+        </ul>
+      </div>
+      <div class="when">Jul 2018 – Feb 2020</div>
+    </div>
+
+    <h2>Skills</h2>
+    <table class="skills">
+      <tr>
+        <th>Frontend</th>
+        <td>
+          React, TypeScript, JavaScript, Angular, AngularJS, Vue.js, HTML,
+          CSS/SCSS, styled-components
+        </td>
+      </tr>
+      <tr>
+        <th>Backend &amp; data</th>
+        <td>
+          Node.js, Express, REST APIs, WebSockets, SharedWorkers, MongoDB,
+          PostgreSQL, MySQL
+        </td>
+      </tr>
+      <tr>
+        <th>AI &amp; agents</th>
+        <td>
+          Coding agents in day-to-day work, MCP servers connected to internal
+          tooling, LLM APIs, PyTorch, neural networks
+        </td>
+      </tr>
+      <tr>
+        <th>Cloud &amp; delivery</th>
+        <td>Azure, AWS, CI/CD (Jenkins, SonarQube), Git, Jira, Agile teams</td>
+      </tr>
+      <tr>
+        <th>Also</th>
+        <td>Python, Flask, PHP, WordPress</td>
+      </tr>
+    </table>
+
+    <h2>Education</h2>
+    <div class="list">
+      <div class="entry">
+        <div>
+          <h3>MSc, Advanced Signal Processing in Multimedia Applications</h3>
+          <span class="sep">|</span>
+          <a href="https://acs.pub.ro/"
+            >Faculty of Automatic Control and Computer Science, POLITEHNICA
+            University of Bucharest</a
+          >
+        </div>
+        <div class="when">2020 – 2022</div>
+      </div>
+      <div class="entry">
+        <div>
+          <h3>BSc, Systems Engineering</h3>
+          <span class="sep">|</span>
+          <a href="https://acs.pub.ro/"
+            >Faculty of Automatic Control and Computer Science, POLITEHNICA
+            University of Bucharest</a
+          >
+        </div>
+        <div class="when">2016 – 2020</div>
+      </div>
+    </div>
+
+    <h2>Certifications &amp; Publications</h2>
+    <div class="list">
+      <div class="entry">
+        <div>
+          <a
+            href="https://learn.microsoft.com/api/credentials/share/en-gb/SilviuDinu-1202/D2162FE9FCA167E1?sharingId=79B7C1ADC9510DE6"
+            >Microsoft Certified: Azure Fundamentals</a
+          >
+          <span class="sep">|</span> Microsoft
+        </div>
+        <div class="when">Sep 2023</div>
+      </div>
+      <div class="entry">
+        <div>
+          <a href="https://learn.mongodb.com/c/yHhzIyEdQC6KznCAMnlgsg"
+            >MongoDB SI Associate Certification</a
+          >
+          <span class="sep">|</span> MongoDB University
+        </div>
+        <div class="when">Jun 2023</div>
+      </div>
+      <div class="entry">
+        <div>
+          <a
+            href="https://www.researchgate.net/publication/357430190_Neural_Network_Based_System_for_Disease_Prediction"
+            >Neural Network Based System for Disease Prediction (published
+            research)</a
+          >
+          <span class="sep">|</span> ResearchGate
+        </div>
+        <div class="when">Dec 2021</div>
+      </div>
+    </div>
+
+    <h2>Languages</h2>
+    <p>English (fluent), Romanian (native), Japanese (N5)</p>
+  </body>
+</html>

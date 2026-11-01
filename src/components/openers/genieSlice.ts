@@ -21,8 +21,25 @@ export interface SliceFrame {
 const STRETCH_ENDS = 0.65;
 const PINCH = 2.4;
 const BEND = 1.8;
+const OUTLINE_SAMPLES = 24;
 
 const lerp = (from: number, to: number, by: number) => from + (to - from) * by;
+
+/* The funnel at `progress`: where the window's top and bottom edges are, how wide, and centred where. */
+const funnel = (progress: number, origin: GenieOrigin) => {
+  const stretch = easeOut(clamp01(progress / STRETCH_ENDS));
+  const release = easeInOut(
+    clamp01((progress - STRETCH_ENDS) / (1 - STRETCH_ENDS)),
+  );
+  return {
+    topY: origin.y * (1 - stretch),
+    topWidth: lerp(origin.width, 1, stretch),
+    topCentre: lerp(origin.x, 0.5, stretch),
+    bottomY: lerp(origin.y, 1, release),
+    bottomWidth: lerp(origin.width, 1, release),
+    bottomCentre: lerp(origin.x, 0.5, release),
+  };
+};
 
 /** The frame of a horizontal slice of the window, `top` of the way down it, at `progress` of the opening. */
 export const genieSlice = (
@@ -30,22 +47,26 @@ export const genieSlice = (
   top: number,
   origin: GenieOrigin,
 ): SliceFrame => {
-  const stretch = easeOut(clamp01(progress / STRETCH_ENDS));
-  const release = easeInOut(
-    clamp01((progress - STRETCH_ENDS) / (1 - STRETCH_ENDS)),
-  );
-  const topY = origin.y * (1 - stretch);
-  const topWidth = lerp(origin.width, 1, stretch);
-  const topCentre = lerp(origin.x, 0.5, stretch);
-  const bottomY = lerp(origin.y, 1, release);
-  const bottomWidth = lerp(origin.width, 1, release);
-  const bottomCentre = lerp(origin.x, 0.5, release);
-  const width = lerp(topWidth, bottomWidth, top ** PINCH);
-  const centre = lerp(topCentre, bottomCentre, top ** BEND);
+  const shape = funnel(progress, origin);
+  const width = lerp(shape.topWidth, shape.bottomWidth, top ** PINCH);
+  const centre = lerp(shape.topCentre, shape.bottomCentre, top ** BEND);
   return {
     x: centre - width / 2,
-    y: topY + top * (bottomY - topY),
+    y: shape.topY + top * (shape.bottomY - shape.topY),
     scaleX: width,
-    scaleY: bottomY - topY,
+    scaleY: shape.bottomY - shape.topY,
   };
+};
+
+/** The funnel's outline as a CSS polygon, so the sliced window has smooth sides instead of steps. */
+export const genieOutline = (progress: number, origin: GenieOrigin) => {
+  const left: string[] = [];
+  const right: string[] = [];
+  for (let sample = 0; sample <= OUTLINE_SAMPLES; sample++) {
+    const top = sample / OUTLINE_SAMPLES;
+    const { x, y, scaleX } = genieSlice(progress, top, origin);
+    left.push(`${x * 100}% ${y * 100}%`);
+    right.unshift(`${(x + scaleX) * 100}% ${y * 100}%`);
+  }
+  return `polygon(${[...left, ...right].join(', ')})`;
 };

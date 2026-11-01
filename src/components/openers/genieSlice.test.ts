@@ -1,7 +1,9 @@
-import { genieSlice } from './genieSlice';
+import { genieOutline, genieSlice } from './genieSlice';
 
 const origin = { x: 0.77, y: 0.95, width: 0.06 };
 const tops = [0, 0.25, 0.5, 0.75, 0.975];
+const numbers = (polygon: string) =>
+  polygon.match(/-?[\d.e-]+(?=%)/g)!.map(Number);
 
 describe('genieSlice', () => {
   it('is the whole window once open', () => {
@@ -32,5 +34,26 @@ describe('genieSlice', () => {
     expect(top.scaleX).toBeGreaterThan(0.6);
     expect(bottom.scaleX).toBeLessThan(0.15);
     expect(bottom.x + bottom.scaleX / 2).toBeCloseTo(origin.x, 1);
+  });
+});
+
+describe('genieOutline', () => {
+  it('spans the whole window once open', () => {
+    const points = numbers(genieOutline(1, origin));
+    const xs = points.filter((_, index) => index % 2 === 0);
+    const ys = points.filter((_, index) => index % 2 === 1);
+    expect(Math.min(...xs)).toBeCloseTo(0);
+    expect(Math.max(...xs)).toBeCloseTo(100);
+    expect(Math.min(...ys)).toBeCloseTo(0);
+    expect(Math.max(...ys)).toBeCloseTo(100);
+  });
+
+  it('sits on the icon before it opens', () => {
+    const points = numbers(genieOutline(0, origin));
+    const xs = points.filter((_, index) => index % 2 === 0);
+    const ys = points.filter((_, index) => index % 2 === 1);
+    expect(Math.min(...xs)).toBeCloseTo((origin.x - origin.width / 2) * 100);
+    expect(Math.max(...xs)).toBeCloseTo((origin.x + origin.width / 2) * 100);
+    ys.forEach((y) => expect(y).toBeCloseTo(origin.y * 100));
   });
 });

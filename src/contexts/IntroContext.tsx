@@ -19,10 +19,17 @@ const IntroContext = createContext<IntroState>({
   finish: () => {},
 });
 
+interface IntroProviderProps {
+  children: ReactNode;
+  /** True where the curtain never shows, such as a page that is not the home page. */
+  skipped?: boolean;
+}
+
 /** Page-load state shared by the intro curtain and whatever waits for it. */
-export const IntroProvider = ({ children }: { children: ReactNode }) => {
+export const IntroProvider = ({ children, skipped }: IntroProviderProps) => {
   const [done, setDone] = useState(
-    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    () =>
+      skipped || window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   );
   const finish = useCallback(() => setDone(true), []);
   return (

@@ -82,7 +82,7 @@ const AppContent = () => {
 
   return (
     <AppContainer>
-      <IntroLoader />
+      {showsHome && <IntroLoader />}
       <SkipLink href="#main">Skip to content</SkipLink>
       {snowing && introDone && <SnowLayer />}
       <MainContent id="main" tabIndex={-1}>
@@ -102,7 +102,7 @@ const AppContent = () => {
 export const App = () => (
   <ErrorBoundary>
     <GlobalStyle />
-    <IntroProvider>
+    <IntroProvider skipped={!showsHome}>
       <SnowfallProvider>
         <AppContent />
       </SnowfallProvider>

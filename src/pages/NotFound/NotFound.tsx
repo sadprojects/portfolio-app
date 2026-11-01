@@ -1,114 +1,76 @@
 import { Header } from '@components/Header/Header';
+import { LineButton } from '@components/ui/LineButton';
 import { fadeUp, stagger } from '@styles/motion';
 import { motion } from 'framer-motion';
 import { Home } from 'lucide-react';
 import styled from 'styled-components';
 
-const PageWrapper = styled.div`
-  min-height: 100vh;
+const Page = styled.div`
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 `;
 
-const NotFoundContainer = styled.div`
+const Centre = styled(motion.main)`
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-`;
-
-const NotFoundContent = styled(motion.div)`
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.25rem;
+  padding: 4rem 1.5rem 6rem;
   text-align: center;
-  max-width: 600px;
 `;
 
-const ErrorCode = styled(motion.h1)`
-  font-size: clamp(6rem, 15vw, 12rem);
-  font-weight: 800;
-  line-height: 1;
-  margin-bottom: 1rem;
-  background: linear-gradient(
-    135deg,
-    ${({ theme }) => theme.colors.foreground} 0%,
-    ${({ theme }) => theme.colors.secondary} 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-`;
-
-const Title = styled(motion.h2)`
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  font-weight: 700;
-  margin-bottom: 1rem;
-`;
-
-const Description = styled(motion.p)`
-  font-size: 1.125rem;
+const Kicker = styled(motion.p)`
+  margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: ${({ theme }) => theme.colors.secondary};
-  margin-bottom: 3rem;
-  line-height: 1.6;
 `;
 
-const ButtonGroup = styled(motion.div)`
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
+const Code = styled(motion.h1)`
+  margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.display};
+  font-weight: 400;
+  font-size: clamp(7rem, 22vw, 17rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
 `;
 
-const PrimaryButton = styled.a`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  background-color: ${({ theme }) => theme.colors.foreground};
-  color: ${({ theme }) => theme.colors.background};
-  border: 2px solid ${({ theme }) => theme.colors.foreground};
-  border-radius: 0.5rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all ${({ theme }) => theme.transitions.fast};
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${({ theme }) => theme.shadows.lg};
-  }
+const Line = styled(motion.p)`
+  max-width: 28ch;
+  margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.display};
+  font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+  line-height: 1.2;
 `;
 
-const NotFound = () => {
-  return (
-    <PageWrapper>
-      <Header
-        sections={[{ id: 'home', label: 'Home', icon: Home }]}
-        onNavigate={() => window.location.assign('/')}
-      />
-      <NotFoundContainer>
-        <NotFoundContent
-          variants={stagger()}
-          initial="hidden"
-          animate="visible"
-        >
-          <ErrorCode variants={fadeUp}>404</ErrorCode>
+const Way = styled(motion.div)`
+  margin-top: 1.5rem;
+`;
 
-          <Title variants={fadeUp}>Page Not Found</Title>
-
-          <Description variants={fadeUp}>
-            Oops! The page you're looking for doesn't exist. It might have been
-            moved or deleted.
-          </Description>
-
-          <ButtonGroup variants={fadeUp}>
-            <PrimaryButton href="/">
-              <Home size={20} />
-              Back to Home
-            </PrimaryButton>
-          </ButtonGroup>
-        </NotFoundContent>
-      </NotFoundContainer>
-    </PageWrapper>
-  );
-};
+const NotFound = () => (
+  <Page>
+    <Header
+      sections={[{ id: 'home', label: 'Home', icon: Home }]}
+      onNavigate={() => window.location.assign('/')}
+    />
+    <Centre variants={stagger()} initial="hidden" animate="visible">
+      <Kicker variants={fadeUp}>Not found</Kicker>
+      <Code variants={fadeUp}>404</Code>
+      <Line variants={fadeUp}>
+        There is nothing at this address. It may have moved, or never been.
+      </Line>
+      <Way variants={fadeUp}>
+        <LineButton as="a" href="/">
+          <Home size={14} />
+          Back to the start
+        </LineButton>
+      </Way>
+    </Centre>
+  </Page>
+);
 
 export default NotFound;

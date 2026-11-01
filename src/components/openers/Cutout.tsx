@@ -50,12 +50,10 @@ export const Startup = styled(motion.div)`
 
 /* A macOS-style overlay scrollbar at the frame's right edge: the thumb sits as far down as the content has been scrolled. */
 const SCROLLBAR_THUMB_PERCENT = 14;
-const THUMB_TRAVEL_PERCENT =
-  ((98 - SCROLLBAR_THUMB_PERCENT) / SCROLLBAR_THUMB_PERCENT) * 100;
+const SCROLLBAR_INSET_PERCENT = 1;
 
 const Thumb = styled(motion.i)`
   position: absolute;
-  top: 1%;
   right: 0.5%;
   width: 0.45%;
   height: ${SCROLLBAR_THUMB_PERCENT}%;
@@ -70,9 +68,18 @@ interface ScrollbarProps {
   /** How far through the content the frame is, 0 to 1. */
   progress: MotionValue<number>;
   opacity?: MotionValue<number>;
+  /** Where the track starts, in % of the frame, below any chrome along its top. */
+  top?: number;
 }
 
-export const Scrollbar = ({ progress, opacity }: ScrollbarProps) => {
-  const y = useTransform(progress, [0, 1], ['0%', `${THUMB_TRAVEL_PERCENT}%`]);
-  return <Thumb style={{ y, opacity }} aria-hidden="true" />;
+export const Scrollbar = ({ progress, opacity, top = 0 }: ScrollbarProps) => {
+  const trackStart = top + SCROLLBAR_INSET_PERCENT;
+  const travel =
+    ((100 - trackStart - SCROLLBAR_INSET_PERCENT - SCROLLBAR_THUMB_PERCENT) /
+      SCROLLBAR_THUMB_PERCENT) *
+    100;
+  const y = useTransform(progress, [0, 1], ['0%', `${travel}%`]);
+  return (
+    <Thumb style={{ top: `${trackStart}%`, y, opacity }} aria-hidden="true" />
+  );
 };

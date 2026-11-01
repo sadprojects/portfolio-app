@@ -35,7 +35,14 @@ import { Scrollbar, Startup } from './Cutout';
 import { Genie } from './Genie';
 import type { GenieOrigin } from './genieSlice';
 import { LaptopFrame, ScreenInset } from './Laptop';
-import { ARTWORK, PINNED_WIDTH, SCREEN, SCREEN_CENTRE } from './laptopArtwork';
+import {
+  ARTWORK,
+  MENU_BAR_HEIGHT,
+  PINNED_WIDTH,
+  SCREEN,
+  SCREEN_CENTRE,
+} from './laptopArtwork';
+import { MenuBar } from './MenuBar';
 import { ResumeFrame, ResumeStill } from './Resume';
 
 export interface DeskApp {
@@ -254,15 +261,22 @@ const DockLabel = styled(motion.span)`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-/* Fills the screen once open. */
+/* Fills the screen below the menu bar once open. */
 const Document = styled(ResumeFrame)`
   position: absolute;
-  inset: 0;
+  inset: ${MENU_BAR_HEIGHT}% 0 0 0;
   aspect-ratio: auto;
   will-change: opacity;
 `;
 
-/* The CV's icon in the dock, as fractions of the screen, from layout alone (the dock's own slide does not count). */
+/* Where the genie plays: the same box as the document. */
+const GenieWindow = styled.div`
+  position: absolute;
+  inset: ${MENU_BAR_HEIGHT}% 0 0 0;
+  pointer-events: none;
+`;
+
+/* The CV's icon in the dock, as fractions of the document's box below the menu bar, from layout alone (the dock's own slide does not count). */
 const iconOrigin = (
   dock: HTMLElement,
   icon: HTMLElement,
@@ -277,8 +291,10 @@ const iconOrigin = (
         icon.offsetWidth / 2) /
       screen.offsetWidth,
     y:
-      (dock.offsetTop + icon.offsetTop + icon.offsetHeight / 2) /
-      screen.offsetHeight,
+      ((dock.offsetTop + icon.offsetTop + icon.offsetHeight / 2) /
+        screen.offsetHeight -
+        MENU_BAR_HEIGHT / 100) /
+      (1 - MENU_BAR_HEIGHT / 100),
     width: icon.offsetWidth / screen.offsetWidth,
   };
 };
@@ -461,7 +477,11 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
             >
               <Statement {...onScreen.intro} exitOnScroll={false} />
             </Startup>
-            <Scrollbar progress={screenScrolled} opacity={screenBarOpacity} />
+            <Scrollbar
+              progress={screenScrolled}
+              opacity={screenBarOpacity}
+              top={MENU_BAR_HEIGHT}
+            />
             <Dock
               ref={dock}
               style={{
@@ -501,10 +521,13 @@ export const Desk = ({ onScreen, inDock }: DeskProps) => {
               style={{ opacity: documentOpacity }}
             />
             {genie && (
-              <Genie progress={genieProgress} origin={genie}>
-                <ResumeStill intro={inDock.intro} />
-              </Genie>
+              <GenieWindow>
+                <Genie progress={genieProgress} origin={genie}>
+                  <ResumeStill intro={inDock.intro} />
+                </Genie>
+              </GenieWindow>
             )}
+            <MenuBar />
           </LaptopFrame>
         </Artwork>
       </Pin>

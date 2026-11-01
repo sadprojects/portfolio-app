@@ -13,3 +13,5 @@ export const SCREEN_CENTRE = `${SCREEN.left + SCREEN.width / 2}% ${SCREEN.top + 
 export const HINGE = 91.4;
 /* Pinned, the screen spans up to 90% of the viewport's width or height, with the whole lid in view (its top 1.5vh under the edge); the keyboard sits below the fold. */
 export const PINNED_WIDTH = 'min(128vw, 206vh)';
+/* The menu bar along the top of the screen, in % of its height; windows open below it. */
+export const MENU_BAR_HEIGHT = 3.6;
