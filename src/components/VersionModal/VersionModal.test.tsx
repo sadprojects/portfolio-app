@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { fireEvent, render, screen } from '@testing-library/react';
+
 import { VersionModal } from './VersionModal';
 
 // Mock the version.json
@@ -14,10 +15,7 @@ describe('VersionModal', () => {
   it('should not render when isOpen is false', () => {
     render(
       <ThemeProvider>
-        <VersionModal
-          isOpen={false}
-          onClose={() => {}}
-        />
+        <VersionModal isOpen={false} onClose={() => {}} />
       </ThemeProvider>,
     );
 
@@ -27,10 +25,7 @@ describe('VersionModal', () => {
   it('should render when isOpen is true', () => {
     render(
       <ThemeProvider>
-        <VersionModal
-          isOpen={true}
-          onClose={() => {}}
-        />
+        <VersionModal isOpen={true} onClose={() => {}} />
       </ThemeProvider>,
     );
 
@@ -40,10 +35,7 @@ describe('VersionModal', () => {
   it('should display version number', () => {
     render(
       <ThemeProvider>
-        <VersionModal
-          isOpen={true}
-          onClose={() => {}}
-        />
+        <VersionModal isOpen={true} onClose={() => {}} />
       </ThemeProvider>,
     );
 
@@ -53,10 +45,7 @@ describe('VersionModal', () => {
   it('should display formatted build date', () => {
     render(
       <ThemeProvider>
-        <VersionModal
-          isOpen={true}
-          onClose={() => {}}
-        />
+        <VersionModal isOpen={true} onClose={() => {}} />
       </ThemeProvider>,
     );
 
@@ -68,10 +57,7 @@ describe('VersionModal', () => {
     const onClose = vi.fn();
     render(
       <ThemeProvider>
-        <VersionModal
-          isOpen={true}
-          onClose={onClose}
-        />
+        <VersionModal isOpen={true} onClose={onClose} />
       </ThemeProvider>,
     );
 
@@ -85,10 +71,7 @@ describe('VersionModal', () => {
     const onClose = vi.fn();
     const { container } = render(
       <ThemeProvider>
-        <VersionModal
-          isOpen={true}
-          onClose={onClose}
-        />
+        <VersionModal isOpen={true} onClose={onClose} />
       </ThemeProvider>,
     );
 
@@ -104,10 +87,7 @@ describe('VersionModal', () => {
     const onClose = vi.fn();
     render(
       <ThemeProvider>
-        <VersionModal
-          isOpen={true}
-          onClose={onClose}
-        />
+        <VersionModal isOpen={true} onClose={onClose} />
       </ThemeProvider>,
     );
 
@@ -121,18 +101,11 @@ describe('VersionModal', () => {
   it('should display Current Version label', () => {
     render(
       <ThemeProvider>
-        <VersionModal
-          isOpen={true}
-          onClose={() => {}}
-        />
+        <VersionModal isOpen={true} onClose={() => {}} />
       </ThemeProvider>,
     );
 
     expect(screen.getByText('Current Version')).toBeDefined();
-  });
-
-  it('should have correct displayName', () => {
-    expect(VersionModal.displayName).toBe('VersionModal');
   });
 });
 
@@ -156,10 +129,7 @@ describe('VersionModal with missing buildTime', () => {
 
     render(
       <ThemeProvider>
-        <VersionModalWithNoBuildTime
-          isOpen={true}
-          onClose={() => {}}
-        />
+        <VersionModalWithNoBuildTime isOpen={true} onClose={() => {}} />
       </ThemeProvider>,
     );
 

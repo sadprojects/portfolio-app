@@ -1,6 +1,7 @@
+import { ThemeProvider } from '@contexts/ThemeContext';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ThemeProvider } from '@contexts/ThemeContext';
+
 import { SudokuCell } from './SudokuCell';
 
 describe('SudokuCell', () => {
@@ -32,12 +33,7 @@ describe('SudokuCell', () => {
   });
 
   it('should render cell with value', () => {
-    renderWithTheme(
-      <SudokuCell
-        {...defaultProps}
-        value={5}
-      />,
-    );
+    renderWithTheme(<SudokuCell {...defaultProps} value={5} />);
     const cell = screen.getByRole('button');
     expect(cell).toHaveTextContent('5');
   });
@@ -46,12 +42,7 @@ describe('SudokuCell', () => {
     const onClick = vi.fn();
     const user = userEvent.setup();
     renderWithTheme(
-      <SudokuCell
-        {...defaultProps}
-        row={3}
-        col={4}
-        onClick={onClick}
-      />,
+      <SudokuCell {...defaultProps} row={3} col={4} onClick={onClick} />,
     );
 
     const cell = screen.getByRole('button');
@@ -62,59 +53,31 @@ describe('SudokuCell', () => {
   });
 
   it('should have tabIndex 0 when selected', () => {
-    renderWithTheme(
-      <SudokuCell
-        {...defaultProps}
-        isSelected={true}
-      />,
-    );
+    renderWithTheme(<SudokuCell {...defaultProps} isSelected={true} />);
     const cell = screen.getByRole('button');
     expect(cell).toHaveAttribute('tabIndex', '0');
   });
 
   it('should have tabIndex -1 when not selected', () => {
-    renderWithTheme(
-      <SudokuCell
-        {...defaultProps}
-        isSelected={false}
-      />,
-    );
+    renderWithTheme(<SudokuCell {...defaultProps} isSelected={false} />);
     const cell = screen.getByRole('button');
     expect(cell).toHaveAttribute('tabIndex', '-1');
   });
 
   it('should have correct aria-label for empty cell', () => {
-    renderWithTheme(
-      <SudokuCell
-        {...defaultProps}
-        row={2}
-        col={3}
-      />,
-    );
+    renderWithTheme(<SudokuCell {...defaultProps} row={2} col={3} />);
     const cell = screen.getByRole('button');
     expect(cell).toHaveAttribute('aria-label', 'Row 3, Column 4, empty');
   });
 
   it('should have correct aria-label for filled cell', () => {
-    renderWithTheme(
-      <SudokuCell
-        {...defaultProps}
-        row={5}
-        col={6}
-        value={7}
-      />,
-    );
+    renderWithTheme(<SudokuCell {...defaultProps} row={5} col={6} value={7} />);
     const cell = screen.getByRole('button');
     expect(cell).toHaveAttribute('aria-label', 'Row 6, Column 7, 7');
   });
 
   it('should have data-initial attribute when initial', () => {
-    renderWithTheme(
-      <SudokuCell
-        {...defaultProps}
-        isInitial={true}
-      />,
-    );
+    renderWithTheme(<SudokuCell {...defaultProps} isInitial={true} />);
     const cell = screen.getByRole('button');
     expect(cell).toHaveAttribute('data-initial', 'true');
   });
@@ -122,18 +85,12 @@ describe('SudokuCell', () => {
   it('should be memoized', () => {
     const onClick = vi.fn();
     const { rerender } = renderWithTheme(
-      <SudokuCell
-        {...defaultProps}
-        onClick={onClick}
-      />,
+      <SudokuCell {...defaultProps} onClick={onClick} />,
     );
 
     rerender(
       <ThemeProvider>
-        <SudokuCell
-          {...defaultProps}
-          onClick={onClick}
-        />
+        <SudokuCell {...defaultProps} onClick={onClick} />
       </ThemeProvider>,
     );
 

@@ -1,22 +1,20 @@
 export type SudokuGrid = number[][];
-export type SudokuDifficulty = 'beginner' | 'easy' | 'medium' | 'hard' | 'expert';
+export type SudokuDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
 
 export interface CellPosition {
   row: number;
   col: number;
 }
 
-export interface HistoryEntry {
+interface HistoryEntry {
   row: number;
   col: number;
   previousValue: number;
-  newValue: number;
 }
 
 export interface HighScore {
   difficulty: SudokuDifficulty;
   time: number; // in seconds
-  date: string;
 }
 
 export interface SudokuGameState {

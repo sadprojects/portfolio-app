@@ -1,27 +1,24 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider } from '@contexts/ThemeContext';
-import { vi } from 'vitest';
-import { Sudoku } from './Sudoku';
-import * as sudokuUtils from './sudokuUtils';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { vi } from 'vite-plus/test';
 
-// Mock sudoku utils
-vi.mock('./sudokuUtils', async () => {
-  const actual = await vi.importActual('./sudokuUtils');
-  return {
-    ...actual,
-    generatePuzzle: vi.fn(() => ({
-      puzzle: Array(9)
-        .fill(null)
-        .map(() => Array(9).fill(0)),
-      solution: Array(9)
-        .fill(null)
-        .map((_, i) => Array(9).fill(i + 1)),
-    })),
-    getHighScores: vi.fn(() => []),
-    saveHighScore: vi.fn(),
-    isNewBest: vi.fn(() => false),
-  };
-});
+import * as puzzle from './puzzle';
+import * as scores from './scores';
+import { Sudoku } from './Sudoku';
+
+vi.mock('./puzzle', async () => ({
+  ...(await vi.importActual<typeof import('./puzzle')>('./puzzle')),
+  generatePuzzle: vi.fn(() => ({
+    puzzle: Array.from({ length: 9 }, () => Array(9).fill(0)),
+    solution: Array.from({ length: 9 }, (_, row) => Array(9).fill(row + 1)),
+  })),
+}));
+vi.mock('./scores', async () => ({
+  ...(await vi.importActual<typeof import('./scores')>('./scores')),
+  getHighScores: vi.fn(() => []),
+  saveHighScore: vi.fn(),
+  isNewBest: vi.fn(() => false),
+}));
 
 describe('Sudoku', () => {
   const renderWithTheme = (component: React.ReactElement) => {
@@ -34,12 +31,11 @@ describe('Sudoku', () => {
 
   it('should render without crashing', () => {
     renderWithTheme(<Sudoku />);
-    expect(screen.getByRole('grid')).toBeInTheDocument();
+    expect(screen.getByLabelText('Sudoku puzzle grid')).toBeInTheDocument();
   });
 
   it('should render difficulty tabs', () => {
     renderWithTheme(<Sudoku />);
-    expect(screen.getByText(/beginner/i)).toBeInTheDocument();
     expect(screen.getByText(/easy/i)).toBeInTheDocument();
     expect(screen.getByText(/medium/i)).toBeInTheDocument();
     expect(screen.getByText(/hard/i)).toBeInTheDocument();
@@ -80,7 +76,7 @@ describe('Sudoku', () => {
     const hardTab = screen.getByText(/hard/i);
     fireEvent.click(hardTab);
 
-    expect(sudokuUtils.generatePuzzle).toHaveBeenCalledWith('hard');
+    expect(puzzle.generatePuzzle).toHaveBeenCalledWith('hard');
   });
 
   it('should start new game when New Game button is clicked', () => {
@@ -90,7 +86,7 @@ describe('Sudoku', () => {
     });
     fireEvent.click(newGameButton);
 
-    expect(sudokuUtils.generatePuzzle).toHaveBeenCalled();
+    expect(puzzle.generatePuzzle).toHaveBeenCalled();
   });
 
   it('should have grid cells', () => {
@@ -105,7 +101,7 @@ describe('Sudoku', () => {
 
   it('should render 81 cells in the grid', () => {
     const { container } = renderWithTheme(<Sudoku />);
-    const grid = container.querySelector('[role="grid"]');
+    const grid = container.querySelector('[aria-label="Sudoku puzzle grid"]');
     const cells = grid?.querySelectorAll('button');
     expect(cells?.length).toBe(81);
   });
@@ -124,12 +120,12 @@ describe('Sudoku', () => {
 
   it('should call generatePuzzle on mount', () => {
     renderWithTheme(<Sudoku />);
-    expect(sudokuUtils.generatePuzzle).toHaveBeenCalledWith('medium');
+    expect(puzzle.generatePuzzle).toHaveBeenCalledWith('medium');
   });
 
   it('should show high score section when best time exists', () => {
-    vi.mocked(sudokuUtils.getHighScores).mockReturnValue([
-      { difficulty: 'medium', time: 120, date: '2024-01-01' },
+    vi.mocked(scores.getHighScores).mockReturnValue([
+      { difficulty: 'medium', time: 120 },
     ]);
 
     renderWithTheme(<Sudoku />);
@@ -159,7 +155,7 @@ describe('Sudoku', () => {
 
   it('should render all 9 boxes', () => {
     const { container } = renderWithTheme(<Sudoku />);
-    const grid = container.querySelector('[role="grid"]');
+    const grid = container.querySelector('[aria-label="Sudoku puzzle grid"]');
     const boxes = grid?.children;
     expect(boxes?.length).toBe(9);
   });
@@ -171,7 +167,7 @@ describe('Sudoku', () => {
     fireEvent.click(easyTab);
 
     await waitFor(() => {
-      expect(easyTab).toHaveAttribute('data-active', 'true');
+      expect(easyTab).toHaveAttribute('aria-selected', 'true');
     });
   });
 

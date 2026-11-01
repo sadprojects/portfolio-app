@@ -1,8 +1,6 @@
 import { AnimatePresence } from 'framer-motion';
-import { Trophy } from 'lucide-react';
 
-import { formatTime } from '../sudokuUtils';
-import type { SudokuDifficulty } from '../types';
+import { formatTime } from '../scores';
 import {
   ActionButton,
   NewBestBadge,
@@ -11,8 +9,9 @@ import {
   WinTime,
   WinTitle,
 } from '../Sudoku.styles';
+import type { SudokuDifficulty } from '../types';
 
-export interface WinOverlayProps {
+interface WinOverlayProps {
   isComplete: boolean;
   elapsedTime: number;
   isNewBestTime: boolean;
@@ -36,31 +35,16 @@ export const WinOverlay = ({
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
         >
-          <Trophy
-            size={56}
-            color="currentColor"
-          />
           <WinContent>
-            <WinTitle>Puzzle Complete!</WinTitle>
+            <WinTitle>Solved.</WinTitle>
             <WinTime>{formatTime(elapsedTime)}</WinTime>
-            {isNewBestTime && <NewBestBadge>🏆 New Record!</NewBestBadge>}
+            {isNewBestTime && <NewBestBadge>New best</NewBestBadge>}
           </WinContent>
-          <ActionButton
-            $variant="primary"
-            onClick={() => onPlayAgain(difficulty)}
-            style={{
-              marginTop: '0.5rem',
-              flex: 'none',
-              width: 'auto',
-              padding: '0.75rem 2rem',
-            }}
-          >
-            Play Again
+          <ActionButton onClick={() => onPlayAgain(difficulty)}>
+            Play again
           </ActionButton>
         </StyledWinOverlay>
       )}
     </AnimatePresence>
   );
 };
-
-WinOverlay.displayName = 'WinOverlay';

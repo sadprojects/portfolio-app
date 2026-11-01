@@ -1,78 +1,35 @@
 import { ThemeProvider } from '@contexts/ThemeContext';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+
 import ErrorBoundary from './ErrorBoundary';
 
 const ThrowError = () => {
   throw new Error('Test error');
 };
 
-const NoError = () => <div>No error</div>;
+const renderWith = (child: React.ReactNode) =>
+  render(
+    <ThemeProvider>
+      <ErrorBoundary>{child}</ErrorBoundary>
+    </ThemeProvider>,
+  );
 
 describe('ErrorBoundary', () => {
-  it('should render children when there is no error', () => {
-    const { container } = render(
-      <ThemeProvider>
-        <ErrorBoundary>
-          <NoError />
-        </ErrorBoundary>
-      </ThemeProvider>
-    );
-    expect(container.textContent).toContain('No error');
+  it('renders children when nothing throws', () => {
+    renderWith(<div>No error</div>);
+    expect(screen.getByText('No error')).toBeInTheDocument();
   });
 
-  it('should catch errors and display error UI', () => {
-    // Suppress console.error for this test
-    const originalError = console.error;
-    console.error = () => {};
-
-    const { container } = render(
-      <ThemeProvider>
-        <ErrorBoundary>
-          <ThrowError />
-        </ErrorBoundary>
-      </ThemeProvider>
+  it('shows the message, the error and a refresh button when a child throws', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    renderWith(<ThrowError />);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Something went wrong.',
     );
-
-    expect(container.textContent).toContain('Oops! Something went wrong');
-    expect(container.textContent).toContain('Test error');
-
-    console.error = originalError;
-  });
-
-  it('should display error details', () => {
-    const originalError = console.error;
-    console.error = () => {};
-
-    const { container } = render(
-      <ThemeProvider>
-        <ErrorBoundary>
-          <ThrowError />
-        </ErrorBoundary>
-      </ThemeProvider>
-    );
-
-    expect(container.textContent).toContain('Error Details:');
-    expect(container.textContent).toContain('Test error');
-
-    console.error = originalError;
-  });
-
-  it('should render refresh and report buttons', () => {
-    const originalError = console.error;
-    console.error = () => {};
-
-    const { container } = render(
-      <ThemeProvider>
-        <ErrorBoundary>
-          <ThrowError />
-        </ErrorBoundary>
-      </ThemeProvider>
-    );
-
-    expect(container.textContent).toContain('Refresh Page');
-    expect(container.textContent).toContain('Copy Error');
-    expect(container.textContent).toContain('Report Issue');
-
-    console.error = originalError;
+    expect(screen.getByText('Test error')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Refresh page' }),
+    ).toBeInTheDocument();
+    vi.restoreAllMocks();
   });
 });

@@ -1,106 +1,98 @@
-import react from '@vitejs/plugin-react';
-import { copyFileSync, mkdirSync, readdirSync, statSync } from 'fs';
 import path from 'path';
-import { defineConfig } from 'vite';
+
+import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 
-function copyAssetsPlugin() {
-  return {
-    name: 'copy-assets',
-    closeBundle() {
-      const srcDir = path.resolve(__dirname, 'src/assets');
-      const destDir = path.resolve(__dirname, 'dist/src/assets');
+const alias = Object.fromEntries(
+  Object.entries({
+    '@': 'src',
+    '@components': 'src/components',
+    '@contexts': 'src/contexts',
+    '@data': 'src/data',
+    '@hooks': 'src/hooks',
+    '@pages': 'src/pages',
+    '@sections': 'src/sections',
+    '@styles': 'src/styles',
+    '@utils': 'src/utils',
+    '@lib': 'src/lib',
+  }).map(([k, v]) => [k, path.resolve(import.meta.dirname, v)]),
+);
 
-      function copyRecursive(src: string, dest: string) {
-        if (!statSync(src).isDirectory()) {
-          mkdirSync(path.dirname(dest), { recursive: true });
-          copyFileSync(src, dest);
-          return;
-        }
+// Vendor chunks keyed by package so a content change doesn't bust the whole bundle cache.
+const chunks: Record<string, RegExp> = {
+  vendor: /node_modules\/(react|react-dom|scheduler)\//,
+  styled: /node_modules\/styled-components\//,
+  animation: /node_modules\/framer-motion\//,
+  icons: /node_modules\/lucide-react\//,
+};
 
-        mkdirSync(dest, { recursive: true });
-        readdirSync(src).forEach((file) => {
-          const srcPath = path.join(src, file);
-          const destPath = path.join(dest, file);
-          copyRecursive(srcPath, destPath);
-        });
-      }
-
-      copyRecursive(srcDir, destDir);
-      console.log('✓ Copied assets to dist/src/assets');
-    },
-  };
-}
-
-// https://vitejs.dev/config/
+// https://viteplus.dev/guide/
 export default defineConfig({
-  plugins: [
+  lint: {
+    plugins: ['oxc', 'typescript', 'unicorn', 'react'],
+    categories: { correctness: 'error' },
+    env: { builtin: true, browser: true, es2020: true },
+    ignorePatterns: ['dist', 'node_modules', '*.config.js', '*.config.ts'],
+    rules: {
+      'no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      'typescript/no-explicit-any': 'warn',
+      'react/exhaustive-deps': 'warn',
+      'react/only-export-components': ['warn', { allowConstantExport: true }],
+      'vite-plus/prefer-vite-plus-imports': 'error',
+      // React Compiler + type-aware rules ESLint never ran here; warn until the call sites are fixed.
+      'react/set-state-in-effect': 'warn',
+      'react/refs': 'warn',
+      'react/purity': 'warn',
+      'typescript/unbound-method': 'off',
+      // Effects start async work and let the promise go by design; `void` would only hide that.
+      'typescript/no-floating-promises': 'off',
+    },
+    options: { typeAware: true, typeCheck: true },
+    jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
+  },
+  fmt: { singleQuote: true, printWidth: 80, sortImports: true },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+    css: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/test/', '**/*.d.ts', '**/types.ts', '**/*.test.{ts,tsx}'],
+      thresholds: { lines: 90, functions: 90, branches: 90, statements: 90 },
+    },
+  },
+  plugins: lazyPlugins(() => [
     react({
       babel: {
         plugins: [
-          ['babel-plugin-react-compiler'],
+          // Coverage would count the compiler's memo-cache branches as code, so tests skip it.
+          ...(process.env.VITEST ? [] : [['babel-plugin-react-compiler']]),
           [
             'babel-plugin-styled-components',
-            {
-              displayName: true,
-              fileName: true,
-            },
+            { displayName: true, fileName: true },
           ],
         ],
       },
     }),
-    svgr({
-      svgrOptions: {
-        icon: true,
-      },
-    }),
-    copyAssetsPlugin(),
-  ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@assets': path.resolve(__dirname, './src/assets'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@ui': path.resolve(__dirname, './src/components/ui'),
-      '@constants': path.resolve(__dirname, './src/constants'),
-      '@contexts': path.resolve(__dirname, './src/contexts'),
-      '@data': path.resolve(__dirname, './src/data'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@models': path.resolve(__dirname, './src/models'),
-      '@pages': path.resolve(__dirname, './src/pages'),
-      '@styles': path.resolve(__dirname, './src/styles'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@lib': path.resolve(__dirname, './src/lib'),
-    },
-  },
-  server: {
-    port: 3000,
-  },
+    svgr({ svgrOptions: { icon: true } }),
+  ]),
+  resolve: { alias },
+  server: { port: 3000 },
   build: {
     outDir: 'dist',
     sourcemap: false,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          styled: ['styled-components'],
-          animation: ['framer-motion'],
-          icons: ['lucide-react'],
-          dates: ['date-fns'],
-        },
+        manualChunks: (id) =>
+          Object.keys(chunks).find((name) => chunks[name].test(id)),
       },
     },
-  },
-  // Pre-bundle these deps for faster dev server startup
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      'styled-components',
-      'framer-motion',
-      'date-fns',
-    ],
   },
 });

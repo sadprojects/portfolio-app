@@ -14,16 +14,22 @@ on:
 permissions:
   contents: write
 
+# A newer push to the same branch cancels the run in progress.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
   AWS_REGION: 'eu-central-1'
   S3_BUCKET: ${{ vars.S3_BUCKET }}
   CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
 
 jobs:
-  lint-and-test:
+  # One job, one install: lint, test and build share the same node_modules.
+  ci:
     runs-on: ubuntu-latest
-    name: Lint & Test
+    name: Lint, Test & Build
 
     steps:
       - name: Checkout code
@@ -35,34 +41,25 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      # Restore node_modules keyed on the lockfile; skip npm ci entirely on a hit.
+      - name: Restore node_modules
+        id: modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-node${{ env.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
 
-      - name: Run linter
+      - name: Install dependencies
+        if: steps.modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Lint
         run: npm run lint
 
-      - name: Run tests
+      - name: Test
         run: npm run test:coverage
 
-  build:
-    runs-on: ubuntu-latest
-    name: Build
-    needs: lint-and-test
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
+      - name: Build
         run: npm run build
 
       - name: Upload build artifacts
@@ -75,7 +72,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy to Production
-    needs: build
+    needs: ci
     # Only deploy on push to main or release branches, not on PRs
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:

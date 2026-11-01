@@ -1,5 +1,11 @@
 import { theme, type ThemeMode } from '@styles/theme';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 
 interface ThemeContextType {
@@ -17,11 +23,7 @@ export const useTheme = () => {
   return context;
 };
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
-}
-
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<ThemeMode>(() => {
     const stored = localStorage.getItem('theme') as ThemeMode;
     return stored || 'dark';
@@ -29,9 +31,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('theme', mode);
-    const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(mode);
   }, [mode]);
 
   const toggleTheme = () => {
@@ -47,9 +46,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
-      <StyledThemeProvider theme={currentTheme}>
-        {children}
-      </StyledThemeProvider>
+      <StyledThemeProvider theme={currentTheme}>{children}</StyledThemeProvider>
     </ThemeContext.Provider>
   );
 };

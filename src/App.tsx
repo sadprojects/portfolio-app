@@ -1,16 +1,24 @@
 import ErrorBoundary from '@components/ErrorBoundary/ErrorBoundary';
 import { Footer } from '@components/Footer/Footer';
-import { Loader } from '@components/Loader/Loader';
-import { Toast } from '@components/Toast/Toast';
-import { useAccessibility } from '@contexts/AccessibilityContext';
-import { Suspense, lazy, useEffect, useState } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { IntroLoader } from '@components/intro/IntroLoader';
+import { IntroProvider, useIntro } from '@contexts/IntroContext';
+import { SnowfallProvider, useSnowfall } from '@contexts/SnowfallContext';
+import Home from '@pages/Home/Home';
+import { SkipLink } from '@styles/a11y';
+import { redirectLegacyPath } from '@utils/legacyRoutes';
+import { Suspense, lazy } from 'react';
 import styled, { createGlobalStyle, useTheme } from 'styled-components';
 
 const Snowfall = lazy(() => import('react-snowfall'));
+const NotFound = lazy(() => import('@pages/NotFound/NotFound'));
 
-const Home = lazy(() => import('@pages/Home'));
-const NotFound = lazy(() => import('@pages/NotFound'));
+const SNOWFLAKE_COUNT = 60;
+const SNOW_COLOR = {
+  dark: 'rgba(255, 255, 255, 0.9)',
+  light: 'rgba(100, 149, 237, 0.8)',
+};
+
+const showsHome = redirectLegacyPath();
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -19,25 +27,16 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  html {
+    overflow-x: clip;
+  }
+
   html,
   body {
     background-color: ${({ theme }) => theme.colors.background};
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-
-  code {
-    font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
   }
 `;
 
@@ -59,150 +58,54 @@ const MainContent = styled.main`
   z-index: 2;
 `;
 
-const SnowLayer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1;
-  pointer-events: none;
-`;
+const SnowLayer = () => {
+  const theme = useTheme();
+  return (
+    <Suspense fallback={null}>
+      <Snowfall
+        snowflakeCount={SNOWFLAKE_COUNT}
+        color={SNOW_COLOR[theme.mode]}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1,
+          pointerEvents: 'none',
+        }}
+      />
+    </Suspense>
+  );
+};
 
 const AppContent = () => {
-  const { snowfallEnabled, toast, hideToast } = useAccessibility();
-  const theme = useTheme();
-  const [showSnow, setShowSnow] = useState(false);
-
-  useEffect(() => {
-    if (snowfallEnabled) {
-      const timer = setTimeout(() => {
-        setShowSnow(true);
-      }, 4000);
-      return () => clearTimeout(timer);
-    } else {
-      setShowSnow(false);
-    }
-  }, [snowfallEnabled]);
-
-  const isDarkMode = theme.colors.background === '#000000';
-  const snowColor = isDarkMode
-    ? 'rgba(255, 255, 255, 0.9)'
-    : 'rgba(100, 149, 237, 0.8)';
+  const { enabled: snowing } = useSnowfall();
+  const { done: introDone } = useIntro();
 
   return (
     <AppContainer>
-      {showSnow && (
-        <SnowLayer>
+      {showsHome && <IntroLoader />}
+      <SkipLink href="#main">Skip to content</SkipLink>
+      {snowing && introDone && <SnowLayer />}
+      <MainContent id="main" tabIndex={-1}>
+        {showsHome ? (
+          <Home />
+        ) : (
           <Suspense fallback={null}>
-            <Snowfall
-              snowflakeCount={60}
-              color={snowColor}
-              style={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-              }}
-            />
+            <NotFound />
           </Suspense>
-        </SnowLayer>
-      )}
-      <MainContent>
-        <Suspense fallback={<Loader />}>
-          <Routes>
-            <Route
-              path="/"
-              element={<Home />}
-            />
-            <Route
-              path="/home"
-              element={
-                <Navigate
-                  to="/"
-                  replace
-                />
-              }
-            />
-            <Route
-              path="/projects"
-              element={
-                <Navigate
-                  to="/#projects"
-                  replace
-                />
-              }
-            />
-            <Route
-              path="/certifications"
-              element={
-                <Navigate
-                  to="/#certifications"
-                  replace
-                />
-              }
-            />
-            <Route
-              path="/skills"
-              element={
-                <Navigate
-                  to="/#skills"
-                  replace
-                />
-              }
-            />
-            <Route
-              path="/experience"
-              element={
-                <Navigate
-                  to="/#experience"
-                  replace
-                />
-              }
-            />
-            <Route
-              path="/hobbies"
-              element={
-                <Navigate
-                  to="/#hobbies"
-                  replace
-                />
-              }
-            />
-            <Route
-              path="/contact"
-              element={
-                <Navigate
-                  to="/#contact"
-                  replace
-                />
-              }
-            />
-            <Route
-              path="*"
-              element={<NotFound />}
-            />
-          </Routes>
-        </Suspense>
+        )}
       </MainContent>
       <Footer />
-      <Toast
-        message={toast.message}
-        isVisible={toast.isVisible}
-        onClose={hideToast}
-        icon={toast.icon}
-        variant={toast.variant}
-      />
     </AppContainer>
   );
 };
 
-export const App = () => {
-  return (
-    <ErrorBoundary>
-      <GlobalStyle />
-      <BrowserRouter>
+export const App = () => (
+  <ErrorBoundary>
+    <GlobalStyle />
+    <IntroProvider skipped={!showsHome}>
+      <SnowfallProvider>
         <AppContent />
-      </BrowserRouter>
-    </ErrorBoundary>
-  );
-};
+      </SnowfallProvider>
+    </IntroProvider>
+  </ErrorBoundary>
+);

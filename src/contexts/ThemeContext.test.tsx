@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { act } from 'react';
+
 import { ThemeProvider, useTheme } from './ThemeContext';
 
 describe('ThemeContext', () => {
@@ -56,7 +57,9 @@ describe('ThemeContext', () => {
   });
 
   it('should throw error when useTheme is used outside provider', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
     expect(() => {
       renderHook(() => useTheme());

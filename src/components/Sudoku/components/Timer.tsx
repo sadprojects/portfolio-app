@@ -1,38 +1,29 @@
-import { Clock } from 'lucide-react';
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { formatTime } from '../sudokuUtils';
+import { formatTime } from '../scores';
 import { TimerDisplay } from '../Sudoku.styles';
 
-export interface TimerProps {
+const TICK_MS = 1000;
+
+interface TimerProps {
   startTime: number;
   isComplete: boolean;
 }
 
-export const Timer = memo(({ startTime, isComplete }: TimerProps) => {
+export const Timer = ({ startTime, isComplete }: TimerProps) => {
   const [elapsed, setElapsed] = useState(0);
 
-  useEffect(() => {
-    if (isComplete) return;
-
-    const interval = setInterval(() => {
-      setElapsed(Math.floor((Date.now() - startTime) / 1000));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [startTime, isComplete]);
-
-  // Reset elapsed when game restarts
   useEffect(() => {
     setElapsed(0);
   }, [startTime]);
 
-  return (
-    <TimerDisplay>
-      <Clock size={18} />
-      {formatTime(elapsed)}
-    </TimerDisplay>
-  );
-});
+  useEffect(() => {
+    if (isComplete) return;
+    const ticker = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+    }, TICK_MS);
+    return () => clearInterval(ticker);
+  }, [startTime, isComplete]);
 
-Timer.displayName = 'Timer';
+  return <TimerDisplay>{formatTime(elapsed)}</TimerDisplay>;
+};

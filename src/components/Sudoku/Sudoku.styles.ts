@@ -1,97 +1,77 @@
+import { LineButton } from '@components/ui/LineButton';
+import { srOnly } from '@styles/a11y';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
+const ERROR_RED = '#ef4444';
+const ERROR_RED_TEXT = '#dc2626';
+const FOCUS_BLUE = '#2563eb';
+const ENTRY_BLUE_DARK = '#60a5fa';
+const ENTRY_BLUE_LIGHT = '#2563eb';
+
+/* The small mono label the rest of the site uses for kickers. */
+const kicker = css`
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.secondary};
+`;
+
+/* One column, as wide as it is tall allows: the level and the clock above the board, the digits in a row beneath it, the actions last. */
 export const GameContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 0;
-  max-width: 100%;
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    gap: 2rem;
-    align-items: center;
-  }
-
-  @media (min-width: 1025px) {
-    flex-direction: row;
-    gap: 2.5rem;
-    align-items: flex-start;
-  }
+  gap: 1.1rem;
+  width: min(100%, 58vh);
+  margin: 0 auto;
 `;
 
-export const BoardSection = styled.div`
+export const TopBar = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+`;
+
+export const Readout = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
 `;
 
 export const StatusBar = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  align-items: baseline;
   gap: 1rem;
 `;
 
-export const ControlsSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  flex: 1;
-  min-width: 0;
-  width: 100%;
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    max-width: 500px;
-  }
-
-  @media (min-width: 1025px) {
-    min-width: 240px;
-    width: auto;
-  }
-`;
-
 export const TimerDisplay = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1.5px solid ${({ theme }) => theme.colors.border};
-  border-radius: 2rem;
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 1rem;
-  font-weight: 600;
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
   color: ${({ theme }) => theme.colors.foreground};
-
-  svg {
-    color: ${({ theme }) => theme.colors.secondary};
-    flex-shrink: 0;
-  }
 `;
 
-export const GridWrapper = styled.div`
+export const ErrorBadge = styled.div<{ $hasErrors: boolean }>`
+  ${kicker}
+  color: ${({ $hasErrors, theme }) =>
+    $hasErrors ? ERROR_RED_TEXT : theme.colors.secondary};
+`;
+
+/* As wide as its column; the cells take their size and their digits from it. */
+export const BoardFrame = styled.div`
   position: relative;
-  border-radius: 0.75rem;
+  container-type: inline-size;
   overflow: hidden;
-  box-shadow:
-    0 0 0 2px ${({ theme }) => theme.colors.foreground},
-    0 8px 32px rgba(0, 0, 0, 0.12);
-
-  @media (max-width: 767px) {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    max-width: 500px;
-    width: 100%;
-  }
+  border: 1px solid ${({ theme }) => theme.colors.foreground};
+  border-radius: 4px;
 `;
 
-export const Grid = styled.div`
+export const BoardGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
@@ -99,41 +79,12 @@ export const Grid = styled.div`
   background: ${({ theme }) => theme.colors.foreground};
 `;
 
-export const Box = styled.div`
+export const BoardBox = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   gap: 1px;
   background: ${({ theme }) => theme.colors.border};
-`;
-
-const cellBase = css`
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  border: none;
-  padding: 0;
-  transition:
-    background-color 80ms ease,
-    transform 80ms ease;
-  user-select: none;
-  position: relative;
-
-  @media (max-width: 767px) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
-    font-size: clamp(1.25rem, 4vw, 1.75rem);
-  }
-
-  @media (min-width: 768px) {
-    width: 48px;
-    height: 48px;
-    font-size: clamp(1.5rem, 2vw, 2rem);
-  }
 `;
 
 export const CellButton = styled.button<{
@@ -144,9 +95,21 @@ export const CellButton = styled.button<{
   $isSameNumber: boolean;
   $isNumberSelected: boolean;
 }>`
-  ${cellBase}
-  font-weight: ${({ $isInitial }) => ($isInitial ? '700' : '500')};
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  font: inherit;
+  font-size: 4.6cqw;
+  font-weight: ${({ $isInitial }) => ($isInitial ? 600 : 400)};
+  font-variant-numeric: tabular-nums;
+  user-select: none;
   cursor: pointer;
+  transition: background-color 80ms ease;
 
   background-color: ${({
     theme,
@@ -156,30 +119,25 @@ export const CellButton = styled.button<{
     $isSameNumber,
     $isNumberSelected,
   }) => {
-    const isDark = theme.colors.foreground === '#FFFFFF';
-    
-    if ($isError) return isDark ? 'rgba(239, 68, 68, 0.25)' : 'rgba(239, 68, 68, 0.15)';
+    const isDark = theme.mode === 'dark';
+
+    if ($isError)
+      return isDark ? 'rgba(239, 68, 68, 0.25)' : 'rgba(239, 68, 68, 0.15)';
     if ($isSelected)
-      return isDark
-        ? 'rgba(59, 130, 246, 0.3)'
-        : 'rgba(0, 0, 0, 0.1)';
+      return isDark ? 'rgba(59, 130, 246, 0.3)' : 'rgba(0, 0, 0, 0.1)';
     if ($isSameNumber || $isNumberSelected)
-      return isDark
-        ? 'rgba(59, 130, 246, 0.18)'
-        : 'rgba(0, 0, 0, 0.06)';
+      return isDark ? 'rgba(59, 130, 246, 0.18)' : 'rgba(0, 0, 0, 0.06)';
     if ($isHighlighted)
-      return isDark
-        ? 'rgba(255, 255, 255, 0.06)'
-        : 'rgba(0, 0, 0, 0.03)';
+      return isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.03)';
     return theme.colors.background;
   }};
 
   color: ${({ theme, $isInitial, $isError }) => {
-    const isDark = theme.colors.foreground === '#FFFFFF';
-    
-    if ($isError) return isDark ? '#ef4444' : '#dc2626';
+    const isDark = theme.mode === 'dark';
+
+    if ($isError) return isDark ? ERROR_RED : ERROR_RED_TEXT;
     if ($isInitial) return theme.colors.foreground;
-    return isDark ? '#60a5fa' : '#2563eb';
+    return isDark ? ENTRY_BLUE_DARK : ENTRY_BLUE_LIGHT;
   }};
 
   &:hover {
@@ -190,20 +148,15 @@ export const CellButton = styled.button<{
       $isSameNumber,
       $isNumberSelected,
     }) => {
-      const isDark = theme.colors.foreground === '#FFFFFF';
-      
-      if ($isError) return isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.2)';
+      const isDark = theme.mode === 'dark';
+
+      if ($isError)
+        return isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.2)';
       if ($isSelected)
-        return isDark
-          ? 'rgba(59, 130, 246, 0.4)'
-          : 'rgba(0, 0, 0, 0.12)';
+        return isDark ? 'rgba(59, 130, 246, 0.4)' : 'rgba(0, 0, 0, 0.12)';
       if ($isSameNumber || $isNumberSelected)
-        return isDark
-          ? 'rgba(59, 130, 246, 0.25)'
-          : 'rgba(0, 0, 0, 0.08)';
-      return isDark
-        ? 'rgba(255, 255, 255, 0.09)'
-        : 'rgba(0, 0, 0, 0.04)';
+        return isDark ? 'rgba(59, 130, 246, 0.25)' : 'rgba(0, 0, 0, 0.08)';
+      return isDark ? 'rgba(255, 255, 255, 0.09)' : 'rgba(0, 0, 0, 0.04)';
     }};
   }
 
@@ -214,233 +167,125 @@ export const CellButton = styled.button<{
   }
 `;
 
-export const NumberPad = styled.div`
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.375rem;
-
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(5, 1fr);
-  }
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    gap: 0.5rem;
-  }
-`;
-
-export const NumberButton = styled.button<{ $isActive?: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1;
-  font-size: clamp(1.25rem, 3.5vw, 1.5rem);
-  font-weight: 700;
-  background: ${({ theme, $isActive }) =>
-    $isActive ? theme.colors.foreground : 'transparent'};
-  border: 2px solid ${({ theme }) => theme.colors.foreground};
-  border-radius: 0.625rem;
-  color: ${({ theme, $isActive }) =>
-    $isActive ? theme.colors.background : theme.colors.foreground};
-  cursor: pointer;
-  transition: all 120ms ease;
-  min-width: clamp(36px, 10vw, 44px);
-  min-height: clamp(36px, 10vw, 44px);
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    min-width: 48px;
-    min-height: 48px;
-    font-size: 1.375rem;
-  }
-
-  &:hover:not(:disabled) {
-    background: ${({ theme, $isActive }) =>
-      $isActive ? theme.colors.foreground : theme.colors.accent};
-    transform: translateY(-1px);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0) scale(0.97);
-  }
-
-  &:focus-visible {
-    outline: 2px solid #2563eb;
-    outline-offset: 2px;
-  }
-
-  &:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-export const ActionRow = styled.div`
-  display: flex;
-  gap: 0.5rem;
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    gap: 0.625rem;
-  }
-`;
-
-export const ActionButton = styled.button<{ $variant?: 'primary' | 'danger' }>`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  background: ${({ theme, $variant }) =>
-    $variant === 'primary'
-      ? theme.colors.foreground
-      : $variant === 'danger'
-        ? 'rgba(239, 68, 68, 0.1)'
-        : 'transparent'};
-  border: 2px solid
-    ${({ theme, $variant }) =>
-      $variant === 'danger' ? '#ef4444' : theme.colors.foreground};
-  border-radius: 0.625rem;
-  color: ${({ theme, $variant }) =>
-    $variant === 'primary'
-      ? theme.colors.background
-      : $variant === 'danger'
-        ? '#ef4444'
-        : theme.colors.foreground};
-  cursor: pointer;
-  transition: all 120ms ease;
-  min-height: 44px;
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    min-height: 48px;
-    font-size: 0.875rem;
-  }
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &:focus-visible {
-    outline: 2px solid #2563eb;
-    outline-offset: 2px;
-  }
-
-  &:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
+export const ControlLabel = styled.span<{ $hidden?: boolean }>`
+  ${kicker}
+  ${({ $hidden }) => $hidden && srOnly}
 `;
 
 export const DifficultyTabs = styled.div`
   display: flex;
   flex-wrap: wrap;
-  border: 2px solid ${({ theme }) => theme.colors.border};
-  border-radius: 0.625rem;
-  padding: 3px;
-  gap: 2px;
-
-  @media (max-width: 400px) {
-    justify-content: center;
-  }
+  gap: 0.5rem 1.4rem;
 `;
 
+/* Plain words; the chosen one is underlined, like the site's links. */
 export const DifficultyTab = styled.button<{ $isActive: boolean }>`
-  flex: 1;
-  min-width: fit-content;
-  padding: 0.5rem 0.5rem;
-  font-size: clamp(0.625rem, 2vw, 0.75rem);
-  font-weight: 600;
+  padding: 0 0 0.3rem;
+  border: 0;
+  border-bottom: 1px solid
+    ${({ $isActive }) => ($isActive ? 'currentColor' : 'transparent')};
+  background: none;
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  background: ${({ $isActive, theme }) =>
-    $isActive ? theme.colors.foreground : 'transparent'};
-  border: none;
-  border-radius: 0.375rem;
-  color: ${({ theme, $isActive }) =>
-    $isActive ? theme.colors.background : theme.colors.secondary};
+  color: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.foreground : theme.colors.secondary};
   cursor: pointer;
-  transition: all 120ms ease;
-  min-height: 36px;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease;
 
-  @media (min-width: 480px) {
-    padding: 0.625rem 0.75rem;
-    letter-spacing: 0.05em;
-  }
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    padding: 0.625rem 0.875rem;
-    font-size: 0.75rem;
-    min-height: 40px;
-  }
-
-  &:hover:not([data-active='true']) {
+  &:hover {
     color: ${({ theme }) => theme.colors.foreground};
-    background: ${({ theme }) => theme.colors.accent};
   }
 
   &:focus-visible {
-    outline: 2px solid #2563eb;
-    outline-offset: -2px;
+    outline: 2px solid ${FOCUS_BLUE};
+    outline-offset: 3px;
   }
 `;
 
-export const Section = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
+export const NumberPad = styled.div`
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 0.4rem;
 `;
 
-export const SectionLabel = styled.span`
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: ${({ theme }) => theme.colors.secondary};
-  padding-left: 2px;
-`;
-
-export const HighScoreItem = styled.div<{ $rank: number }>`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0.625rem;
-  font-size: 0.8125rem;
+export const NumberButton = styled.button<{ $isActive?: boolean }>`
+  aspect-ratio: 1;
+  border: 1px solid
+    ${({ $isActive, theme }) =>
+      $isActive ? theme.colors.foreground : theme.colors.border};
+  border-radius: 4px;
+  background: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.foreground : 'transparent'};
+  color: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.background : theme.colors.foreground};
+  font: inherit;
+  font-size: 1.1rem;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.foreground};
-  background: ${({ $rank, theme }) =>
-    $rank === 1 ? 'rgba(251, 191, 36, 0.12)' : theme.colors.accent};
-  border-radius: 0.375rem;
   font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
 
-  span:first-child {
-    font-size: 1rem;
+  &:hover:not(:disabled) {
+    border-color: ${({ theme }) => theme.colors.foreground};
   }
+
+  &:focus-visible {
+    outline: 2px solid ${FOCUS_BLUE};
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+`;
+
+export const ActionRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.75rem;
+`;
+
+export const Actions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.75rem;
+`;
+
+/* The site's line button; a disabled one just waits. */
+export const ActionButton = styled(LineButton)`
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+`;
+
+export const HighScoreItem = styled.div`
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  color: ${({ theme }) => theme.colors.foreground};
 `;
 
 export const WinOverlay = styled(motion.div)`
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  background: ${({ theme }) =>
-    theme.colors.foreground === '#FFFFFF'
-      ? 'rgba(0, 0, 0, 0.92)'
-      : 'rgba(255, 255, 255, 0.97)'};
-  backdrop-filter: blur(8px);
-  border-radius: 0.5rem;
   z-index: 10;
+  display: grid;
+  place-content: center;
+  gap: 1.5rem;
   padding: 2rem;
+  text-align: center;
+  background: ${({ theme }) => theme.colors.background}f2;
   color: ${({ theme }) => theme.colors.foreground};
 `;
 
@@ -448,63 +293,25 @@ export const WinContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  text-align: center;
+  gap: 0.6rem;
 `;
 
 export const WinTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: inherit;
   margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.display};
+  font-weight: 400;
+  font-size: clamp(2rem, 9cqw, 3rem);
+  line-height: 1;
 `;
 
 export const WinTime = styled.p`
-  font-size: 2rem;
-  font-weight: 700;
-  color: inherit;
   margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 1.25rem;
   font-variant-numeric: tabular-nums;
 `;
 
 export const NewBestBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem 1.25rem;
-  background: ${({ theme }) => theme.colors.foreground};
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.background};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-`;
-
-export const ErrorBadge = styled.div<{ $hasErrors: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
-  border: 1.5px solid
-    ${({ $hasErrors, theme }) => ($hasErrors ? '#ef4444' : theme.colors.border)};
-  border-radius: 2rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: ${({ $hasErrors, theme }) =>
-    $hasErrors ? '#dc2626' : theme.colors.secondary};
-  background: ${({ $hasErrors }) =>
-    $hasErrors ? 'rgba(239, 68, 68, 0.08)' : 'transparent'};
-`;
-
-export const ScreenReaderOnly = styled.span`
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  ${kicker}
+  color: ${({ theme }) => theme.colors.foreground};
 `;

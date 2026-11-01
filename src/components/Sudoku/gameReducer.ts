@@ -1,28 +1,32 @@
 import {
+  cloneGrid,
   findErrors,
   generatePuzzle,
   isGridComplete,
-  saveHighScore,
-} from './sudokuUtils';
+} from './puzzle';
+import { saveHighScore } from './scores';
 import type { CellPosition, SudokuDifficulty, SudokuGameState } from './types';
 
 export type GameAction =
   | { type: 'NEW_GAME'; difficulty: SudokuDifficulty }
-  | { type: 'SELECT_CELL'; cell: CellPosition }
+  | { type: 'SELECT_CELL'; cell: CellPosition | null }
   | { type: 'SET_VALUE'; value: number }
   | { type: 'CLEAR_CELL' }
   | { type: 'UNDO' }
   | { type: 'RESET' }
   | { type: 'AUTO_SOLVE' };
 
+const elapsedSeconds = (startTime: number) =>
+  Math.floor((Date.now() - startTime) / 1000);
+
 export function createInitialState(
   difficulty: SudokuDifficulty,
 ): SudokuGameState {
   const { puzzle, solution } = generatePuzzle(difficulty);
   return {
-    grid: puzzle.map((row) => [...row]),
+    grid: cloneGrid(puzzle),
     solution,
-    initial: puzzle.map((row) => [...row]),
+    initial: cloneGrid(puzzle),
     selectedCell: null,
     isComplete: false,
     errors: new Set(),
@@ -33,6 +37,37 @@ export function createInitialState(
   };
 }
 
+const writeCell = (state: SudokuGameState, value: number): SudokuGameState => {
+  if (!state.selectedCell || state.isComplete) return state;
+  const { row, col } = state.selectedCell;
+  if (state.initial[row][col] !== 0) return state;
+
+  const previousValue = state.grid[row][col];
+  if (previousValue === value) return state;
+
+  const grid = cloneGrid(state.grid);
+  grid[row][col] = value;
+  const history = [...state.history, { row, col, previousValue }];
+  const errors = findErrors(grid, state.solution);
+
+  if (value !== 0 && isGridComplete(grid, state.solution)) {
+    const elapsed = elapsedSeconds(state.startTime);
+    saveHighScore({
+      difficulty: state.difficulty,
+      time: elapsed,
+    });
+    return {
+      ...state,
+      grid,
+      errors,
+      history,
+      isComplete: true,
+      elapsedTime: elapsed,
+    };
+  }
+  return { ...state, grid, errors, history };
+};
+
 export function gameReducer(
   state: SudokuGameState,
   action: GameAction,
@@ -41,106 +76,45 @@ export function gameReducer(
     case 'NEW_GAME':
       return createInitialState(action.difficulty);
 
-    case 'SELECT_CELL': {
+    case 'SELECT_CELL':
       return { ...state, selectedCell: action.cell };
-    }
 
-    case 'SET_VALUE': {
-      if (!state.selectedCell || state.isComplete) return state;
-      const { row, col } = state.selectedCell;
-      if (state.initial[row][col] !== 0) return state;
+    case 'SET_VALUE':
+      return writeCell(state, action.value);
 
-      const previousValue = state.grid[row][col];
-      // Don't add to history if value is the same
-      if (previousValue === action.value) return state;
-
-      const newGrid = state.grid.map((r) => [...r]);
-      newGrid[row][col] = action.value;
-
-      const errors = findErrors(newGrid, state.solution);
-      const isComplete = isGridComplete(newGrid, state.solution);
-
-      // Add to history
-      const historyEntry = { row, col, previousValue, newValue: action.value };
-      const newHistory = [...state.history, historyEntry];
-
-      if (isComplete) {
-        const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
-        saveHighScore({
-          difficulty: state.difficulty,
-          time: elapsed,
-          date: new Date().toISOString(),
-        });
-        return {
-          ...state,
-          grid: newGrid,
-          errors,
-          isComplete,
-          elapsedTime: elapsed,
-          history: newHistory,
-        };
-      }
-
-      return { ...state, grid: newGrid, errors, history: newHistory };
-    }
-
-    case 'CLEAR_CELL': {
-      if (!state.selectedCell || state.isComplete) return state;
-      const { row, col } = state.selectedCell;
-      if (state.initial[row][col] !== 0) return state;
-
-      const previousValue = state.grid[row][col];
-      // Don't add to history if already empty
-      if (previousValue === 0) return state;
-
-      const newGrid = state.grid.map((r) => [...r]);
-      newGrid[row][col] = 0;
-
-      // Add to history
-      const historyEntry = { row, col, previousValue, newValue: 0 };
-      const newHistory = [...state.history, historyEntry];
-
-      const errors = findErrors(newGrid, state.solution);
-      return { ...state, grid: newGrid, errors, history: newHistory };
-    }
+    case 'CLEAR_CELL':
+      return writeCell(state, 0);
 
     case 'UNDO': {
       if (state.history.length === 0 || state.isComplete) return state;
-
-      const newHistory = [...state.history];
-      const lastAction = newHistory.pop()!;
-
-      const newGrid = state.grid.map((r) => [...r]);
-      newGrid[lastAction.row][lastAction.col] = lastAction.previousValue;
-
-      const errors = findErrors(newGrid, state.solution);
+      const history = [...state.history];
+      const lastMove = history.pop()!;
+      const grid = cloneGrid(state.grid);
+      grid[lastMove.row][lastMove.col] = lastMove.previousValue;
       return {
         ...state,
-        grid: newGrid,
-        errors,
-        history: newHistory,
-        selectedCell: { row: lastAction.row, col: lastAction.col },
+        grid,
+        history,
+        errors: findErrors(grid, state.solution),
+        selectedCell: { row: lastMove.row, col: lastMove.col },
       };
     }
 
-    case 'AUTO_SOLVE': {
+    case 'AUTO_SOLVE':
       if (state.isComplete) return state;
-      const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
-      // Don't save to high scores for auto-solve
       return {
         ...state,
-        grid: state.solution.map((r) => [...r]),
+        grid: cloneGrid(state.solution),
         errors: new Set(),
         isComplete: true,
-        elapsedTime: elapsed,
+        elapsedTime: elapsedSeconds(state.startTime),
         selectedCell: null,
       };
-    }
 
     case 'RESET':
       return {
         ...state,
-        grid: state.initial.map((r) => [...r]),
+        grid: cloneGrid(state.initial),
         selectedCell: null,
         isComplete: false,
         errors: new Set(),
